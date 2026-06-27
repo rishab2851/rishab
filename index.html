@@ -13,14 +13,29 @@
             theme: {
                 extend: {
                     colors: {
+                        // Surface and brand palette, now driven by CSS variables so Light, Dark and System themes can swap instantly.
                         corp: {
-                            900: '#0A1128', // Deep Navy Background
-                            800: '#162345', // Sidebar / Card Background
-                            700: '#243B6B', // Borders / Accents
-                            600: '#345494', // Hover states
-                            500: '#436BBE', // Primary Brand
-                            400: '#608DE8', // Highlights
-                        }
+                            900: 'rgb(var(--corp-900) / <alpha-value>)',
+                            800: 'rgb(var(--corp-800) / <alpha-value>)',
+                            700: 'rgb(var(--corp-700) / <alpha-value>)',
+                            600: 'rgb(var(--corp-600) / <alpha-value>)',
+                            500: 'rgb(var(--corp-500) / <alpha-value>)',
+                            400: 'rgb(var(--corp-400) / <alpha-value>)',
+                            300: 'rgb(var(--corp-300) / <alpha-value>)',
+                        },
+                        // Text ink ramp, also variable driven so it flips between light and dark for readability.
+                        white: 'rgb(var(--ink-strong) / <alpha-value>)',
+                        gray: {
+                            100: 'rgb(var(--gray-100) / <alpha-value>)',
+                            200: 'rgb(var(--gray-200) / <alpha-value>)',
+                            300: 'rgb(var(--gray-300) / <alpha-value>)',
+                            400: 'rgb(var(--gray-400) / <alpha-value>)',
+                            500: 'rgb(var(--gray-500) / <alpha-value>)',
+                            600: 'rgb(var(--gray-600) / <alpha-value>)',
+                            700: 'rgb(var(--gray-700) / <alpha-value>)',
+                            800: 'rgb(var(--gray-800) / <alpha-value>)',
+                            900: 'rgb(var(--gray-900) / <alpha-value>)',
+                        },
                     },
                     fontFamily: {
                         sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
@@ -30,6 +45,51 @@
         }
     </script>
     <style>
+        /* ============================================================
+           THEME ENGINE: Light, Dark and System.
+           Every colour token resolves through these CSS variables, so
+           switching themes never touches a single line of markup.
+           Values are space separated RGB triplets to support opacity.
+           ============================================================ */
+        :root, [data-theme="dark"] {
+            --corp-900: 10 17 40;
+            --corp-800: 22 35 69;
+            --corp-700: 36 59 107;
+            --corp-600: 52 84 148;
+            --corp-500: 67 107 190;
+            --corp-400: 96 141 232;
+            --corp-300: 150 180 240;
+            --ink-strong: 255 255 255;
+            --gray-100: 243 244 246;
+            --gray-200: 229 231 235;
+            --gray-300: 209 213 219;
+            --gray-400: 156 163 175;
+            --gray-500: 107 114 128;
+            --gray-600: 75 85 99;
+            --gray-700: 55 65 81;
+            --gray-800: 31 41 55;
+            --gray-900: 17 24 39;
+        }
+        [data-theme="light"] {
+            --corp-900: 238 242 249;   /* page and field surface */
+            --corp-800: 255 255 255;   /* cards, sidebar, modals */
+            --corp-700: 220 227 239;   /* borders and nav states */
+            --corp-600: 61 99 181;     /* primary brand blue */
+            --corp-500: 80 120 201;    /* brand hover blue */
+            --corp-400: 47 86 156;     /* readable blue text on white */
+            --corp-300: 58 96 174;
+            --ink-strong: 17 24 39;    /* strong headings, was white */
+            --gray-100: 31 41 55;
+            --gray-200: 55 65 81;
+            --gray-300: 75 85 99;
+            --gray-400: 100 116 139;
+            --gray-500: 148 163 184;
+            --gray-600: 148 163 184;
+            --gray-700: 203 213 225;
+            --gray-800: 226 232 240;
+            --gray-900: 241 245 249;
+        }
+
         /* Apple-style typography & custom scrollbars */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
@@ -37,9 +97,9 @@
             -moz-osx-font-smoothing: grayscale;
         }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0A1128; }
-        ::-webkit-scrollbar-thumb { background: #243B6B; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #345494; }
+        ::-webkit-scrollbar-track { background: rgb(var(--corp-900)); }
+        ::-webkit-scrollbar-thumb { background: rgb(var(--corp-700)); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgb(var(--corp-600)); }
         
         .resizer { position: absolute; top: 0; right: 0; width: 6px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; }
         .resizer:hover, .resizing { background-color: #436BBE; border-right: 1px solid #608DE8; }
@@ -64,6 +124,21 @@
             .mobile-sidebar-visible { transform: translateX(0); }
         }
     </style>
+    <script>
+        // Apply the saved theme immediately so there is no flash of the wrong theme.
+        (function () {
+            try {
+                var mode = localStorage.getItem('rishab_theme') || 'system';
+                var resolved = mode;
+                if (mode === 'system') {
+                    resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                document.documentElement.setAttribute('data-theme', resolved);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
 </head>
 <body class="bg-corp-900 text-gray-100 h-screen overflow-hidden">
 
@@ -75,22 +150,12 @@
             <h1 class="text-2xl font-bold text-white mb-2 tracking-tight">Rishab OS</h1>
             <p class="text-corp-400 text-sm mb-8 text-center font-medium">Securely access your workspace</p>
             
-            <div id="g_id_onload"
-                 data-client_id="652853887650-v3g4851d8tpc6b1dtv1dc5ckrcjqaegu.apps.googleusercontent.com"
-                 data-context="signin"
-                 data-ux_mode="popup"
-                 data-callback="handleCredentialResponse"
-                 data-auto_prompt="false">
-            </div>
-            <div class="g_id_signin"
-                 data-type="standard"
-                 data-shape="rectangular"
-                 data-theme="outline"
-                 data-text="signin_with"
-                 data-size="large"
-                 data-logo_alignment="left">
-            </div>
+            <button id="signin-btn" onclick="googleAuth(true)" class="w-full flex items-center justify-center gap-3 font-semibold py-3 px-4 rounded-lg shadow transition hover:opacity-90" style="background:#ffffff;color:#3c4043;border:1px solid #dadce0;">
+                <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                Sign in with Google
+            </button>
             <p id="auth-error" class="text-red-400 text-xs mt-4 hidden font-medium text-center">Authentication failed. Please try again.</p>
+            <p id="client-missing" class="text-amber-400 text-xs mt-4 hidden font-medium text-center">Google Client ID is not set yet. Open the file and paste it where marked near the top of the script.</p>
         </div>
     </div>
 
@@ -103,12 +168,12 @@
             </button>
         </div>
 
-        <aside id="sidebar" class="w-64 bg-corp-800 border-r border-corp-700 flex flex-col flex-shrink-0 z-50 overflow-y-auto absolute md:relative h-full transition-transform duration-300 mobile-sidebar-hidden md:translate-x-0 mt-[60px] md:mt-0 pb-[60px] md:pb-0">
+        <aside id="sidebar" class="w-64 bg-corp-800 border-r border-corp-700 flex flex-col flex-shrink-0 z-50 overflow-y-auto absolute md:relative h-full transition-transform duration-300 mobile-sidebar-hidden md:translate-x-0 mt-[60px] md:mt-0 pb-[130px] md:pb-0">
             <div class="p-5 pb-2 hidden md:block">
                 <h1 class="text-xl font-bold text-white tracking-wide">Rishab OS</h1>
             </div>
             
-            <nav class="flex flex-col gap-1 p-3 flex-1 select-none pb-20">
+            <nav class="flex flex-col gap-1 p-3 flex-1 select-none pb-36">
                 
                 <div class="group flex items-center justify-between px-3 py-2 rounded hover:bg-corp-700 transition cursor-pointer text-gray-300 hover:text-white" onclick="switchTab('home')" id="nav-home">
                     <div class="flex items-center gap-2"><span class="text-lg">🏠</span> <span contenteditable="false" class="outline-none focus:bg-corp-900 focus:px-1 rounded text-sm font-medium transition-all">Home</span></div>
@@ -155,11 +220,26 @@
 
             </nav>
 
-            <div class="absolute bottom-0 left-0 w-full p-4 flex items-center justify-between border-t border-corp-700 bg-corp-800">
-                <span class="text-xs text-gray-500 font-medium tracking-wide">Master Build V25</span>
-                <button onclick="togglePrivacy()" class="text-gray-500 hover:text-gray-300 transition text-lg leading-none" title="Toggle Global Privacy Mode">
-                    <span id="eye-icon">👁️</span>
-                </button>
+            <div class="absolute bottom-0 left-0 w-full border-t border-corp-700 bg-corp-800">
+                <div class="flex items-center justify-between gap-2 px-4 pt-3 pb-2">
+                    <div class="flex items-center gap-0.5 bg-corp-900 border border-corp-700 rounded-lg p-0.5" title="Appearance">
+                        <button onclick="setThemeMode('light')" id="thm-light" class="px-2 py-1 rounded text-xs transition" title="Light">☀️</button>
+                        <button onclick="setThemeMode('dark')" id="thm-dark" class="px-2 py-1 rounded text-xs transition" title="Dark">🌙</button>
+                        <button onclick="setThemeMode('system')" id="thm-system" class="px-2 py-1 rounded text-xs transition" title="System">💻</button>
+                    </div>
+                    <button onclick="logout()" class="flex items-center gap-1.5 text-xs font-medium text-gray-300 hover:text-white bg-corp-900 hover:bg-corp-700 border border-corp-700 rounded-lg px-3 py-1.5 transition" title="Log out and lock the workspace">
+                        <span class="leading-none">⏻</span> Log out
+                    </button>
+                </div>
+                <div class="px-4 pb-1">
+                    <span id="sync-status" class="text-[10px] text-gray-500 font-medium tracking-wide truncate block">Local only</span>
+                </div>
+                <div class="flex items-center justify-between px-4 pb-3 pt-1 border-t border-corp-700/60">
+                    <span class="text-xs text-gray-500 font-medium tracking-wide">Master Build V25</span>
+                    <button onclick="togglePrivacy()" class="text-gray-500 hover:text-gray-300 transition text-lg leading-none" title="Toggle Global Privacy Mode">
+                        <span id="eye-icon">👁️</span>
+                    </button>
+                </div>
             </div>
         </aside>
 
@@ -300,7 +380,7 @@
                     <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Cashflow Analytics</h2>
                     <div class="flex items-center gap-3">
                         <span class="text-sm text-gray-400">Timeframe:</span>
-                        <input type="month" id="analytics-month" value="2026-06" onchange="renderCashflowAnalytics()" class="bg-corp-800 border border-corp-700 rounded-lg px-3 py-1.5 text-sm text-white outline-none focus:border-corp-500 cursor-pointer transition">
+                        <input type="month" id="analytics-month" onchange="renderCashflowAnalytics()" class="bg-corp-800 border border-corp-700 rounded-lg px-3 py-1.5 text-sm text-white outline-none focus:border-corp-500 cursor-pointer transition">
                     </div>
                 </div>
 
@@ -529,6 +609,15 @@
     </div>
 
     <script>
+        // ==========================================================
+        //  GOOGLE SETUP  >>>  PASTE YOUR CLIENT ID ON THE LINE BELOW
+        //  Get it from Google Cloud Console, OAuth 2.0 Client IDs.
+        //  Keep the quotes. Nothing else here needs to change.
+        // ==========================================================
+        const CLIENT_ID = "652853887650-v3g4851d8tpc6b1dtv1dc5ckrcjqaegu.apps.googleusercontent.com";
+        const SCOPES = "https://www.googleapis.com/auth/drive.file";
+        // ==========================================================
+
         // ==========================================
         // GOOGLE OAUTH HANDLING
         // ==========================================
@@ -565,13 +654,7 @@
         // ==========================================
         // V25 BUDGET CONFIGURATION ENGINE
         // ==========================================
-        let userBudget = JSON.parse(localStorage.getItem('rishab_budget')) || {
-            global: 50000,
-            categories: { 
-                'Rent': 18000, 'Food': 10000, 'Transit': 2000, 'Petrol': 2500, 
-                'Groceries': 5000, 'Flat Exp': 2000, 'Snacks': 1000, 'Shopping': 2000, 'Other': 2000 
-            }
-        };
+        let userBudget = { global: 0, categories: {} };
 
         function openBudgetManager() {
             document.getElementById('bm-global').value = userBudget.global;
@@ -636,7 +719,12 @@
         // ==========================================
         // COMMON ENGINE CORE & SIDEBAR LOGIC
         // ==========================================
-        const TODAY = new Date('2026-06-26T12:00:00'); 
+        const TODAY = new Date();
+        // Returns an ISO style string for TODAY using local calendar fields, so the date stays correct in IST even after midnight.
+        function todayISO() {
+            const d = TODAY;
+            return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString();
+        }
         let isPrivate = false;
 
         function updateGreeting() {
@@ -697,7 +785,7 @@
 
             if(tabId === 'home') { updateGreeting(); renderHomeWidgets(); }
             if(tabId === 'finance') renderAccounts();
-            if(tabId === 'recurring') renderRecTable();
+            if(tabId === 'recurring') { populateModeDropdown(); renderRecTable(); }
             if(tabId === 'record') renderRecordForm();
             if(tabId === 'analytics') renderCashflowAnalytics();
             if(tabId === 'tasks') renderTaskTable();
@@ -723,15 +811,7 @@
         // ==========================================
         // 1. FINANCE & LEDGER MODULE
         // ==========================================
-        let accounts = [
-            { id: 'acc_1', name: 'Axis Bank UPI', type: 'asset', balance: 45000 },
-            { id: 'acc_2', name: 'SBI UPI', type: 'asset', balance: 120000 },
-            { id: 'acc_3', name: 'AU Bank UPI', type: 'asset', balance: 35000 },
-            { id: 'acc_4', name: 'Cash', type: 'asset', balance: 5000 },
-            { id: 'acc_5', name: 'Mutual Funds', type: 'asset', balance: 250000 },
-            { id: 'acc_6', name: 'SBI CC', type: 'liability', balance: 31762 },
-            { id: 'acc_7', name: 'AU CC', type: 'liability', balance: 8500 }
-        ];
+        let accounts = [];
 
         function addAccount(e) { e.preventDefault(); accounts.push({ id: 'acc_' + Date.now(), name: document.getElementById('acc-name').value, type: document.getElementById('acc-type').value, balance: Number(document.getElementById('acc-balance').value) }); document.getElementById('finance-form').reset(); renderAccounts(); populateModeDropdown(); }
         function updateAccount(id, field, value) { const acc = accounts.find(a => a.id === id); if(acc) acc[field] = field === 'balance' ? Number(value) : value; renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
@@ -760,17 +840,13 @@
         // ==========================================
         // 2. UNIVERSAL TRANSACTIONS
         // ==========================================
-        let transactionsDB = [
-            { id: 1, type: 'expense', amount: 350, category: 'Food', emoji: '🍔', desc: 'Meghana Foods', date: '2026-06-23', modeId: 'acc_1', tags: ['GIES-Closure'] },
-            { id: 2, type: 'expense', amount: 1500, category: 'Petrol', emoji: '⛽', desc: 'Shell Station', date: '2026-06-20', modeId: 'acc_2', tags: [] },
-            { id: 3, type: 'income', amount: 45000, category: 'Salary', emoji: '💼', desc: 'Acme Corp', date: '2026-06-01', modeId: 'acc_2', tags: [] }
-        ];
+        let transactionsDB = [];
 
         let currTxType = 'expense';
         const expChipsData = [ { cat: 'Food', emo: '🍔' }, { cat: 'Transit', emo: '🚕' }, { cat: 'Petrol', emo: '⛽' }, { cat: 'Flat Exp', emo: '🏠' }, { cat: 'Groceries', emo: '🛒' }, { cat: 'Snacks', emo: '☕' }, { cat: 'Shopping', emo: '🛍️' }, { cat: 'Other', emo: '➕' } ];
         const incChipsData = [ { cat: 'Salary', emo: '💼' }, { cat: 'Freelance', emo: '💻' }, { cat: 'Dividend', emo: '📈' }, { cat: 'Commission', emo: '🤝' }, { cat: 'Gift', emo: '🎁' }, { cat: 'Refund', emo: '🔄' }, { cat: 'Other', emo: '➕' } ];
 
-        function renderRecordForm() { document.getElementById('tx-date').value = TODAY.toISOString().split('T')[0]; renderTxChips(); }
+        function renderRecordForm() { populateModeDropdown(); document.getElementById('tx-date').value = todayISO().split('T')[0]; renderTxChips(); }
 
         function setTxType(type) {
             currTxType = type;
@@ -995,10 +1071,10 @@
         // HOME DASHBOARD ENGINE
         // ==========================================
         function renderHomeWidgets() {
-            const todayStr = TODAY.toISOString().split('T')[0];
+            const todayStr = todayISO().split('T')[0];
             const tomorrow = new Date(TODAY); tomorrow.setDate(tomorrow.getDate() + 1);
             const tomorrowStr = tomorrow.toISOString().split('T')[0];
-            const currMonth = TODAY.toISOString().slice(0,7);
+            const currMonth = todayISO().slice(0,7);
 
             const folderSelect = document.getElementById('scratch-folder');
             folderSelect.innerHTML = folders.map(f => `<option value="${f.id}" ${f.name.includes('Brainstorming')?'selected':''}>${f.name}</option>`).join('');
@@ -1077,10 +1153,7 @@
         // ==========================================
         // DOCUMENTS VAULT
         // ==========================================
-        let docsDB = [
-            { id: 'd1', name: 'PAN Card Copy', category: 'Identity', expiry: '', link: '#', tags: ['Personal'] },
-            { id: 'd2', name: 'Car PUC Certificate', category: 'Vehicle', expiry: '2026-06-26', link: '#', tags: ['Hyundai'] }
-        ];
+        let docsDB = [];
 
         function addDocument(e) {
             e.preventDefault(); const tagsInput = document.getElementById('doc-tags').value;
@@ -1091,7 +1164,7 @@
         function delDoc(id) { if(confirm("Remove this document from the vault?")) { docsDB = docsDB.filter(d => d.id !== id); renderDocs(); renderHomeWidgets(); } }
 
         function renderDocs() {
-            const grid = document.getElementById('docs-grid'); const filterText = (document.getElementById('doc-search').value || '').toLowerCase(); const todayStr = TODAY.toISOString().split('T')[0];
+            const grid = document.getElementById('docs-grid'); const filterText = (document.getElementById('doc-search').value || '').toLowerCase(); const todayStr = todayISO().split('T')[0];
             let filtered = docsDB.filter(d => d.name.toLowerCase().includes(filterText) || d.category.toLowerCase().includes(filterText) || (d.tags && d.tags.join(' ').toLowerCase().includes(filterText)));
             grid.innerHTML = '';
             if(filtered.length === 0) { grid.innerHTML = `<p class="text-sm text-gray-500 italic col-span-full">No documents found.</p>`; return; }
@@ -1148,9 +1221,9 @@
         // ==========================================
         let recSortAscending = true;
         let recCols = [ { id: 'done', label: '✔', fixed: true, width: '40px' }, { id: 'name', label: 'Aa Bill', width: '220px' }, { id: 'tags', label: '🏷 Tags', width: '130px' }, { id: 'type', label: '🗂 Type', width: '130px' }, { id: 'amount', label: '# Amount', width: '110px' }, { id: 'date', label: '📅 Due date', width: '130px' }, { id: 'status', label: '🔆 Status', width: '130px' }, { id: 'mode', label: '💳 Mode', width: '150px' }, { id: 'recurring', label: '🔄 Recurring', width: '100px' }, { id: 'actions', label: '✕', fixed: true, width: '50px' } ];
-        let recDB = [ { id: 1, name: 'Netflix', type: 'Subscription', amount: 199, date: '2026-06-15', modeId: 'acc_6', recurring: true, done: false, status: 'Overdue', tags: ['Personal'], custom: {} }, { id: 2, name: 'Rent', type: 'Rent', amount: 18000, date: '2026-06-28', modeId: 'acc_2', recurring: true, done: false, status: 'Due', tags: ['Housing'], custom: {} }, { id: 3, name: 'SIP', type: 'Investments', amount: 10000, date: '2026-06-05', modeId: 'acc_2', recurring: true, done: true, status: 'Paid', tags: ['Investments'], custom: {} } ];
+        let recDB = [];
 
-        function evalRecStatus(dateStr) { const tgt = new Date(dateStr + 'T00:00:00'); const today = new Date(TODAY.toISOString().split('T')[0]+'T00:00:00'); if (tgt < today) return 'Overdue'; if (tgt.getMonth() === today.getMonth() && tgt.getFullYear() === today.getFullYear()) return 'Due'; return 'Upcoming'; }
+        function evalRecStatus(dateStr) { const tgt = new Date(dateStr + 'T00:00:00'); const today = new Date(todayISO().split('T')[0]+'T00:00:00'); if (tgt < today) return 'Overdue'; if (tgt.getMonth() === today.getMonth() && tgt.getFullYear() === today.getFullYear()) return 'Due'; return 'Upcoming'; }
 
         function addRecurring(e) { e.preventDefault(); const dateStr = document.getElementById('rec-date').value; const tagsInput = document.getElementById('rec-tags-input').value; recDB.push({ id: Date.now(), name: document.getElementById('rec-name').value, type: document.getElementById('rec-type').value, amount: document.getElementById('rec-amount').value, date: dateStr, modeId: document.getElementById('rec-mode').value, recurring: true, done: false, status: evalRecStatus(dateStr), tags: parseTags(tagsInput), custom: {} }); document.getElementById('rec-form').reset(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
         function toggleRecPaid(id, isChecked) { const item = recDB.find(r => r.id === id); if(!item) return; if(item.done === isChecked) return; const success = processTransaction(item, !isChecked); if(!success) { renderRecTable(); return; } item.done = isChecked; item.status = isChecked ? 'Paid' : evalRecStatus(item.date); if(isChecked && item.recurring) { let oldD = new Date(item.date); oldD.setMonth(oldD.getMonth() + 1); recDB.push({ ...item, id: Date.now() + Math.floor(Math.random()*100), date: oldD.toISOString().split('T')[0], done: false, status: 'Upcoming', custom: {...item.custom} }); } renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
@@ -1210,7 +1283,7 @@
         // ==========================================
         let tSortAsc = true;
         let tCols = [ { id: 'done', label: '✔', fixed: true, width: '40px' }, { id: 'name', label: 'Aa Task Name', width: '220px' }, { id: 'client_name', label: '🏢 Client Name', width: '160px' }, { id: 'tags', label: '🏷 Tags', width: '130px' }, { id: 'category', label: '🗂 Category', width: '110px' }, { id: 'status', label: '🔆 Status', width: '180px' }, { id: 'date', label: '📅 Due Date', width: '130px' }, { id: 'recurring', label: '🔄 Recurring', width: '100px' }, { id: 'actions', label: '✕', fixed: true, width: '50px' } ];
-        let tDB = [ { id: 1, name: "Prepare detailed tax checklist", client_name: "Y H C & Associates", category: "Work", tags: ["GIES-Closure"], date: "2026-06-25", status: "Preparation", recurring: false, done: false, customData: {} } ];
+        let tDB = [];
 
         function addTask(e) { e.preventDefault(); const tagsIn = document.getElementById('task-tags-input').value; tDB.push({ id: Date.now(), name: document.getElementById('task-name').value, client_name: document.getElementById('task-client-name').value || "-", category: document.getElementById('task-category').value, tags: parseTags(tagsIn), date: document.getElementById('task-date').value, status: document.getElementById('task-status').value, recurring: document.getElementById('task-recurring').checked, done: (document.getElementById('task-status').value === "Done"), customData: {} }); document.getElementById('task-form').reset(); renderTaskTable(); renderHomeWidgets(); }
         function toggleTaskDone(id) { const t = tDB.find(x => x.id === id); if(!t) return; t.done = !t.done; t.status = t.done ? "Done" : "Not started"; if(t.done && t.recurring) { let old = new Date(t.date); old.setMonth(old.getMonth()+1); tDB.push({...t, id:Date.now(), date:old.toISOString().split('T')[0], done:false, status:"Not started", customData:{...t.customData}}); } renderTaskTable(); renderHomeWidgets(); }
@@ -1273,8 +1346,8 @@
         // ==========================================
         // KNOWLEDGE BASE (NOTES) MODULE & DRAG/DROP
         // ==========================================
-        let folders = [ { id: 'f1', name: '🏢 Clients' }, { id: 'f2', name: '💡 Brainstorming' }, { id: 'f3', name: '👤 Personal' } ];
-        let notesDB = [ { id: 'n1', folderId: 'f1', title: 'GIES Closure Plan', content: 'Discussion points for tomorrow:\n<br><input type="checkbox" class="note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer" onclick="toggleNoteTask(this)"><span class="task-text">Review Q2 inventory logic</span>\n<br><input type="checkbox" class="note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer" onclick="toggleNoteTask(this)"><span class="task-text">Send Form 1065 checklist</span><br><br>Related to #GIES-Closure' } ];
+        let folders = [];
+        let notesDB = [];
         let activeNoteId = null;
 
         function renderNotesSidebar() {
@@ -1310,19 +1383,334 @@
         function deleteCurrentNote() { if(!activeNoteId) return; if(!confirm("Are you sure you want to delete this note?")) return; notesDB = notesDB.filter(n => n.id !== activeNoteId); activeNoteId = null; renderNotesSidebar(); }
         function handleEditorShortcuts(e) { if(e.code === 'Space') { const sel = window.getSelection(); if (!sel.rangeCount) return; const node = sel.anchorNode; if(node.nodeType === 3 && node.textContent.endsWith('[ ]')) { e.preventDefault(); node.textContent = node.textContent.slice(0, -3); const range = sel.getRangeAt(0); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)'); const span = document.createElement('span'); span.className = 'task-text'; span.innerHTML = '&#8203;'; range.insertNode(span); range.insertNode(cb); range.setStart(span, 1); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); saveNoteState(); } } }
         function toggleNoteTask(cb) { if(cb.nextSibling && cb.nextSibling.classList.contains('task-text')) { if(cb.checked) { cb.nextSibling.style.textDecoration = 'line-through'; cb.nextSibling.style.opacity = '0.5'; } else { cb.nextSibling.style.textDecoration = 'none'; cb.nextSibling.style.opacity = '1'; } } const taskId = cb.getAttribute('data-task-id'); if(taskId) { const t = tDB.find(x => x.id == taskId); if(t) { t.done = cb.checked; t.status = t.done ? 'Done' : 'Not started'; renderTaskTable(); renderHomeWidgets(); } } saveNoteState(); }
-        function syncTasksToApp() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(!note) return; const editor = document.getElementById('note-editor'); const checkboxes = editor.querySelectorAll('.note-cb'); let count = 0; checkboxes.forEach(cb => { if(!cb.hasAttribute('data-task-id')) { const textNode = cb.nextSibling; const taskName = textNode ? textNode.textContent.replace(/\u200B/g, '').trim() : ''; if(taskName) { const newTaskId = Date.now() + count; cb.setAttribute('data-task-id', newTaskId); tDB.push({ id: newTaskId, name: taskName, client_name: note.title || "Note Sync", category: "Work", date: TODAY.toISOString().split('T')[0], status: cb.checked ? "Done" : "Not started", recurring: false, done: cb.checked, tags: [], customData: {} }); count++; } } }); saveNoteState(); if(count > 0) { alert(`⚡ Magic Sync Complete!\n\nSuccessfully beamed ${count} new action item(s) to your Task Tracker.`); renderTaskTable(); renderHomeWidgets(); } else { alert(`No new unsynced to-dos found.\n\nTip: Type "[ ] " and hit space to create a new task.`); } }
+        function syncTasksToApp() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(!note) return; const editor = document.getElementById('note-editor'); const checkboxes = editor.querySelectorAll('.note-cb'); let count = 0; checkboxes.forEach(cb => { if(!cb.hasAttribute('data-task-id')) { const textNode = cb.nextSibling; const taskName = textNode ? textNode.textContent.replace(/\u200B/g, '').trim() : ''; if(taskName) { const newTaskId = Date.now() + count; cb.setAttribute('data-task-id', newTaskId); tDB.push({ id: newTaskId, name: taskName, client_name: note.title || "Note Sync", category: "Work", date: todayISO().split('T')[0], status: cb.checked ? "Done" : "Not started", recurring: false, done: cb.checked, tags: [], customData: {} }); count++; } } }); saveNoteState(); if(count > 0) { alert(`⚡ Magic Sync Complete!\n\nSuccessfully beamed ${count} new action item(s) to your Task Tracker.`); renderTaskTable(); renderHomeWidgets(); } else { alert(`No new unsynced to-dos found.\n\nTip: Type "[ ] " and hit space to create a new task.`); } }
 
-        // ==========================================
-        // INITIALIZE APP
-        // ==========================================
-        // Note: switchTab('home') is now called only AFTER a successful Google Login.
-        populateModeDropdown();
-        renderAccounts();
-        renderRecTable();
-        renderCashflowAnalytics();
-        renderTaskTable();
-        renderNotesSidebar();
-        renderDocs();
+        // ==========================================================
+        // PAYMENT MODE DROPDOWN
+        // Fills the Record and Recurring forms with the user's accounts.
+        // ==========================================================
+        function populateModeDropdown() {
+            const opts = accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+            const tx = document.getElementById('tx-mode'); if (tx) tx.innerHTML = opts;
+            const rec = document.getElementById('rec-mode'); if (rec) rec.innerHTML = opts;
+        }
+
+        // ==========================================================
+        // UNIFIED STATE (LOCAL + GOOGLE DRIVE)
+        // All data lives in one object saved to localStorage and to a
+        // single backup.json inside a "Rishab OS" folder in your Drive.
+        // The Drive logic mirrors the synchronisation engine you supplied.
+        // ==========================================================
+        const LOCAL_KEY = 'rishab_os_state_v1';
+        const DRIVE_FOLDER = 'Rishab OS';
+        const DRIVE_FILE = 'backup.json';
+
+        let googleToken = null;
+        let driveFolderId = null;
+        let driveFileId = null;
+        let useCloud = false;
+        let syncing = false;
+        let needsSync = false;
+        let saveTimer = null;
+        let hydrating = true;        // true while loading; blocks saves so cloud data is never overwritten by blanks
+        let authMode = 'interactive';
+        let tokenClient = null;
+
+        function collectState() {
+            return {
+                accounts, transactionsDB, recDB, recCols, tDB, tCols,
+                notesDB, folders, docsDB, userBudget,
+                savedAt: new Date().toISOString()
+            };
+        }
+
+        function applyState(d) {
+            if (!d || typeof d !== 'object') return;
+            if (Array.isArray(d.accounts)) accounts = d.accounts;
+            if (Array.isArray(d.transactionsDB)) transactionsDB = d.transactionsDB;
+            if (Array.isArray(d.recDB)) recDB = d.recDB;
+            if (Array.isArray(d.recCols)) recCols = d.recCols;
+            if (Array.isArray(d.tDB)) tDB = d.tDB;
+            if (Array.isArray(d.tCols)) tCols = d.tCols;
+            if (Array.isArray(d.notesDB)) notesDB = d.notesDB;
+            if (Array.isArray(d.folders)) folders = d.folders;
+            if (Array.isArray(d.docsDB)) docsDB = d.docsDB;
+            if (d.userBudget && typeof d.userBudget === 'object') userBudget = d.userBudget;
+            populateModeDropdown();
+            renderAccounts(); renderRecTable(); renderTaskTable(); renderDocs();
+            renderNotesSidebar(); renderCashflowAnalytics(); renderHomeWidgets();
+        }
+
+        function persistLocal() {
+            try { localStorage.setItem(LOCAL_KEY, JSON.stringify(collectState())); } catch (e) {}
+        }
+
+        function scheduleSave() {
+            if (hydrating) return;            // never save mid load
+            persistLocal();                   // local copy is always immediate
+            if (!useCloud) return;
+            if (saveTimer) clearTimeout(saveTimer);
+            saveTimer = setTimeout(syncToCloud, 1500);   // debounced cloud push
+        }
+
+        function setSyncStatus(text) {
+            const el = document.getElementById('sync-status');
+            if (el) el.textContent = text;
+        }
+
+        // ----- Google Drive engine (adapted from the supplied study.html) -----
+        async function initializeCloudSync() {
+            const headers = { Authorization: `Bearer ${googleToken}` };
+
+            // Find or create the Rishab OS folder.
+            const fQ = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent("name='" + DRIVE_FOLDER + "' and mimeType='application/vnd.google-apps.folder' and trashed=false")}&fields=files(id)`, { headers });
+            const fData = await fQ.json();
+            if (fData.files && fData.files.length > 0) {
+                driveFolderId = fData.files[0].id;
+            } else {
+                const cr = await fetch('https://www.googleapis.com/drive/v3/files', {
+                    method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: DRIVE_FOLDER, mimeType: 'application/vnd.google-apps.folder' })
+                });
+                driveFolderId = (await cr.json()).id;
+            }
+
+            // Find the backup file inside that folder.
+            const bQ = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`'${driveFolderId}' in parents and name='${DRIVE_FILE}' and trashed=false`)}&fields=files(id)`, { headers });
+            const bData = await bQ.json();
+            if (bData.files && bData.files.length > 0) {
+                driveFileId = bData.files[0].id;
+                const cloudRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, { headers });
+                const cloudData = await cloudRes.json();
+                if (cloudData && typeof cloudData === 'object') {
+                    applyState(cloudData);
+                    persistLocal();
+                }
+            }
+        }
+
+        async function syncToCloud() {
+            if (!googleToken || !driveFolderId) return;
+            if (syncing) { needsSync = true; return; }
+            syncing = true; needsSync = false;
+            setSyncStatus('Syncing...');
+            try {
+                const boundary = 'rishab_boundary_' + Date.now();
+                const metadata = { name: DRIVE_FILE, mimeType: 'application/json' };
+                if (!driveFileId) metadata.parents = [driveFolderId];
+
+                const blob = new Blob([JSON.stringify(collectState())], { type: 'application/json' });
+                const delimiter = `\r\n--${boundary}\r\n`;
+                const closeDelimiter = `\r\n--${boundary}--`;
+                const body = new Blob([
+                    delimiter,
+                    'Content-Type: application/json; charset=UTF-8\r\n\r\n',
+                    JSON.stringify(metadata),
+                    delimiter,
+                    'Content-Type: application/json\r\n\r\n',
+                    blob,
+                    closeDelimiter
+                ]);
+
+                const url = driveFileId
+                    ? `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`
+                    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+
+                const res = await fetch(url, {
+                    method: driveFileId ? 'PATCH' : 'POST',
+                    headers: { Authorization: `Bearer ${googleToken}`, 'Content-Type': `multipart/related; boundary=${boundary}` },
+                    body: body
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    // Token expired during a long session. Refresh silently then re sync.
+                    needsSync = true;
+                    setSyncStatus('Reconnecting...');
+                    googleAuth(false);
+                    return;
+                }
+                if (!res.ok) { const er = await res.json().catch(() => ({})); throw new Error((er.error && er.error.message) || 'Sync failed'); }
+
+                const data = await res.json();
+                if (data.id) {
+                    driveFileId = data.id;
+                    const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    setSyncStatus('Cloud synced ' + t);
+                }
+            } catch (e) {
+                console.error('Sync Error:', e);
+                setSyncStatus('Sync error, will retry');
+            } finally {
+                syncing = false;
+                if (needsSync) syncToCloud();
+            }
+        }
+
+        // ----- Authentication (OAuth token client, can reach Drive) -----
+        function whenGoogleReady(cb, tries) {
+            tries = tries || 0;
+            if (window.google && google.accounts && google.accounts.oauth2) return cb();
+            if (tries > 60) { setSyncStatus('Google not reachable'); return; }
+            setTimeout(() => whenGoogleReady(cb, tries + 1), 100);
+        }
+
+        function initTokenClientOnce() {
+            if (tokenClient) return;
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: async (res) => {
+                    if (res && res.error) {
+                        if (authMode === 'silent') {
+                            // Could not restore quietly. Keep the user in the app with their cached data.
+                            hydrating = false; useCloud = false;
+                            setSyncStatus('Cloud paused, click Log out then sign in to reconnect');
+                        } else {
+                            document.getElementById('auth-error').classList.remove('hidden');
+                        }
+                        return;
+                    }
+                    googleToken = res.access_token;
+                    localStorage.setItem('rishab_cloud', 'true');
+                    if (authMode === 'interactive') revealApp();
+                    await finalizeCloud();
+                }
+            });
+        }
+
+        function googleAuth(interactive) {
+            if (!CLIENT_ID || CLIENT_ID.indexOf('PASTE_YOUR') !== -1) {
+                document.getElementById('client-missing').classList.remove('hidden');
+                return;
+            }
+            authMode = interactive ? 'interactive' : 'silent';
+            whenGoogleReady(() => {
+                initTokenClientOnce();
+                interactive ? tokenClient.requestAccessToken() : tokenClient.requestAccessToken({ prompt: 'none' });
+            });
+        }
+
+        function revealApp() {
+            const auth = document.getElementById('auth-screen');
+            auth.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => auth.classList.add('hidden'), 500);
+            document.getElementById('main-app').classList.remove('hidden');
+            const am = document.getElementById('analytics-month');
+            if (am && !am.value) am.value = todayISO().slice(0, 7);
+            switchTab('home');
+        }
+
+        async function finalizeCloud() {
+            try {
+                if (googleToken) { useCloud = true; await initializeCloudSync(); }
+            } catch (e) {
+                console.error('Cloud init error:', e);
+                setSyncStatus('Cloud error, using local copy');
+            } finally {
+                populateModeDropdown();
+                hydrating = false;
+                persistLocal();
+                if (useCloud) {
+                    if (!driveFileId) { syncToCloud(); }   // create backup.json on first ever login
+                    else { setSyncStatus('Cloud synced'); }
+                } else {
+                    setSyncStatus('Local only');
+                }
+            }
+        }
+
+        function logout() {
+            if (!confirm('Log out and lock this workspace on this device? Your data stays safe in your Google Drive and returns when you sign in again.')) return;
+            try { if (googleToken && window.google && google.accounts && google.accounts.oauth2) google.accounts.oauth2.revoke(googleToken, () => {}); } catch (e) {}
+            // Wipe the local cache so a shared computer keeps nothing. Drive remains the trusted source.
+            localStorage.removeItem(LOCAL_KEY);
+            localStorage.removeItem('rishab_cloud');
+            localStorage.removeItem('rishab_budget');
+            googleToken = null;
+            location.reload();
+        }
+
+        // ----- Theme control -----
+        function setThemeMode(mode) {
+            localStorage.setItem('rishab_theme', mode);
+            applyTheme(mode);
+            updateThemeButtons(mode);
+        }
+        function applyTheme(mode) {
+            let resolved = mode;
+            if (mode === 'system') {
+                resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', resolved);
+        }
+        function updateThemeButtons(mode) {
+            ['light', 'dark', 'system'].forEach(m => {
+                const b = document.getElementById('thm-' + m);
+                if (!b) return;
+                if (m === mode) { b.classList.add('bg-corp-600', 'text-white'); b.classList.remove('text-gray-400'); }
+                else { b.classList.remove('bg-corp-600', 'text-white'); b.classList.add('text-gray-400'); }
+            });
+        }
+        // Keep the System option live if the device switches appearance.
+        try {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if ((localStorage.getItem('rishab_theme') || 'system') === 'system') applyTheme('system');
+            });
+        } catch (e) {}
+
+        // ==========================================================
+        // AUTO SAVE: wrap the existing render functions so every data
+        // change is persisted. Calculations are untouched; we only add
+        // a save after each redraw. Saves are blocked while hydrating.
+        // ==========================================================
+        (function () {
+            const toWrap = ['renderAccounts', 'renderRecTable', 'renderTaskTable', 'renderDocs', 'renderNotesSidebar', 'saveNoteState', 'renderCashflowAnalytics', 'renderHomeWidgets'];
+            toWrap.forEach(name => {
+                const orig = window[name];
+                if (typeof orig !== 'function') return;
+                window[name] = function () {
+                    const r = orig.apply(this, arguments);
+                    scheduleSave();
+                    return r;
+                };
+            });
+        })();
+
+        // ==========================================================
+        // BOOTSTRAP
+        // ==========================================================
+        (function init() {
+            // Default the analytics month to the current month before anything renders.
+            try { const am = document.getElementById('analytics-month'); if (am && !am.value) am.value = todayISO().slice(0, 7); } catch (e) {}
+
+            // Theme buttons reflect the saved choice.
+            const themeMode = localStorage.getItem('rishab_theme') || 'system';
+            updateThemeButtons(themeMode);
+
+            // Load the last local copy first so the app shows instantly.
+            hydrating = true;
+            try {
+                const cached = localStorage.getItem(LOCAL_KEY);
+                if (cached) applyState(JSON.parse(cached));
+            } catch (e) {}
+
+            const wasCloud = localStorage.getItem('rishab_cloud') === 'true';
+            if (wasCloud) {
+                // Returning user: skip the sign in screen and restore the Drive session silently.
+                revealApp();
+                setSyncStatus('Reconnecting to Drive...');
+                googleAuth(false);
+                // Safety net: if the silent restore stalls, unlock local saving so edits are not lost.
+                setTimeout(() => { if (hydrating) { hydrating = false; if (!useCloud) setSyncStatus('Cloud paused, working locally'); } }, 9000);
+            } else {
+                // First visit on this device: show the sign in screen.
+                hydrating = false;
+                if (!CLIENT_ID || CLIENT_ID.indexOf('PASTE_YOUR') !== -1) {
+                    const cm = document.getElementById('client-missing');
+                    if (cm) cm.classList.remove('hidden');
+                }
+            }
+        })();
 
     </script>
 </body>
