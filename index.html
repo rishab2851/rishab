@@ -4,38 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rishab OS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <script>
-        // Tailwind Configuration for Corporate Blue Theme
+        // Tailwind Configuration for Premium Corporate Blue Theme
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        // Surface and brand palette, now driven by CSS variables so Light, Dark and System themes can swap instantly.
                         corp: {
-                            900: 'rgb(var(--corp-900) / <alpha-value>)',
-                            800: 'rgb(var(--corp-800) / <alpha-value>)',
-                            700: 'rgb(var(--corp-700) / <alpha-value>)',
-                            600: 'rgb(var(--corp-600) / <alpha-value>)',
-                            500: 'rgb(var(--corp-500) / <alpha-value>)',
-                            400: 'rgb(var(--corp-400) / <alpha-value>)',
-                            300: 'rgb(var(--corp-300) / <alpha-value>)',
-                        },
-                        // Text ink ramp, also variable driven so it flips between light and dark for readability.
-                        white: 'rgb(var(--ink-strong) / <alpha-value>)',
-                        gray: {
-                            100: 'rgb(var(--gray-100) / <alpha-value>)',
-                            200: 'rgb(var(--gray-200) / <alpha-value>)',
-                            300: 'rgb(var(--gray-300) / <alpha-value>)',
-                            400: 'rgb(var(--gray-400) / <alpha-value>)',
-                            500: 'rgb(var(--gray-500) / <alpha-value>)',
-                            600: 'rgb(var(--gray-600) / <alpha-value>)',
-                            700: 'rgb(var(--gray-700) / <alpha-value>)',
-                            800: 'rgb(var(--gray-800) / <alpha-value>)',
-                            900: 'rgb(var(--gray-900) / <alpha-value>)',
-                        },
+                            900: '#070C16', // Deepest Navy / Near Black
+                            800: '#111A2E', // Sidebar / Card Background
+                            700: '#1E2C4A', // Borders / Accents
+                            600: '#2C416B', // Hover states
+                            500: '#3D5A94', // Primary Brand / Highlights
+                            400: '#5C80CC', // Text Highlights
+                        }
                     },
                     fontFamily: {
                         sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
@@ -45,51 +32,6 @@
         }
     </script>
     <style>
-        /* ============================================================
-           THEME ENGINE: Light, Dark and System.
-           Every colour token resolves through these CSS variables, so
-           switching themes never touches a single line of markup.
-           Values are space separated RGB triplets to support opacity.
-           ============================================================ */
-        :root, [data-theme="dark"] {
-            --corp-900: 10 17 40;
-            --corp-800: 22 35 69;
-            --corp-700: 36 59 107;
-            --corp-600: 52 84 148;
-            --corp-500: 67 107 190;
-            --corp-400: 96 141 232;
-            --corp-300: 150 180 240;
-            --ink-strong: 255 255 255;
-            --gray-100: 243 244 246;
-            --gray-200: 229 231 235;
-            --gray-300: 209 213 219;
-            --gray-400: 156 163 175;
-            --gray-500: 107 114 128;
-            --gray-600: 75 85 99;
-            --gray-700: 55 65 81;
-            --gray-800: 31 41 55;
-            --gray-900: 17 24 39;
-        }
-        [data-theme="light"] {
-            --corp-900: 238 242 249;   /* page and field surface */
-            --corp-800: 255 255 255;   /* cards, sidebar, modals */
-            --corp-700: 220 227 239;   /* borders and nav states */
-            --corp-600: 61 99 181;     /* primary brand blue */
-            --corp-500: 80 120 201;    /* brand hover blue */
-            --corp-400: 47 86 156;     /* readable blue text on white */
-            --corp-300: 58 96 174;
-            --ink-strong: 17 24 39;    /* strong headings, was white */
-            --gray-100: 31 41 55;
-            --gray-200: 55 65 81;
-            --gray-300: 75 85 99;
-            --gray-400: 100 116 139;
-            --gray-500: 148 163 184;
-            --gray-600: 148 163 184;
-            --gray-700: 203 213 225;
-            --gray-800: 226 232 240;
-            --gray-900: 241 245 249;
-        }
-
         /* Apple-style typography & custom scrollbars */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
@@ -97,13 +39,13 @@
             -moz-osx-font-smoothing: grayscale;
         }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgb(var(--corp-900)); }
-        ::-webkit-scrollbar-thumb { background: rgb(var(--corp-700)); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgb(var(--corp-600)); }
+        ::-webkit-scrollbar-track { background: #070C16; }
+        ::-webkit-scrollbar-thumb { background: #1E2C4A; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2C416B; }
         
         .resizer { position: absolute; top: 0; right: 0; width: 6px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; }
-        .resizer:hover, .resizing { background-color: #436BBE; border-right: 1px solid #608DE8; }
-        .drag-over { border-left: 2px solid #436BBE; }
+        .resizer:hover, .resizing { background-color: #3D5A94; border-right: 1px solid #5C80CC; }
+        .drag-over { border-left: 2px solid #3D5A94; }
         
         #note-editor { font-family: ui-sans-serif, system-ui, sans-serif; min-height: 50vh; }
         #note-editor:focus { outline: none; }
@@ -111,34 +53,18 @@
         .task-text { transition: all 0.2s; }
         input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="password"] { font-family: caption, monospace; letter-spacing: 2px; }
-        input[type="month"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        input[type="month"]::-webkit-calendar-picker-indicator, input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         
         .folder-dropzone { transition: background-color 0.2s; }
-        .folder-dropzone.drag-active { background-color: rgba(67, 107, 190, 0.2); border-radius: 0.375rem; }
-        .filter-active { border-color: #436BBE !important; background-color: rgba(67, 107, 190, 0.1) !important; }
+        .folder-dropzone.drag-active { background-color: rgba(61, 90, 148, 0.2); border-radius: 0.375rem; }
+        .filter-active { border-color: #3D5A94 !important; background-color: rgba(61, 90, 148, 0.1) !important; }
         .income-blur { filter: blur(6px); user-select: none; transition: filter 0.3s; }
 
-        /* Mobile Sidebar Toggle Logic */
         @media (max-width: 768px) {
             .mobile-sidebar-hidden { transform: translateX(-100%); }
             .mobile-sidebar-visible { transform: translateX(0); }
         }
     </style>
-    <script>
-        // Apply the saved theme immediately so there is no flash of the wrong theme.
-        (function () {
-            try {
-                var mode = localStorage.getItem('rishab_theme') || 'system';
-                var resolved = mode;
-                if (mode === 'system') {
-                    resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                }
-                document.documentElement.setAttribute('data-theme', resolved);
-            } catch (e) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
-        })();
-    </script>
 </head>
 <body class="bg-corp-900 text-gray-100 h-screen overflow-hidden">
 
@@ -150,12 +76,11 @@
             <h1 class="text-2xl font-bold text-white mb-2 tracking-tight">Rishab OS</h1>
             <p class="text-corp-400 text-sm mb-8 text-center font-medium">Securely access your workspace</p>
             
-            <button id="signin-btn" onclick="googleAuth(true)" class="w-full flex items-center justify-center gap-3 font-semibold py-3 px-4 rounded-lg shadow transition hover:opacity-90" style="background:#ffffff;color:#3c4043;border:1px solid #dadce0;">
-                <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                Sign in with Google
+            <button onclick="authenticateAndSync(true)" id="google-login-btn" class="w-full bg-white text-gray-900 font-bold py-3 px-4 rounded-lg shadow hover:bg-gray-100 transition flex items-center justify-center gap-3">
+                <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/><path fill="none" d="M1 1h22v22H1z"/></svg>
+                Sign in & Sync via Google
             </button>
-            <p id="auth-error" class="text-red-400 text-xs mt-4 hidden font-medium text-center">Authentication failed. Please try again.</p>
-            <p id="client-missing" class="text-amber-400 text-xs mt-4 hidden font-medium text-center">Google Client ID is not set yet. Open the file and paste it where marked near the top of the script.</p>
+            <p id="auth-status" class="text-corp-400 text-xs mt-4 font-medium text-center hidden">Connecting to Drive...</p>
         </div>
     </div>
 
@@ -168,23 +93,20 @@
             </button>
         </div>
 
-        <aside id="sidebar" class="w-64 bg-corp-800 border-r border-corp-700 flex flex-col flex-shrink-0 z-50 overflow-y-auto absolute md:relative h-full transition-transform duration-300 mobile-sidebar-hidden md:translate-x-0 mt-[60px] md:mt-0 pb-[130px] md:pb-0">
-            <div class="p-5 pb-2 hidden md:block">
+        <aside id="sidebar" class="w-64 bg-corp-800 border-r border-corp-700 flex flex-col flex-shrink-0 z-50 overflow-y-auto absolute md:relative h-full transition-transform duration-300 mobile-sidebar-hidden md:translate-x-0 mt-[60px] md:mt-0 pb-[80px] md:pb-0">
+            <div class="p-5 pb-2 hidden md:block flex justify-between items-center">
                 <h1 class="text-xl font-bold text-white tracking-wide">Rishab OS</h1>
             </div>
             
-            <nav class="flex flex-col gap-1 p-3 flex-1 select-none pb-36">
-                
+            <nav class="flex flex-col gap-1 p-3 flex-1 select-none pb-20">
                 <div class="group flex items-center justify-between px-3 py-2 rounded hover:bg-corp-700 transition cursor-pointer text-gray-300 hover:text-white" onclick="switchTab('home')" id="nav-home">
-                    <div class="flex items-center gap-2"><span class="text-lg">🏠</span> <span contenteditable="false" class="outline-none focus:bg-corp-900 focus:px-1 rounded text-sm font-medium transition-all">Home</span></div>
+                    <div class="flex items-center gap-2"><span class="text-lg">🏠</span> <span class="text-sm font-medium">Home</span></div>
                 </div>
 
                 <div class="mt-2">
                     <div class="group flex items-center justify-between px-3 py-2 rounded hover:bg-corp-700 transition cursor-pointer text-gray-300 hover:text-white" onclick="toggleAccordion('acc-wealth')">
-                        <div class="flex items-center gap-2"><span class="text-lg">💰</span> <span contenteditable="false" class="outline-none focus:bg-corp-900 focus:px-1 rounded text-sm font-medium transition-all">Wealth Dashboard</span></div>
-                        <div class="flex items-center gap-1">
-                            <span id="icon-acc-wealth" class="text-xs transition-transform transform rotate-0">▶</span>
-                        </div>
+                        <div class="flex items-center gap-2"><span class="text-lg">💰</span> <span class="text-sm font-medium">Wealth Dashboard</span></div>
+                        <div class="flex items-center gap-1"><span id="icon-acc-wealth" class="text-xs transition-transform transform rotate-0">▶</span></div>
                     </div>
                     <div id="acc-wealth" class="flex flex-col ml-7 mt-1 border-l border-corp-700 pl-2 gap-1 hidden">
                         <button onclick="switchTab('finance')" id="nav-finance" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Financial Dashboard</button>
@@ -196,10 +118,8 @@
 
                 <div class="mt-2">
                     <div class="group flex items-center justify-between px-3 py-2 rounded hover:bg-corp-700 transition cursor-pointer text-gray-300 hover:text-white" onclick="toggleAccordion('acc-prof')">
-                        <div class="flex items-center gap-2"><span class="text-lg">🎯</span> <span contenteditable="false" class="outline-none focus:bg-corp-900 focus:px-1 rounded text-sm font-medium transition-all">Professional</span></div>
-                        <div class="flex items-center gap-1">
-                            <span id="icon-acc-prof" class="text-xs transition-transform transform rotate-0">▶</span>
-                        </div>
+                        <div class="flex items-center gap-2"><span class="text-lg">🎯</span> <span class="text-sm font-medium">Professional</span></div>
+                        <div class="flex items-center gap-1"><span id="icon-acc-prof" class="text-xs transition-transform transform rotate-0">▶</span></div>
                     </div>
                     <div id="acc-prof" class="flex flex-col ml-7 mt-1 border-l border-corp-700 pl-2 gap-1 hidden">
                         <button onclick="switchTab('tasks')" id="nav-tasks" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Tasks & Projects</button>
@@ -208,37 +128,25 @@
 
                 <div class="mt-2">
                     <div class="group flex items-center justify-between px-3 py-2 rounded hover:bg-corp-700 transition cursor-pointer text-gray-300 hover:text-white" onclick="switchTab('notes')" id="nav-notes">
-                        <div class="flex items-center gap-2"><span class="text-lg">🧠</span> <span contenteditable="false" class="outline-none focus:bg-corp-900 focus:px-1 rounded text-sm font-medium transition-all">Knowledge Base</span></div>
+                        <div class="flex items-center gap-2"><span class="text-lg">🧠</span> <span class="text-sm font-medium">Knowledge Base</span></div>
                     </div>
                 </div>
 
                 <div class="mt-2">
                     <div class="group flex items-center justify-between px-3 py-2 rounded hover:bg-corp-700 transition cursor-pointer text-gray-300 hover:text-white" onclick="switchTab('documents')" id="nav-documents">
-                        <div class="flex items-center gap-2"><span class="text-lg">📁</span> <span contenteditable="false" class="outline-none focus:bg-corp-900 focus:px-1 rounded text-sm font-medium transition-all">Documents Vault</span></div>
+                        <div class="flex items-center gap-2"><span class="text-lg">📁</span> <span class="text-sm font-medium">Documents Vault</span></div>
                     </div>
                 </div>
-
             </nav>
 
-            <div class="absolute bottom-0 left-0 w-full border-t border-corp-700 bg-corp-800">
-                <div class="flex items-center justify-between gap-2 px-4 pt-3 pb-2">
-                    <div class="flex items-center gap-0.5 bg-corp-900 border border-corp-700 rounded-lg p-0.5" title="Appearance">
-                        <button onclick="setThemeMode('light')" id="thm-light" class="px-2 py-1 rounded text-xs transition" title="Light">☀️</button>
-                        <button onclick="setThemeMode('dark')" id="thm-dark" class="px-2 py-1 rounded text-xs transition" title="Dark">🌙</button>
-                        <button onclick="setThemeMode('system')" id="thm-system" class="px-2 py-1 rounded text-xs transition" title="System">💻</button>
-                    </div>
-                    <button onclick="logout()" class="flex items-center gap-1.5 text-xs font-medium text-gray-300 hover:text-white bg-corp-900 hover:bg-corp-700 border border-corp-700 rounded-lg px-3 py-1.5 transition" title="Log out and lock the workspace">
-                        <span class="leading-none">⏻</span> Log out
-                    </button>
+            <div class="absolute bottom-0 left-0 w-full p-4 flex flex-col gap-2 border-t border-corp-700 bg-corp-800">
+                <div class="flex items-center justify-between">
+                    <button onclick="logout()" class="text-xs text-red-400 hover:text-red-300 font-bold transition px-2 py-1 bg-corp-900 rounded border border-corp-700">Log Out</button>
+                    <button onclick="togglePrivacy()" class="text-gray-500 hover:text-gray-300 transition text-lg leading-none" title="Toggle Global Privacy Mode"><span id="eye-icon">👁️</span></button>
                 </div>
-                <div class="px-4 pb-1">
-                    <span id="sync-status" class="text-[10px] text-gray-500 font-medium tracking-wide truncate block">Local only</span>
-                </div>
-                <div class="flex items-center justify-between px-4 pb-3 pt-1 border-t border-corp-700/60">
+                <div class="flex items-center justify-between mt-1">
                     <span class="text-xs text-gray-500 font-medium tracking-wide">Master Build V25</span>
-                    <button onclick="togglePrivacy()" class="text-gray-500 hover:text-gray-300 transition text-lg leading-none" title="Toggle Global Privacy Mode">
-                        <span id="eye-icon">👁️</span>
-                    </button>
+                    <span id="sync-indicator" class="text-[10px] text-green-400 font-bold hidden">☁️ Synced</span>
                 </div>
             </div>
         </aside>
@@ -258,8 +166,7 @@
                                 <span class="flex items-center gap-2"><span class="text-corp-400">🎯</span> Action Items</span>
                                 <button onclick="switchTab('tasks')" class="text-xs text-gray-400 hover:text-white transition">View All →</button>
                             </h3>
-                            <div id="home-tasks-list" class="space-y-2">
-                                </div>
+                            <div id="home-tasks-list" class="space-y-2"></div>
                         </div>
 
                         <div class="bg-corp-800 rounded-xl p-5 md:p-6 border border-corp-700 shadow-lg">
@@ -268,25 +175,21 @@
                                 <textarea id="home-scratchpad" class="flex-1 w-full bg-corp-900 border border-corp-700 rounded-lg p-3 text-sm text-white resize-none h-[88px] outline-none focus:border-corp-500 transition" placeholder="Jot down a quick thought, number, or note..."></textarea>
                                 <div class="flex flex-col gap-2 w-full sm:w-48 shrink-0">
                                     <label class="text-xs text-gray-400">Save to Workspace:</label>
-                                    <select id="scratch-folder" class="bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 cursor-pointer">
-                                        </select>
+                                    <select id="scratch-folder" class="bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 cursor-pointer"></select>
                                     <button onclick="saveScratchpad()" class="bg-corp-600 hover:bg-corp-500 text-white px-4 py-2 rounded-lg font-medium transition shadow h-[38px]">Save Note</button>
                                 </div>
                             </div>
                             <p id="scratch-status" class="text-xs text-green-400 mt-2 hidden">✔ Note successfully saved to workspace</p>
                         </div>
-
                     </div>
 
                     <div class="col-span-1 flex flex-col gap-6">
-                        
                         <div id="home-doc-alerts" class="bg-corp-800 rounded-xl p-5 md:p-6 border border-orange-700/50 shadow-lg hidden">
                             <h3 class="text-white font-bold mb-4 flex items-center justify-between">
                                 <span class="flex items-center gap-2"><span class="text-orange-400">⚠️</span> Expiry Alerts</span>
                                 <button onclick="switchTab('documents')" class="text-xs text-gray-400 hover:text-white transition">Vault →</button>
                             </h3>
-                            <div id="home-doc-list" class="space-y-3">
-                                </div>
+                            <div id="home-doc-list" class="space-y-3"></div>
                         </div>
 
                         <div class="bg-corp-800 rounded-xl p-5 md:p-6 border border-corp-700 shadow-lg">
@@ -294,8 +197,7 @@
                                 <span class="flex items-center gap-2"><span class="text-red-400">💸</span> Upcoming Flow</span>
                                 <button onclick="switchTab('recurring')" class="text-xs text-gray-400 hover:text-white transition">Ledger →</button>
                             </h3>
-                            <div id="home-cash-list" class="space-y-3">
-                                </div>
+                            <div id="home-cash-list" class="space-y-3"></div>
                         </div>
 
                         <div class="bg-corp-800 rounded-xl p-5 md:p-6 border border-corp-700 shadow-lg">
@@ -324,7 +226,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </section>
@@ -367,10 +268,10 @@
                         <div class="flex flex-col sm:flex-row gap-4 mb-6 items-end">
                             <div class="relative w-full sm:w-48 shrink-0"><label class="block text-xs text-gray-400 mb-1">Amount</label><span class="absolute left-3 bottom-3 text-gray-400 text-xl font-bold">₹</span><input type="number" id="tx-amount" required class="w-full bg-corp-900 border border-corp-700 rounded-xl pl-8 pr-3 py-3 text-2xl font-bold text-white outline-none focus:border-corp-500 focus:ring-1 focus:ring-corp-500 transition" placeholder="0" autocomplete="off"></div>
                             <div class="w-full sm:w-40 shrink-0"><label class="block text-xs text-gray-400 mb-1">Date</label><input type="date" id="tx-date" required class="w-full bg-corp-900 border border-corp-700 rounded-xl px-3 py-3.5 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div>
-                            <div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1" id="tx-desc-label">What was this for? (e.g. Swiggy)</label><input type="text" id="tx-desc" placeholder="..." class="w-full bg-corp-900 border border-corp-700 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div>
+                            <div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1" id="tx-desc-label">What was this for?</label><input type="text" id="tx-desc" placeholder="..." class="w-full bg-corp-900 border border-corp-700 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div>
                         </div>
                         <div class="mb-6"><label class="block text-xs text-gray-400 mb-2 uppercase tracking-wide font-semibold">Select Category</label><div id="tx-chips-container" class="flex flex-wrap gap-2"></div><input type="hidden" id="tx-category" value="Food"><input type="hidden" id="tx-emoji" value="🍔"><div id="custom-cat-wrapper" class="hidden mt-3 max-w-sm"><input type="text" id="custom-cat-input" placeholder="Enter custom category name..." class="w-full bg-corp-900 border border-corp-700 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div></div>
-                        <div class="flex flex-col sm:flex-row items-end gap-4 border-t border-corp-700 pt-6"><div class="w-full sm:w-1/3"><label class="block text-xs text-gray-400 mb-1">Mode of Payment</label><select id="tx-mode" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div><div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1">Pivot Tags (Optional, comma split)</label><input type="text" id="tx-tags" placeholder="e.g. GIES-Closure, Audit" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div><button type="submit" id="btn-tx-submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]">Log Expense</button></div>
+                        <div class="flex flex-col sm:flex-row items-end gap-4 border-t border-corp-700 pt-6"><div class="w-full sm:w-1/3"><label class="block text-xs text-gray-400 mb-1">Mode of Payment</label><select id="tx-mode" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div><div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1">Pivot Tags (Optional, comma split)</label><input type="text" id="tx-tags" placeholder="e.g. Audit" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div><button type="submit" id="btn-tx-submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]">Log Expense</button></div>
                     </form>
                 </div>
             </section>
@@ -400,7 +301,6 @@
                 </div>
 
                 <div class="flex gap-6 flex-col lg:flex-row">
-                    
                     <div class="flex-[7] bg-corp-800 rounded-xl border border-corp-700 shadow-lg flex flex-col min-h-[500px] overflow-hidden">
                         <div class="bg-corp-900/50 p-4 border-b border-corp-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                             <div class="flex items-center gap-3">
@@ -414,24 +314,11 @@
                     
                     <div class="flex-[3] flex flex-col gap-6">
                         <div class="bg-corp-800 rounded-xl border border-corp-700 shadow-lg p-5">
-                            <h3 class="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-4">Burn Rate Comparison</h3>
-                            <div class="flex h-24 items-end gap-4 border-b border-corp-700 pb-2 mb-2 relative">
-                                <div id="bar-last-month" class="w-1/2 bg-corp-700 rounded-t flex items-end justify-center pb-2 text-xs text-gray-300 font-bold transition-all" style="height: 0%"></div>
-                                <div id="bar-curr-month" class="w-1/2 bg-red-500/80 rounded-t flex items-end justify-center pb-2 text-xs text-white font-bold transition-all" style="height: 0%"></div>
-                            </div>
-                            <div class="flex justify-between text-xs text-gray-500 font-medium">
-                                <span class="w-1/2 text-center">Last Month</span>
-                                <span class="w-1/2 text-center text-gray-300">Selected</span>
-                            </div>
-                        </div>
-
-                        <div class="bg-corp-800 rounded-xl border border-corp-700 shadow-lg p-5">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="text-gray-400 text-sm font-semibold uppercase tracking-wider">Budget Limits</h3>
                                 <button onclick="openBudgetManager()" class="text-xs bg-corp-700 hover:bg-corp-600 text-white px-3 py-1.5 rounded-lg transition border border-corp-600">⚙️ Manage</button>
                             </div>
-                            <div id="ana-budget-list" class="space-y-4">
-                                </div>
+                            <div id="ana-budget-list" class="space-y-4"></div>
                         </div>
 
                         <div class="bg-corp-800 rounded-xl border border-corp-700 shadow-lg flex flex-col flex-1 overflow-hidden min-h-[300px]">
@@ -464,11 +351,6 @@
                 </div>
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 bg-corp-800 p-3 rounded-xl border border-corp-700 shadow gap-3">
                     <div class="flex items-center gap-4 px-2 w-full sm:w-1/2 bg-corp-900 rounded-lg p-2 border border-corp-700"><span class="text-gray-400 text-sm">🔍</span><input type="text" id="rec-search-filter" placeholder="Filter by tags, type, bill..." onkeyup="renderRecTable()" class="bg-transparent border-none focus:outline-none text-sm text-white w-full"></div>
-                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                        <button onclick="toggleRecSort()" class="text-sm bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-1.5 rounded-lg transition shadow">↕ Sort</button>
-                        <button onclick="exportRecCSV()" class="text-sm bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-1.5 rounded-lg transition shadow">📥 CSV</button>
-                        <button onclick="addRecCustomCol()" class="text-sm bg-corp-600 hover:bg-corp-500 text-white px-3 py-1.5 rounded-lg transition shadow">+ Column</button>
-                    </div>
                 </div>
                 <div class="bg-corp-800 rounded-xl border border-corp-700 overflow-x-auto relative shadow-xl">
                     <table class="w-full text-left border-collapse whitespace-nowrap" style="table-layout: fixed;">
@@ -483,22 +365,15 @@
                 <div class="bg-corp-800 rounded-xl p-5 border border-corp-700 mb-6 shadow-lg">
                     <form id="task-form" class="flex flex-col md:flex-row flex-wrap gap-4 items-end" onsubmit="addTask(event)">
                         <div class="flex-1 w-full min-w-[180px]"><label class="block text-xs text-gray-400 mb-1">Task Name</label><input type="text" id="task-name" required class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
-                        <div class="w-full md:w-36"><label class="block text-xs text-gray-400 mb-1">Client Name</label><input type="text" id="task-client-name" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" placeholder="e.g. Internal"></div>
-                        <div class="w-full md:w-32"><label class="block text-xs text-gray-400 mb-1">Category</label><select id="task-category" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"><option>Work</option><option>Personal</option><option>Office</option></select></div>
+                        <div class="w-full md:w-32"><label class="block text-xs text-gray-400 mb-1">Category</label><select id="task-category" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"><option>Work</option><option>Personal</option><option>Misc</option></select></div>
                         <div class="w-full md:w-32"><label class="block text-xs text-gray-400 mb-1">Due Date</label><input type="date" id="task-date" required class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
-                        <div class="w-full md:w-36"><label class="block text-xs text-gray-400 mb-1">Tags</label><input type="text" id="task-tags-input" placeholder="e.g. GIES-Closure" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
-                        <div class="w-full md:w-36"><label class="block text-xs text-gray-400 mb-1">Status</label><select id="task-status" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"><option>Not started</option><option>Preparation</option><option>Awaiting information</option><option>Open points</option><option>Partner review</option><option>Client approval</option><option>Done</option></select></div>
-                        <div class="w-full md:w-20 flex items-center justify-start md:justify-center pb-2"><label class="flex items-center gap-2 cursor-pointer text-sm text-gray-300"><input type="checkbox" id="task-recurring" class="w-4 h-4 accent-corp-500 rounded bg-corp-900 border-corp-700"> Recur</label></div>
+                        <div class="w-full md:w-36"><label class="block text-xs text-gray-400 mb-1">Tags</label><input type="text" id="task-tags-input" placeholder="e.g. Urgent" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
+                        <div class="w-full md:w-36"><label class="block text-xs text-gray-400 mb-1">Status</label><select id="task-status" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"><option>Not started</option><option>In Progress</option><option>Done</option></select></div>
                         <button type="submit" class="w-full md:w-auto bg-corp-600 hover:bg-corp-500 text-white px-5 py-2 rounded-lg text-sm font-medium transition h-[38px] shadow">Add</button>
                     </form>
                 </div>
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 bg-corp-800 p-3 rounded-xl border border-corp-700 shadow gap-3">
-                    <div class="flex items-center gap-4 px-2 w-full sm:w-1/2 bg-corp-900 rounded-lg p-2 border border-corp-700"><span class="text-gray-400 text-sm">🔍</span><input type="text" id="task-search-filter" placeholder="Filter tasks, tags, clients..." onkeyup="renderTaskTable()" class="bg-transparent border-none focus:outline-none text-sm text-white w-full"></div>
-                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                        <button onclick="toggleTaskSort()" class="text-sm bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-1.5 rounded-lg transition shadow">↕ Sort</button>
-                        <button onclick="exportTaskCSV()" class="text-sm bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-1.5 rounded-lg transition shadow">📥 CSV</button>
-                        <button onclick="addTaskCustomCol()" class="text-sm bg-corp-600 hover:bg-corp-500 text-white px-3 py-1.5 rounded-lg transition shadow">+ Column</button>
-                    </div>
+                    <div class="flex items-center gap-4 px-2 w-full sm:w-1/2 bg-corp-900 rounded-lg p-2 border border-corp-700"><span class="text-gray-400 text-sm">🔍</span><input type="text" id="task-search-filter" placeholder="Filter tasks, tags..." onkeyup="renderTaskTable()" class="bg-transparent border-none focus:outline-none text-sm text-white w-full"></div>
                 </div>
                 <div class="bg-corp-800 rounded-xl border border-corp-700 overflow-x-auto relative shadow-xl">
                     <table class="w-full text-left border-collapse whitespace-nowrap" style="table-layout: fixed;" id="main-table">
@@ -519,20 +394,19 @@
                     <div class="flex-1 bg-corp-800 rounded-xl border border-corp-700 flex flex-col shadow-lg overflow-hidden relative min-h-[400px]">
                         <div class="h-auto md:h-14 py-3 md:py-0 bg-corp-900/50 border-b border-corp-700 flex flex-col md:flex-row items-start md:items-center justify-between px-6 shrink-0 gap-3">
                             <div class="flex items-center gap-4">
-                                <span id="note-folder-badge" class="bg-corp-700 text-gray-300 text-xs px-2 py-1 rounded font-medium">🏢 Clients</span>
+                                <span id="note-folder-badge" class="bg-corp-700 text-gray-300 text-xs px-2 py-1 rounded font-medium">Unsorted</span>
                                 <span id="save-status" class="text-gray-500 text-xs flex items-center gap-1"><i></i> Auto-saved locally</span>
                             </div>
                             <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-                                <button onclick="syncTasksToApp()" class="flex items-center gap-2 bg-corp-600/20 hover:bg-corp-600/40 text-corp-300 border border-corp-600/50 px-3 py-1.5 rounded-lg text-sm transition shadow-sm font-medium">⚡ Sync To-Dos</button>
-                                <button onclick="deleteCurrentNote()" class="text-gray-500 hover:text-red-400 transition bg-corp-900 p-2 rounded-lg border border-corp-700" title="Delete Note"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg></button>
+                                <button onclick="deleteCurrentNote()" class="text-gray-500 hover:text-red-400 transition bg-corp-900 p-2 rounded-lg border border-corp-700" title="Delete Note">✕</button>
                             </div>
                         </div>
-                        <div id="editor-container" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col relative">
+                        <div id="editor-container" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col relative hidden">
                             <input type="text" id="note-title" class="text-3xl md:text-4xl font-bold bg-transparent border-none text-white focus:outline-none mb-6 w-full placeholder-gray-600 tracking-tight" placeholder="Untitled Note" oninput="saveNoteState()">
                             <p class="text-xs text-gray-500 mb-4 select-none">💡 Tip: Type <code class="bg-corp-900 border border-corp-700 px-1 rounded">[ ] </code> and hit Space to create a checkbox. Type <code class="text-corp-400">#Tag</code> to link databases.</p>
                             <div id="note-editor" class="flex-1 text-gray-300 text-base md:text-lg leading-relaxed focus:outline-none" contenteditable="true" placeholder="Start typing here..." oninput="saveNoteState()" onkeydown="handleEditorShortcuts(event)"></div>
                         </div>
-                        <div id="no-note-screen" class="absolute inset-0 bg-corp-800 z-10 flex flex-col items-center justify-center text-center hidden p-4">
+                        <div id="no-note-screen" class="absolute inset-0 bg-corp-800 z-10 flex flex-col items-center justify-center text-center p-4">
                             <span class="text-6xl mb-4">📓</span><h3 class="text-xl font-bold text-white mb-2">Knowledge Base</h3><p class="text-gray-400 max-w-sm mb-6">Select a note from the sidebar or click '+' next to a folder to start writing.</p>
                         </div>
                     </div>
@@ -553,7 +427,7 @@
                 <div class="bg-corp-800 rounded-xl p-5 border border-corp-700 mb-8 shadow-lg">
                     <form id="doc-form" onsubmit="addDocument(event)" class="flex flex-col md:flex-row flex-wrap gap-4 items-end">
                         <div class="flex-1 w-full min-w-[200px]"><label class="block text-xs text-gray-400 mb-1">Document Name</label><input type="text" id="doc-name" required class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" placeholder="e.g. PAN Card"></div>
-                        <div class="w-full md:w-40"><label class="block text-xs text-gray-400 mb-1">Category</label><select id="doc-cat" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"><option>Identity</option><option>Vehicle</option><option>Education</option><option>Health</option><option>Property</option><option>Office</option><option>Other</option></select></div>
+                        <div class="w-full md:w-40"><label class="block text-xs text-gray-400 mb-1">Category</label><select id="doc-cat" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"><option>Identity</option><option>Vehicle</option><option>Education</option><option>Health</option><option>Property</option><option>Other</option></select></div>
                         <div class="w-full md:w-36"><label class="block text-xs text-gray-400 mb-1">Expiry (Optional)</label><input type="date" id="doc-exp" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
                         <div class="flex-1 w-full min-w-[250px]"><label class="block text-xs text-gray-400 mb-1">Drive / Cloud Link</label><input type="url" id="doc-link" required class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" placeholder="https://drive.google.com/..."></div>
                         <div class="w-full md:w-40"><label class="block text-xs text-gray-400 mb-1">Tags</label><input type="text" id="doc-tags" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" placeholder="e.g. Personal"></div>
@@ -563,7 +437,6 @@
 
                 <div id="docs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </section>
-
         </main>
     </div>
 
@@ -573,8 +446,7 @@
                 <h2 class="text-xl font-bold text-white flex items-center gap-2">🏷️ Unified View: <span id="pivot-title" class="text-corp-400">#Tag</span></h2>
                 <button onclick="closePivot()" class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
             </div>
-            <div class="p-6 overflow-y-auto flex-1 flex flex-col gap-6" id="pivot-content">
-                </div>
+            <div class="p-6 overflow-y-auto flex-1 flex flex-col gap-6" id="pivot-content"></div>
         </div>
     </div>
 
@@ -589,7 +461,6 @@
                     <label class="block text-xs text-gray-400 mb-1 font-bold tracking-wide uppercase">Global Monthly Ceiling (₹)</label>
                     <input type="number" id="bm-global" oninput="calcUnallocated()" class="w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-xl font-bold text-white outline-none focus:border-corp-500 transition">
                 </div>
-                
                 <div class="bg-corp-900 p-4 rounded-xl border border-corp-700 sticky top-0 z-10 shadow-md">
                     <div class="flex justify-between items-center">
                         <span class="text-sm text-gray-400 font-bold uppercase tracking-wide">Unallocated Funds</span>
@@ -597,9 +468,7 @@
                     </div>
                     <p class="text-[10px] text-gray-500 mt-1" id="bm-warning">Assign these funds to your categories below.</p>
                 </div>
-                
-                <div id="bm-categories" class="space-y-3 mt-2 border-t border-corp-800 pt-4">
-                    </div>
+                <div id="bm-categories" class="space-y-3 mt-2 border-t border-corp-800 pt-4"></div>
             </div>
             <div class="p-5 border-t border-corp-800 bg-corp-800 flex justify-end gap-3 shrink-0">
                 <button onclick="closeBudgetManager()" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition">Cancel</button>
@@ -609,34 +478,194 @@
     </div>
 
     <script>
-        // ==========================================================
-        //  GOOGLE SETUP  >>>  PASTE YOUR CLIENT ID ON THE LINE BELOW
-        //  Get it from Google Cloud Console, OAuth 2.0 Client IDs.
-        //  Keep the quotes. Nothing else here needs to change.
-        // ==========================================================
-        const CLIENT_ID = "652853887650-v3g4851d8tpc6b1dtv1dc5ckrcjqaegu.apps.googleusercontent.com";
-        const SCOPES = "https://www.googleapis.com/auth/drive.file";
-        // ==========================================================
+        // ==========================================
+        // 1. CLOUD SYNC & AUTHENTICATION (UPDATE YOUR CLIENT ID HERE)
+        // ==========================================
+        const CLIENT_ID = '652853887650-v3g4851d8tpc6b1dtv1dc5ckrcjqaegu.apps.googleusercontent.com'; 
+        const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
-        // ==========================================
-        // GOOGLE OAUTH HANDLING
-        // ==========================================
-        function handleCredentialResponse(response) {
-            // Once authenticated, hide the auth screen and show the app.
-            if(response.credential) {
-                document.getElementById('auth-screen').classList.add('opacity-0', 'pointer-events-none');
-                setTimeout(() => {
-                    document.getElementById('auth-screen').classList.add('hidden');
-                    document.getElementById('main-app').classList.remove('hidden');
-                    // Initialize layout properly
-                    switchTab('home');
-                }, 500);
+        let googleToken = null;
+        let driveFolderId = null;
+        let driveFileId = null;
+        let isSyncing = false;
+        let needsSync = false;
+        let syncTimer = null;
+
+        // Check for persistent session on load
+        window.onload = () => {
+            if (localStorage.getItem('rishab_auth') === 'true') {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                initAppEngine();
+                // Silent token refresh would go here in a full prod environment
+            }
+        };
+
+        function authenticateAndSync(interactive = true) {
+            document.getElementById('google-login-btn').classList.add('hidden');
+            document.getElementById('auth-status').classList.remove('hidden');
+            
+            const client = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: async (res) => {
+                    if (res.error) {
+                        alert("Auth Error. Please check your Client ID and Origin configurations.");
+                        document.getElementById('google-login-btn').classList.remove('hidden');
+                        document.getElementById('auth-status').classList.add('hidden');
+                        return;
+                    }
+                    googleToken = res.access_token;
+                    localStorage.setItem('rishab_auth', 'true');
+                    await initializeCloudSync();
+                    
+                    document.getElementById('auth-screen').classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => {
+                        document.getElementById('auth-screen').classList.add('hidden');
+                        document.getElementById('main-app').classList.remove('hidden');
+                        initAppEngine();
+                    }, 500);
+                },
+            });
+            interactive ? client.requestAccessToken() : client.requestAccessToken({ prompt: 'none' });
+        }
+
+        function logout() {
+            localStorage.removeItem('rishab_auth');
+            googleToken = null;
+            location.reload();
+        }
+
+        async function initializeCloudSync() {
+            await new Promise(r => gapi.load('client', r));
+            const headers = { Authorization: `Bearer ${googleToken}` };
+            
+            const folderName = 'Rishab OS Workspace';
+            const fQuery = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`name='${folderName}' and mimeType='application/vnd.google-apps.folder' and trashed=false`)}`, { headers });
+            const fData = await fQuery.json();
+            
+            if (fData.files?.length > 0) {
+                driveFolderId = fData.files[0].id;
             } else {
-                document.getElementById('auth-error').classList.remove('hidden');
+                const createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
+                    method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: folderName, mimeType: 'application/vnd.google-apps.folder' })
+                });
+                const data = await createRes.json();
+                driveFolderId = data.id;
+            }
+            
+            const bQuery = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`'${driveFolderId}' in parents and name='backup.json' and trashed=false`)}`, { headers });
+            const bData = await bQuery.json();
+            
+            if (bData.files?.length > 0) {
+                driveFileId = bData.files[0].id;
+                const cloudRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, { headers });
+                const cloudData = await cloudRes.json();
+                
+                if (cloudData) {
+                    if(cloudData.accounts) accounts = cloudData.accounts;
+                    if(cloudData.transactionsDB) transactionsDB = cloudData.transactionsDB;
+                    if(cloudData.recDB) recDB = cloudData.recDB;
+                    if(cloudData.tDB) tDB = cloudData.tDB;
+                    if(cloudData.notesDB) notesDB = cloudData.notesDB;
+                    if(cloudData.folders) folders = cloudData.folders;
+                    if(cloudData.docsDB) docsDB = cloudData.docsDB;
+                    if(cloudData.userBudget) userBudget = cloudData.userBudget;
+                }
             }
         }
 
-        // Mobile Sidebar Toggle
+        function getMasterData() {
+            return { accounts, transactionsDB, recDB, tDB, notesDB, folders, docsDB, userBudget };
+        }
+
+        function triggerSync() {
+            if (!googleToken) return;
+            document.getElementById('sync-indicator').classList.add('hidden');
+            if (syncTimer) clearTimeout(syncTimer);
+            syncTimer = setTimeout(() => { syncToCloud(getMasterData()); }, 1500);
+        }
+
+        async function syncToCloud(payloadData) {
+            if (!googleToken || !driveFolderId) return;
+            if (isSyncing) { needsSync = true; return; }
+            
+            isSyncing = true; needsSync = false;
+            try {
+                const boundary = 'rishab_os_multipart_boundary_' + Date.now();
+                const metadata = { name: 'backup.json', mimeType: 'application/json' };
+                if (!driveFileId) metadata.parents = [driveFolderId];
+
+                const blob = new Blob([JSON.stringify(payloadData)], { type: 'application/json' });
+                const delimiter = `\r\n--${boundary}\r\n`;
+                const closeDelimiter = `\r\n--${boundary}--`;
+                
+                const body = new Blob([
+                    delimiter, 'Content-Type: application/json; charset=UTF-8\r\n\r\n',
+                    JSON.stringify(metadata), delimiter, 'Content-Type: application/json\r\n\r\n',
+                    blob, closeDelimiter
+                ]);
+
+                const url = driveFileId 
+                    ? `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart` 
+                    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+                
+                const res = await fetch(url, { 
+                    method: driveFileId ? 'PATCH' : 'POST', 
+                    headers: { Authorization: `Bearer ${googleToken}`, 'Content-Type': `multipart/related; boundary=${boundary}` }, 
+                    body: body 
+                });
+
+                if (!res.ok) throw new Error(await res.text());
+                const data = await res.json();
+                if (data.id && !driveFileId) driveFileId = data.id;
+                
+                document.getElementById('sync-indicator').classList.remove('hidden');
+            } catch(e) {
+                console.error("Sync Error:", e);
+            } finally {
+                isSyncing = false;
+                if (needsSync) syncToCloud(getMasterData());
+            }
+        }
+
+        // ==========================================
+        // 2. BLANK SLATE DATA STRUCTURES
+        // ==========================================
+        const TODAY = new Date();
+        let isPrivate = false;
+
+        let accounts = [];
+        let transactionsDB = [];
+        let recDB = [];
+        let tDB = [];
+        let notesDB = [];
+        let folders = [];
+        let docsDB = [];
+        let userBudget = { global: 0, categories: {} };
+
+        // ==========================================
+        // 3. CORE LOGIC (Dynamic Time & UI Rendering)
+        // ==========================================
+        
+        function initAppEngine() {
+            // Set dynamic dates on inputs
+            const todayStr = TODAY.toISOString().split('T')[0];
+            document.getElementById('tx-date').value = todayStr;
+            const currentMonth = todayStr.substring(0, 7);
+            document.getElementById('analytics-month').value = currentMonth;
+
+            populateModeDropdown();
+            renderAccounts();
+            renderRecTable();
+            renderCashflowAnalytics();
+            renderTaskTable();
+            renderNotesSidebar();
+            renderDocs();
+            switchTab('home');
+        }
+
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -651,99 +680,13 @@
             }
         }
 
-        // ==========================================
-        // V25 BUDGET CONFIGURATION ENGINE
-        // ==========================================
-        let userBudget = { global: 0, categories: {} };
-
-        function openBudgetManager() {
-            document.getElementById('bm-global').value = userBudget.global;
-            const container = document.getElementById('bm-categories');
-            container.innerHTML = '';
-            
-            Object.keys(userBudget.categories).forEach(cat => {
-                container.innerHTML += `
-                    <div class="flex justify-between items-center gap-4 bg-corp-800 p-2.5 rounded-lg border border-corp-700">
-                        <span class="text-sm text-gray-300 font-medium w-24 truncate">${cat}</span>
-                        <div class="flex items-center gap-2 flex-1">
-                            <span class="text-gray-500 text-xs">₹</span>
-                            <input type="number" data-cat="${cat}" value="${userBudget.categories[cat]}" oninput="calcUnallocated()" class="bm-cat-input w-full bg-corp-900 border border-corp-600 rounded px-2 py-1.5 text-sm text-white outline-none focus:border-corp-500 text-right">
-                        </div>
-                    </div>
-                `;
-            });
-            calcUnallocated();
-            document.getElementById('budget-modal').classList.remove('hidden');
-        }
-
-        function closeBudgetManager() {
-            document.getElementById('budget-modal').classList.add('hidden');
-        }
-
-        function calcUnallocated() {
-            const globalLimit = Number(document.getElementById('bm-global').value) || 0;
-            let sumCats = 0;
-            document.querySelectorAll('.bm-cat-input').forEach(input => { sumCats += (Number(input.value) || 0); });
-            
-            const unallocated = globalLimit - sumCats;
-            const unEl = document.getElementById('bm-unallocated');
-            const warnEl = document.getElementById('bm-warning');
-            const saveBtn = document.getElementById('bm-save-btn');
-            
-            unEl.innerText = `₹ ${formatMoney(unallocated)}`;
-            if (unallocated < 0) {
-                unEl.classList.replace('text-green-400', 'text-red-400');
-                warnEl.innerText = "⚠️ Global Budget Exceeded. Reduce a category limit.";
-                warnEl.classList.add('text-red-400');
-                saveBtn.disabled = true;
-            } else {
-                unEl.classList.replace('text-red-400', 'text-green-400');
-                warnEl.innerText = "Assign these remaining funds.";
-                warnEl.classList.remove('text-red-400');
-                saveBtn.disabled = false;
-            }
-        }
-
-        function saveBudgetConfig() {
-            userBudget.global = Number(document.getElementById('bm-global').value) || 0;
-            document.querySelectorAll('.bm-cat-input').forEach(input => {
-                const catName = input.getAttribute('data-cat');
-                userBudget.categories[catName] = Number(input.value) || 0;
-            });
-            localStorage.setItem('rishab_budget', JSON.stringify(userBudget));
-            closeBudgetManager();
-            renderCashflowAnalytics();
-            renderHomeWidgets();
-        }
-
-        // ==========================================
-        // COMMON ENGINE CORE & SIDEBAR LOGIC
-        // ==========================================
-        const TODAY = new Date();
-        // Returns an ISO style string for TODAY using local calendar fields, so the date stays correct in IST even after midnight.
-        function todayISO() {
-            const d = TODAY;
-            return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString();
-        }
-        let isPrivate = false;
-
         function updateGreeting() {
             const hour = TODAY.getHours();
             let greeting = '';
-            
-            if (hour >= 5 && hour < 12) {
-                const msgs = ["How was your breakfast?", "Ready to crush the day?", "Grab a coffee and let's get to work."];
-                greeting = `Good morning. ${msgs[Math.floor(Math.random() * msgs.length)]}`;
-            } else if (hour >= 12 && hour < 17) {
-                const msgs = ["Hope you had a solid lunch.", "Mid-day hustle. Let's keep the momentum.", "Afternoon grind."];
-                greeting = `Good afternoon. ${msgs[Math.floor(Math.random() * msgs.length)]}`;
-            } else if (hour >= 17 && hour < 22) {
-                const msgs = ["Grabbed your evening coffee?", "Winding down or still grinding?", "Reflecting on a productive day?"];
-                greeting = `Good evening. ${msgs[Math.floor(Math.random() * msgs.length)]}`;
-            } else {
-                const msgs = ["Working late? Make sure to get some rest.", "Late night grind. Don't burn out.", "Still at it? Take a break soon."];
-                greeting = `Good evening. ${msgs[Math.floor(Math.random() * msgs.length)]}`;
-            }
+            if (hour >= 5 && hour < 12) greeting = "Good morning.";
+            else if (hour >= 12 && hour < 17) greeting = "Good afternoon.";
+            else if (hour >= 17 && hour < 22) greeting = "Good evening.";
+            else greeting = "Late night grind.";
             document.getElementById('home-greeting').innerText = greeting;
         }
 
@@ -757,11 +700,7 @@
         function forceOpenAccordion(id) {
             const el = document.getElementById(id);
             const icon = document.getElementById('icon-' + id);
-            if(el && el.classList.contains('hidden')) {
-                el.classList.remove('hidden');
-                icon.classList.remove('rotate-0');
-                icon.classList.add('rotate-90');
-            }
+            if(el && el.classList.contains('hidden')) { el.classList.remove('hidden'); icon.classList.remove('rotate-0'); icon.classList.add('rotate-90'); }
         }
 
         function switchTab(tabId) {
@@ -779,20 +718,16 @@
                 if (targetNav.tagName === 'BUTTON') { targetNav.classList.replace('text-gray-400', 'text-gray-200'); targetNav.classList.add('bg-corp-700'); } 
                 else { targetNav.classList.replace('hover:bg-corp-700', 'bg-corp-700'); }
             }
-
             if(['finance', 'record', 'analytics', 'recurring'].includes(tabId)) forceOpenAccordion('acc-wealth');
             if(['tasks'].includes(tabId)) forceOpenAccordion('acc-prof');
-
             if(tabId === 'home') { updateGreeting(); renderHomeWidgets(); }
             if(tabId === 'finance') renderAccounts();
-            if(tabId === 'recurring') { populateModeDropdown(); renderRecTable(); }
+            if(tabId === 'recurring') renderRecTable();
             if(tabId === 'record') renderRecordForm();
             if(tabId === 'analytics') renderCashflowAnalytics();
             if(tabId === 'tasks') renderTaskTable();
             if(tabId === 'notes') renderNotesSidebar();
             if(tabId === 'documents') renderDocs();
-            
-            // Auto close sidebar on mobile after clicking tab
             if(window.innerWidth <= 768) {
                 document.getElementById('sidebar').classList.add('mobile-sidebar-hidden');
                 document.getElementById('sidebar').classList.remove('mobile-sidebar-visible');
@@ -807,14 +742,23 @@
         }
 
         function formatMoney(num) { return isPrivate ? '***,***' : Number(num).toLocaleString('en-IN'); }
+        function populateModeDropdown() {
+            const expMode = document.getElementById('tx-mode');
+            const recMode = document.getElementById('rec-mode');
+            const options = accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+            if(expMode) expMode.innerHTML = options;
+            if(recMode) recMode.innerHTML = options;
+        }
 
         // ==========================================
-        // 1. FINANCE & LEDGER MODULE
+        // MODULE: FINANCE (Intact Math Logic)
         // ==========================================
-        let accounts = [];
-
-        function addAccount(e) { e.preventDefault(); accounts.push({ id: 'acc_' + Date.now(), name: document.getElementById('acc-name').value, type: document.getElementById('acc-type').value, balance: Number(document.getElementById('acc-balance').value) }); document.getElementById('finance-form').reset(); renderAccounts(); populateModeDropdown(); }
-        function updateAccount(id, field, value) { const acc = accounts.find(a => a.id === id); if(acc) acc[field] = field === 'balance' ? Number(value) : value; renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
+        function addAccount(e) { 
+            e.preventDefault(); 
+            accounts.push({ id: 'acc_' + Date.now(), name: document.getElementById('acc-name').value, type: document.getElementById('acc-type').value, balance: Number(document.getElementById('acc-balance').value) }); 
+            document.getElementById('finance-form').reset(); renderAccounts(); populateModeDropdown(); triggerSync();
+        }
+        function updateAccount(id, field, value) { const acc = accounts.find(a => a.id === id); if(acc) acc[field] = field === 'balance' ? Number(value) : value; renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); triggerSync(); }
         
         function renderAccounts() {
             let ast = 0, liab = 0; const alist = document.getElementById('asset-list'); const llist = document.getElementById('liability-list'); alist.innerHTML = ''; llist.innerHTML = '';
@@ -831,28 +775,24 @@
             const acc = accounts.find(a => a.id === item.modeId); if(!acc) { alert("Payment mode missing in Ledger!"); return false; }
             let amt = Number(item.amount); if(isReversal) amt = -amt;
             if(!isReversal && acc.type === 'asset' && acc.balance < amt) { alert(`Insufficient funds in ${acc.name}! Requires ₹${amt}. Available: ₹${acc.balance}.`); return false; }
-            
-            if(acc.type === 'asset') acc.balance -= amt; else acc.balance += amt; 
+            if(acc.type === 'asset') acc.balance -= amt; else acc.balance += amt; // EXACT PRESERVATION OF LIABILITY LOGIC
             if(item.type === 'Investments') { let mf = accounts.find(a => a.name.toLowerCase().includes('mutual')); if(mf) mf.balance += amt; } else if (item.type === 'Credit card') { let cc = accounts.find(a => a.name === item.name); if(cc) cc.balance -= amt; }
             return true;
         }
 
         // ==========================================
-        // 2. UNIVERSAL TRANSACTIONS
+        // MODULE: TRANSACTIONS
         // ==========================================
-        let transactionsDB = [];
-
         let currTxType = 'expense';
-        const expChipsData = [ { cat: 'Food', emo: '🍔' }, { cat: 'Transit', emo: '🚕' }, { cat: 'Petrol', emo: '⛽' }, { cat: 'Flat Exp', emo: '🏠' }, { cat: 'Groceries', emo: '🛒' }, { cat: 'Snacks', emo: '☕' }, { cat: 'Shopping', emo: '🛍️' }, { cat: 'Other', emo: '➕' } ];
-        const incChipsData = [ { cat: 'Salary', emo: '💼' }, { cat: 'Freelance', emo: '💻' }, { cat: 'Dividend', emo: '📈' }, { cat: 'Commission', emo: '🤝' }, { cat: 'Gift', emo: '🎁' }, { cat: 'Refund', emo: '🔄' }, { cat: 'Other', emo: '➕' } ];
+        const expChipsData = [ { cat: 'Food', emo: '🍔' }, { cat: 'Transit', emo: '🚕' }, { cat: 'Petrol', emo: '⛽' }, { cat: 'Flat Exp', emo: '🏠' }, { cat: 'Groceries', emo: '🛒' }, { cat: 'Shopping', emo: '🛍️' }, { cat: 'Other', emo: '➕' } ];
+        const incChipsData = [ { cat: 'Salary', emo: '💼' }, { cat: 'Freelance', emo: '💻' }, { cat: 'Dividend', emo: '📈' }, { cat: 'Other', emo: '➕' } ];
 
-        function renderRecordForm() { populateModeDropdown(); document.getElementById('tx-date').value = todayISO().split('T')[0]; renderTxChips(); }
-
+        function renderRecordForm() { renderTxChips(); }
         function setTxType(type) {
             currTxType = type;
             const btnExp = document.getElementById('btn-tx-exp'); const btnInc = document.getElementById('btn-tx-inc'); const submitBtn = document.getElementById('btn-tx-submit'); const descLabel = document.getElementById('tx-desc-label');
-            if (type === 'expense') { btnExp.className = "flex-1 bg-red-500/20 text-red-400 border border-red-500/50 rounded-lg py-2 font-bold transition shadow-sm"; btnInc.className = "flex-1 bg-transparent text-gray-400 border border-transparent hover:text-gray-200 rounded-lg py-2 font-bold transition"; submitBtn.className = "w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Expense"; descLabel.innerText = "What was this for? (e.g. Swiggy)"; } 
-            else { btnInc.className = "flex-1 bg-green-500/20 text-green-400 border border-green-500/50 rounded-lg py-2 font-bold transition shadow-sm"; btnExp.className = "flex-1 bg-transparent text-gray-400 border border-transparent hover:text-gray-200 rounded-lg py-2 font-bold transition"; submitBtn.className = "w-full sm:w-auto bg-green-600 hover:bg-green-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Income"; descLabel.innerText = "Source of income? (e.g. Acme Corp)"; }
+            if (type === 'expense') { btnExp.className = "flex-1 bg-red-500/20 text-red-400 border border-red-500/50 rounded-lg py-2 font-bold transition shadow-sm"; btnInc.className = "flex-1 bg-transparent text-gray-400 border border-transparent hover:text-gray-200 rounded-lg py-2 font-bold transition"; submitBtn.className = "w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Expense"; descLabel.innerText = "What was this for?"; } 
+            else { btnInc.className = "flex-1 bg-green-500/20 text-green-400 border border-green-500/50 rounded-lg py-2 font-bold transition shadow-sm"; btnExp.className = "flex-1 bg-transparent text-gray-400 border border-transparent hover:text-gray-200 rounded-lg py-2 font-bold transition"; submitBtn.className = "w-full sm:w-auto bg-green-600 hover:bg-green-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Income"; descLabel.innerText = "Source of income?"; }
             renderTxChips(); document.getElementById('custom-cat-wrapper').classList.add('hidden');
         }
 
@@ -875,16 +815,13 @@
             if(currTxType === 'expense' && acc && acc.type === 'asset' && acc.balance < amt) { alert(`Insufficient funds in ${acc.name}! Requires ₹${amt}. Available: ₹${acc.balance}.`); return; }
             let finalCat = document.getElementById('tx-category').value; if (finalCat === 'Other') { const custom = document.getElementById('custom-cat-input').value.trim(); finalCat = custom !== '' ? custom : 'Other'; }
             
-            if (currTxType === 'expense' && !userBudget.categories[finalCat]) {
-                userBudget.categories[finalCat] = 0;
-                localStorage.setItem('rishab_budget', JSON.stringify(userBudget));
-            }
-
+            if (currTxType === 'expense' && !userBudget.categories[finalCat]) { userBudget.categories[finalCat] = 0; }
             const item = { id: Date.now(), type: currTxType, amount: amt, category: finalCat, emoji: document.getElementById('tx-emoji').value, desc: document.getElementById('tx-desc').value, date: document.getElementById('tx-date').value, modeId: modeId, tags: parseTags(document.getElementById('tx-tags').value) };
             if (currTxType === 'income') { if(acc.type === 'asset') acc.balance += amt; else acc.balance -= amt; } else { if(acc.type === 'asset') acc.balance -= amt; else acc.balance += amt; }
             transactionsDB.push(item);
             document.getElementById('tx-amount').value = ''; document.getElementById('tx-desc').value = ''; document.getElementById('tx-tags').value = ''; document.getElementById('custom-cat-input').value = ''; document.getElementById('tx-amount').focus();
             renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets(); alert(`${currTxType === 'income' ? 'Income' : 'Expense'} logged successfully!`);
+            triggerSync();
         }
 
         function delTransaction(id) {
@@ -892,69 +829,53 @@
             if(!window.confirm(`Delete this transaction and reverse ₹${tx.amount} in your ledger?`)) return;
             const acc = accounts.find(a => a.id === tx.modeId);
             if(acc) { if(tx.type === 'income') { if(acc.type === 'asset') acc.balance -= tx.amount; else acc.balance += tx.amount; } else { if(acc.type === 'asset') acc.balance += tx.amount; else acc.balance -= tx.amount; } }
-            transactionsDB = transactionsDB.filter(e => e.id !== id); renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+            transactionsDB = transactionsDB.filter(e => e.id !== id); renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets(); triggerSync();
         }
 
         // ==========================================
-        // CASHFLOW ANALYTICS
+        // MODULE: BUDGET MANAGER & ANALYTICS
         // ==========================================
-        window.currentAnaStats = null; 
-        let anaBreakdownView = 'category';
-        let anaTimelineFilter = null; 
-        let isIncomeRevealed = false;
-
-        function toggleIncomeVault() {
-            isIncomeRevealed = !isIncomeRevealed;
-            const shield = document.getElementById('ana-inc-shield');
-            const val = document.getElementById('ana-income');
-            if(isIncomeRevealed) {
-                shield.classList.add('hidden');
-                val.classList.remove('income-blur');
-            } else {
-                shield.classList.remove('hidden');
-                val.classList.add('income-blur');
-            }
-        }
-
+        window.currentAnaStats = null; let anaBreakdownView = 'category'; let anaTimelineFilter = null; let isIncomeRevealed = false;
+        function toggleIncomeVault() { isIncomeRevealed = !isIncomeRevealed; const shield = document.getElementById('ana-inc-shield'); const val = document.getElementById('ana-income'); if(isIncomeRevealed) { shield.classList.add('hidden'); val.classList.remove('income-blur'); } else { shield.classList.remove('hidden'); val.classList.add('income-blur'); } }
         function toggleAnaBreakdown(view) { anaBreakdownView = view; renderBreakdownList(); }
         function setTimelineFilter(type, value) { anaTimelineFilter = { type, value }; document.getElementById('ana-filter-badge').classList.remove('hidden'); renderCashflowAnalytics(false); }
         function clearTimelineFilter() { anaTimelineFilter = null; document.getElementById('ana-filter-badge').classList.add('hidden'); renderCashflowAnalytics(false); }
 
-        function renderCashflowAnalytics(recalcStats = true) {
-            const selMonth = document.getElementById('analytics-month').value;
-            let tTotalInc = 0, tTotalExp = 0, tTotalInv = 0; 
-            let dayGroups = {}; let catTotals = {}; let vendorTotals = {};
+        function openBudgetManager() {
+            document.getElementById('bm-global').value = userBudget.global;
+            const container = document.getElementById('bm-categories'); container.innerHTML = '';
+            Object.keys(userBudget.categories).forEach(cat => {
+                container.innerHTML += `<div class="flex justify-between items-center gap-4 bg-corp-800 p-2.5 rounded-lg border border-corp-700"><span class="text-sm text-gray-300 font-medium w-24 truncate">${cat}</span><div class="flex items-center gap-2 flex-1"><span class="text-gray-500 text-xs">₹</span><input type="number" data-cat="${cat}" value="${userBudget.categories[cat]}" oninput="calcUnallocated()" class="bm-cat-input w-full bg-corp-900 border border-corp-600 rounded px-2 py-1.5 text-sm text-white outline-none focus:border-corp-500 text-right"></div></div>`;
+            });
+            calcUnallocated(); document.getElementById('budget-modal').classList.remove('hidden');
+        }
+        function closeBudgetManager() { document.getElementById('budget-modal').classList.add('hidden'); }
+        function calcUnallocated() {
+            const globalLimit = Number(document.getElementById('bm-global').value) || 0; let sumCats = 0;
+            document.querySelectorAll('.bm-cat-input').forEach(input => { sumCats += (Number(input.value) || 0); });
+            const unallocated = globalLimit - sumCats; const unEl = document.getElementById('bm-unallocated'); const warnEl = document.getElementById('bm-warning'); const saveBtn = document.getElementById('bm-save-btn');
+            unEl.innerText = `₹ ${formatMoney(unallocated)}`;
+            if (unallocated < 0) { unEl.classList.replace('text-green-400', 'text-red-400'); warnEl.innerText = "⚠️ Global Budget Exceeded."; warnEl.classList.add('text-red-400'); saveBtn.disabled = true; } 
+            else { unEl.classList.replace('text-red-400', 'text-green-400'); warnEl.innerText = "Assign these remaining funds."; warnEl.classList.remove('text-red-400'); saveBtn.disabled = false; }
+        }
+        function saveBudgetConfig() {
+            userBudget.global = Number(document.getElementById('bm-global').value) || 0;
+            document.querySelectorAll('.bm-cat-input').forEach(input => { userBudget.categories[input.getAttribute('data-cat')] = Number(input.value) || 0; });
+            closeBudgetManager(); renderCashflowAnalytics(); renderHomeWidgets(); triggerSync();
+        }
 
+        function renderCashflowAnalytics(recalcStats = true) {
+            const selMonth = document.getElementById('analytics-month').value; if(!selMonth) return;
+            let tTotalInc = 0, tTotalExp = 0, tTotalInv = 0; let dayGroups = {}; let catTotals = {}; let vendorTotals = {};
             let lastMonthStr = ''; let lmTotalExp = 0;
-            if(recalcStats) {
-                const parts = selMonth.split('-');
-                let lmDate = new Date(parts[0], parts[1]-1, 1);
-                lmDate.setMonth(lmDate.getMonth() - 1);
-                lastMonthStr = lmDate.getFullYear() + '-' + String(lmDate.getMonth()+1).padStart(2, '0');
-            }
+            if(recalcStats) { const parts = selMonth.split('-'); let lmDate = new Date(parts[0], parts[1]-1, 1); lmDate.setMonth(lmDate.getMonth() - 1); lastMonthStr = lmDate.getFullYear() + '-' + String(lmDate.getMonth()+1).padStart(2, '0'); }
 
             transactionsDB.forEach(tx => {
                 if(tx.date.startsWith(selMonth)) {
                     if(tx.type === 'income') { if(recalcStats) tTotalInc += tx.amount; } 
-                    else {
-                        if(recalcStats) {
-                            tTotalExp += tx.amount;
-                            if(!catTotals[tx.category]) catTotals[tx.category] = { amount: 0, emoji: tx.emoji }; catTotals[tx.category].amount += tx.amount;
-                            let vendorName = tx.desc ? tx.desc.trim() : tx.category; if(!vendorTotals[vendorName]) vendorTotals[vendorName] = { amount: 0, emoji: tx.emoji }; vendorTotals[vendorName].amount += tx.amount;
-                        }
-                    }
-                    
-                    let passesFilter = true;
-                    if(anaTimelineFilter && tx.type !== 'income') {
-                        if(anaTimelineFilter.type === 'category' && tx.category !== anaTimelineFilter.value) passesFilter = false;
-                        if(anaTimelineFilter.type === 'vendor' && (tx.desc ? tx.desc.trim() : tx.category) !== anaTimelineFilter.value) passesFilter = false;
-                    } else if (anaTimelineFilter && tx.type === 'income') { passesFilter = false; }
-
-                    if(passesFilter) {
-                        if(!dayGroups[tx.date]) dayGroups[tx.date] = { net: 0, items: [] }; 
-                        dayGroups[tx.date].items.push({...tx, isRec: false}); 
-                        dayGroups[tx.date].net += (tx.type === 'income' ? tx.amount : -tx.amount);
-                    }
+                    else { if(recalcStats) { tTotalExp += tx.amount; if(!catTotals[tx.category]) catTotals[tx.category] = { amount: 0, emoji: tx.emoji }; catTotals[tx.category].amount += tx.amount; let vendorName = tx.desc ? tx.desc.trim() : tx.category; if(!vendorTotals[vendorName]) vendorTotals[vendorName] = { amount: 0, emoji: tx.emoji }; vendorTotals[vendorName].amount += tx.amount; } }
+                    let passesFilter = true; if(anaTimelineFilter && tx.type !== 'income') { if(anaTimelineFilter.type === 'category' && tx.category !== anaTimelineFilter.value) passesFilter = false; if(anaTimelineFilter.type === 'vendor' && (tx.desc ? tx.desc.trim() : tx.category) !== anaTimelineFilter.value) passesFilter = false; } else if (anaTimelineFilter && tx.type === 'income') { passesFilter = false; }
+                    if(passesFilter) { if(!dayGroups[tx.date]) dayGroups[tx.date] = { net: 0, items: [] }; dayGroups[tx.date].items.push({...tx, isRec: false}); dayGroups[tx.date].net += (tx.type === 'income' ? tx.amount : -tx.amount); }
                 }
                 if(recalcStats && tx.type === 'expense' && tx.date.startsWith(lastMonthStr)) { lmTotalExp += tx.amount; }
             });
@@ -963,364 +884,177 @@
                 if(r.done && r.date.startsWith(selMonth)) {
                     let isInv = r.tags.includes('Investments') || r.type === 'Investments';
                     if(isInv) { if(recalcStats) tTotalInv += Number(r.amount); } 
-                    else {
-                        if(recalcStats) {
-                            tTotalExp += Number(r.amount);
-                            if(!catTotals[r.type]) catTotals[r.type] = { amount: 0, emoji: '🔄' }; catTotals[r.type].amount += Number(r.amount);
-                            let vendorName = r.name.trim(); if(!vendorTotals[vendorName]) vendorTotals[vendorName] = { amount: 0, emoji: '🔄' }; vendorTotals[vendorName].amount += Number(r.amount);
-                        }
-                    }
-
-                    let passesFilter = true;
-                    if(anaTimelineFilter && !isInv) {
-                        if(anaTimelineFilter.type === 'category' && r.type !== anaTimelineFilter.value) passesFilter = false;
-                        if(anaTimelineFilter.type === 'vendor' && r.name.trim() !== anaTimelineFilter.value) passesFilter = false;
-                    } else if (anaTimelineFilter && isInv) { passesFilter = false; }
-
-                    if(passesFilter) {
-                        if(!dayGroups[r.date]) dayGroups[r.date] = { net: 0, items: [] }; 
-                        dayGroups[r.date].items.push({...r, isRec: true, type: 'expense', emoji: '🔄'}); 
-                        dayGroups[r.date].net -= Number(r.amount);
-                    }
+                    else { if(recalcStats) { tTotalExp += Number(r.amount); if(!catTotals[r.type]) catTotals[r.type] = { amount: 0, emoji: '🔄' }; catTotals[r.type].amount += Number(r.amount); let vendorName = r.name.trim(); if(!vendorTotals[vendorName]) vendorTotals[vendorName] = { amount: 0, emoji: '🔄' }; vendorTotals[vendorName].amount += Number(r.amount); } }
+                    let passesFilter = true; if(anaTimelineFilter && !isInv) { if(anaTimelineFilter.type === 'category' && r.type !== anaTimelineFilter.value) passesFilter = false; if(anaTimelineFilter.type === 'vendor' && r.name.trim() !== anaTimelineFilter.value) passesFilter = false; } else if (anaTimelineFilter && isInv) { passesFilter = false; }
+                    if(passesFilter) { if(!dayGroups[r.date]) dayGroups[r.date] = { net: 0, items: [] }; dayGroups[r.date].items.push({...r, isRec: true, type: 'expense', emoji: '🔄'}); dayGroups[r.date].net -= Number(r.amount); }
                 }
                 if(recalcStats && r.done && r.date.startsWith(lastMonthStr) && !r.tags.includes('Investments') && r.type !== 'Investments') { lmTotalExp += Number(r.amount); }
             });
 
             if(recalcStats) {
                 window.currentAnaStats = { catTotals, vendorTotals, totalExp: tTotalExp };
-                document.getElementById('ana-income').innerText = `₹ ${formatMoney(tTotalInc)}`; 
-                if(!isIncomeRevealed) document.getElementById('ana-income').classList.add('income-blur');
+                document.getElementById('ana-income').innerText = `₹ ${formatMoney(tTotalInc)}`; if(!isIncomeRevealed) document.getElementById('ana-income').classList.add('income-blur');
                 document.getElementById('ana-expense').innerText = `₹ ${formatMoney(tTotalExp)}`; document.getElementById('ana-invest').innerText = `₹ ${formatMoney(tTotalInv)}`;
-                
                 const maxBar = Math.max(tTotalExp, lmTotalExp, 1);
-                const lmPct = (lmTotalExp / maxBar) * 100; const tmPct = (tTotalExp / maxBar) * 100;
-                document.getElementById('bar-last-month').style.height = `${lmPct}%`; document.getElementById('bar-last-month').innerText = `₹${(lmTotalExp/1000).toFixed(1)}k`;
-                document.getElementById('bar-curr-month').style.height = `${tmPct}%`; document.getElementById('bar-curr-month').innerText = `₹${(tTotalExp/1000).toFixed(1)}k`;
-
-                const budgetList = document.getElementById('ana-budget-list');
-                budgetList.innerHTML = '';
-                let hasBudgets = false;
-                
+                document.getElementById('bar-last-month').style.height = `${(lmTotalExp / maxBar) * 100}%`; document.getElementById('bar-curr-month').style.height = `${(tTotalExp / maxBar) * 100}%`;
+                const budgetList = document.getElementById('ana-budget-list'); budgetList.innerHTML = ''; let hasBudgets = false;
                 Object.keys(userBudget.categories).forEach(cat => {
-                    const limit = userBudget.categories[cat];
-                    if (limit > 0) hasBudgets = true; 
-                    const spent = (catTotals[cat] ? catTotals[cat].amount : 0);
-                    if(limit === 0 && spent === 0) return;
-                    
-                    let pct = limit > 0 ? (spent / limit) * 100 : (spent > 0 ? 100 : 0);
-                    if(pct > 100) pct = 100;
+                    const limit = userBudget.categories[cat]; if (limit > 0) hasBudgets = true; const spent = (catTotals[cat] ? catTotals[cat].amount : 0); if(limit === 0 && spent === 0) return;
+                    let pct = limit > 0 ? (spent / limit) * 100 : (spent > 0 ? 100 : 0); if(pct > 100) pct = 100;
                     let color = pct > 90 ? 'bg-red-500' : (pct > 70 ? 'bg-yellow-500' : 'bg-corp-500');
-                    
-                    budgetList.innerHTML += `
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-gray-300 font-medium">${cat}</span>
-                                <span class="text-gray-400">₹${formatMoney(spent)} / ${formatMoney(limit)}</span>
-                            </div>
-                            <div class="w-full bg-corp-900 rounded-full h-1.5 border border-corp-700 overflow-hidden">
-                                <div class="${color} h-1.5 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
-                            </div>
-                        </div>
-                    `;
+                    budgetList.innerHTML += `<div><div class="flex justify-between text-xs mb-1"><span class="text-gray-300 font-medium">${cat}</span><span class="text-gray-400">₹${formatMoney(spent)} / ${formatMoney(limit)}</span></div><div class="w-full bg-corp-900 rounded-full h-1.5 border border-corp-700 overflow-hidden"><div class="${color} h-1.5 rounded-full transition-all duration-500" style="width: ${pct}%"></div></div></div>`;
                 });
-                
-                if(!hasBudgets) {
-                    budgetList.innerHTML = `<p class="text-xs text-gray-500 italic">No limits set. Click Manage to configure.</p>`;
-                }
-
+                if(!hasBudgets) { budgetList.innerHTML = `<p class="text-xs text-gray-500 italic">No limits set. Click Manage to configure.</p>`; }
                 renderBreakdownList();
             }
 
             const timeline = document.getElementById('analytics-timeline'); timeline.innerHTML = '';
             let sortedDays = Object.keys(dayGroups).sort((a,b) => new Date(b) - new Date(a));
             if(sortedDays.length === 0) { timeline.innerHTML = `<p class="text-sm text-gray-500 italic text-center mt-10">No transactions match this view.</p>`; return; }
-
             sortedDays.forEach(dateStr => {
                 const dayData = dayGroups[dateStr]; const displayDate = new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
                 let dayHtml = `<div class="mb-4"><h3 class="text-gray-400 font-bold mb-3 border-b border-corp-700 pb-1 text-sm tracking-wide uppercase">📅 ${displayDate}</h3><div class="space-y-2">`;
                 dayData.items.forEach(item => {
-                    const acc = accounts.find(a => a.id === item.modeId); const isInc = item.type === 'income'; const amountStr = `${isInc ? '+' : '-'} ₹${formatMoney(item.amount)}`; const colorClass = isInc ? 'text-green-400' : 'text-red-400'; const title = item.isRec ? `${item.name} (${item.type})` : (item.desc || item.category);
-                    dayHtml += `<div class="flex flex-col sm:flex-row sm:items-center justify-between bg-corp-900/50 p-3 rounded-lg border border-corp-700/50 hover:bg-corp-800 transition group gap-2"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-corp-800 flex items-center justify-center text-lg border border-corp-700 shrink-0 shadow-sm">${item.emoji}</div><div><div class="font-medium text-gray-200 text-sm">${title}</div><div class="text-xs text-gray-500 flex gap-2 mt-0.5"><span>💳 ${acc?acc.name:'Unknown'}</span> ${item.isRec ? '<span class="text-corp-400">🔄 Recurring</span>' : ''}</div>${(item.tags && item.tags.length > 0) ? `<div class="mt-1 flex flex-wrap gap-1">${renderTagBadges(item.tags)}</div>` : ''}</div></div><div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 w-full sm:w-auto"><span class="${colorClass} font-bold text-sm tracking-wide">${amountStr}</span>${!item.isRec ? `<button onclick="delTransaction(${item.id})" class="text-gray-500 hover:text-red-400 text-xs opacity-100 sm:opacity-0 group-hover:opacity-100 transition">Refund & Delete</button>` : ''}</div></div>`;
+                    const acc = accounts.find(a => a.id === item.modeId); const isInc = item.type === 'income'; const colorClass = isInc ? 'text-green-400' : 'text-red-400'; const title = item.isRec ? `${item.name} (${item.type})` : (item.desc || item.category);
+                    dayHtml += `<div class="flex flex-col sm:flex-row sm:items-center justify-between bg-corp-900/50 p-3 rounded-lg border border-corp-700/50 hover:bg-corp-800 transition group gap-2"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-corp-800 flex items-center justify-center text-lg border border-corp-700 shrink-0 shadow-sm">${item.emoji}</div><div><div class="font-medium text-gray-200 text-sm">${title}</div><div class="text-xs text-gray-500 flex gap-2 mt-0.5"><span>💳 ${acc?acc.name:'Unknown'}</span> ${item.isRec ? '<span class="text-corp-400">🔄 Recurring</span>' : ''}</div>${(item.tags && item.tags.length > 0) ? `<div class="mt-1 flex flex-wrap gap-1">${renderTagBadges(item.tags)}</div>` : ''}</div></div><div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 w-full sm:w-auto"><span class="${colorClass} font-bold text-sm tracking-wide">${isInc ? '+' : '-'} ₹${formatMoney(item.amount)}</span>${!item.isRec ? `<button onclick="delTransaction(${item.id})" class="text-gray-500 hover:text-red-400 text-xs opacity-100 sm:opacity-0 group-hover:opacity-100 transition">Refund & Delete</button>` : ''}</div></div>`;
                 });
-                const netColor = dayData.net >= 0 ? 'text-green-400' : 'text-red-400'; const netSign = dayData.net >= 0 ? '+' : '';
-                dayHtml += `</div><div class="text-right mt-2 mr-2"><span class="text-xs text-gray-500 font-semibold uppercase tracking-wider mr-2">Daily Net:</span><span class="${netColor} font-bold text-sm bg-corp-900 px-2 py-1 rounded border border-corp-700 shadow-inner">${netSign}₹${formatMoney(dayData.net)}</span></div></div>`;
+                dayHtml += `</div><div class="text-right mt-2 mr-2"><span class="text-xs text-gray-500 font-semibold uppercase tracking-wider mr-2">Daily Net:</span><span class="${dayData.net >= 0 ? 'text-green-400' : 'text-red-400'} font-bold text-sm bg-corp-900 px-2 py-1 rounded border border-corp-700 shadow-inner">${dayData.net >= 0 ? '+' : ''}₹${formatMoney(dayData.net)}</span></div></div>`;
                 timeline.innerHTML += dayHtml;
             });
         }
-
         function renderBreakdownList() {
             if(!window.currentAnaStats) return; const stats = window.currentAnaStats; const container = document.getElementById('ana-breakdown-list'); container.innerHTML = '';
             const dataMap = anaBreakdownView === 'category' ? stats.catTotals : stats.vendorTotals; let sorted = Object.keys(dataMap).sort((a,b) => dataMap[b].amount - dataMap[a].amount);
-            if(sorted.length === 0) { container.innerHTML = `<p class="text-xs text-gray-500 italic text-center mt-4">No data to display.</p>`; return; }
-            
+            if(sorted.length === 0) { container.innerHTML = `<p class="text-xs text-gray-500 italic text-center mt-4">No data.</p>`; return; }
             sorted.forEach(key => { 
-                const item = dataMap[key]; const pct = stats.totalExp > 0 ? (item.amount / stats.totalExp) * 100 : 0; 
-                let isFiltered = anaTimelineFilter && anaTimelineFilter.type === anaBreakdownView && anaTimelineFilter.value === key;
-                
-                container.innerHTML += `<div class="mb-3 cursor-pointer p-2 rounded transition hover:bg-corp-700 ${isFiltered ? 'filter-active' : ''}" onclick="setTimelineFilter('${anaBreakdownView}', '${key.replace(/'/g, "\\'")}')">
-                    <div class="flex justify-between text-xs mb-1.5"><span class="text-gray-300 font-medium truncate pr-2">${item.emoji} ${key}</span><span class="text-gray-400 whitespace-nowrap">₹${formatMoney(item.amount)} <span class="text-gray-600">(${pct.toFixed(0)}%)</span></span></div>
-                    <div class="w-full bg-corp-900 rounded-full h-1.5 border border-corp-700 overflow-hidden"><div class="bg-corp-500 h-1.5 rounded-full" style="width: ${pct}%"></div></div>
-                </div>`; 
+                const item = dataMap[key]; const pct = stats.totalExp > 0 ? (item.amount / stats.totalExp) * 100 : 0; let isFiltered = anaTimelineFilter && anaTimelineFilter.type === anaBreakdownView && anaTimelineFilter.value === key;
+                container.innerHTML += `<div class="mb-3 cursor-pointer p-2 rounded transition hover:bg-corp-700 ${isFiltered ? 'filter-active' : ''}" onclick="setTimelineFilter('${anaBreakdownView}', '${key.replace(/'/g, "\\'")}')"><div class="flex justify-between text-xs mb-1.5"><span class="text-gray-300 font-medium truncate pr-2">${item.emoji} ${key}</span><span class="text-gray-400 whitespace-nowrap">₹${formatMoney(item.amount)} <span class="text-gray-600">(${pct.toFixed(0)}%)</span></span></div><div class="w-full bg-corp-900 rounded-full h-1.5 border border-corp-700 overflow-hidden"><div class="bg-corp-500 h-1.5 rounded-full" style="width: ${pct}%"></div></div></div>`; 
             });
-            
-            document.getElementById('btn-view-cat').classList.toggle('bg-corp-700', anaBreakdownView === 'category'); document.getElementById('btn-view-cat').classList.toggle('text-white', anaBreakdownView === 'category'); document.getElementById('btn-view-cat').classList.toggle('text-gray-400', anaBreakdownView !== 'category');
-            document.getElementById('btn-view-ven').classList.toggle('bg-corp-700', anaBreakdownView === 'vendor'); document.getElementById('btn-view-ven').classList.toggle('text-white', anaBreakdownView === 'vendor'); document.getElementById('btn-view-ven').classList.toggle('text-gray-400', anaBreakdownView !== 'vendor');
+            document.getElementById('btn-view-cat').className = `px-3 py-1 font-medium transition ${anaBreakdownView === 'category' ? 'bg-corp-700 text-white' : 'text-gray-400'}`;
+            document.getElementById('btn-view-ven').className = `px-3 py-1 font-medium transition ${anaBreakdownView === 'vendor' ? 'bg-corp-700 text-white' : 'text-gray-400'}`;
         }
 
         // ==========================================
-        // HOME DASHBOARD ENGINE
+        // MODULE: HOME DASHBOARD
         // ==========================================
         function renderHomeWidgets() {
-            const todayStr = todayISO().split('T')[0];
-            const tomorrow = new Date(TODAY); tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowStr = tomorrow.toISOString().split('T')[0];
-            const currMonth = todayISO().slice(0,7);
+            const todayStr = TODAY.toISOString().split('T')[0];
+            const tomorrow = new Date(TODAY); tomorrow.setDate(tomorrow.getDate() + 1); const tomorrowStr = tomorrow.toISOString().split('T')[0];
+            const currMonth = TODAY.toISOString().slice(0,7);
 
-            const folderSelect = document.getElementById('scratch-folder');
-            folderSelect.innerHTML = folders.map(f => `<option value="${f.id}" ${f.name.includes('Brainstorming')?'selected':''}>${f.name}</option>`).join('');
+            const folderSelect = document.getElementById('scratch-folder'); folderSelect.innerHTML = folders.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
 
             const tasksList = document.getElementById('home-tasks-list');
             let pendingTasks = tDB.filter(t => !t.done && t.date <= todayStr);
             if(pendingTasks.length === 0) { tasksList.innerHTML = `<p class="text-xs text-gray-500 italic">No tasks due today. You are all caught up!</p>`; } 
-            else {
-                tasksList.innerHTML = pendingTasks.map(t => {
-                    const isOverdue = t.date < todayStr;
-                    return `<div class="flex items-center gap-3 bg-corp-900/50 p-2.5 rounded border border-corp-700"><input type="checkbox" onchange="toggleTaskDone(${t.id}); renderHomeWidgets();" class="w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 cursor-pointer"><div class="flex-1 min-w-0"><p class="text-sm text-gray-200 truncate font-medium">${t.name}</p><p class="text-xs ${isOverdue?'text-red-400 font-bold':'text-gray-500'}">🏢 ${t.client_name} ${isOverdue?'(Overdue)':''}</p></div></div>`;
-                }).join('');
-            }
+            else { tasksList.innerHTML = pendingTasks.map(t => { const isOverdue = t.date < todayStr; return `<div class="flex items-center gap-3 bg-corp-900/50 p-2.5 rounded border border-corp-700"><input type="checkbox" onchange="toggleTaskDone(${t.id}); renderHomeWidgets();" class="w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 cursor-pointer"><div class="flex-1 min-w-0"><p class="text-sm text-gray-200 truncate font-medium">${t.name}</p><p class="text-xs ${isOverdue?'text-red-400 font-bold':'text-gray-500'}">🗂 ${t.category} ${isOverdue?'(Overdue)':''}</p></div></div>`; }).join(''); }
 
             const cashList = document.getElementById('home-cash-list');
             let upcomingFlow = recDB.filter(r => !r.done && r.date <= tomorrowStr);
             if(upcomingFlow.length === 0) { cashList.innerHTML = `<p class="text-xs text-gray-500 italic">No bills or SIPs due or overdue.</p>`; } 
-            else {
-                cashList.innerHTML = upcomingFlow.map(r => {
-                    const acc = accounts.find(a => a.id === r.modeId);
-                    let dueText = ''; let dueClass = '';
-                    if(r.date < todayStr) { dueText = 'OVERDUE'; dueClass = 'text-red-500 font-bold'; }
-                    else if(r.date === todayStr) { dueText = 'Due Today'; dueClass = 'text-orange-400 font-bold'; }
-                    else { dueText = 'Due Tomorrow'; dueClass = 'text-yellow-400'; }
-                    
-                    return `<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-corp-900/50 p-2.5 rounded border border-corp-700 gap-2"><div class="flex-1 w-full"><p class="text-sm text-gray-200 font-medium">${r.name}</p><p class="text-xs text-gray-500">💳 ${acc?acc.name:''} • <span class="${dueClass}">${dueText}</span></p></div><span class="text-red-400 font-bold text-sm">-₹${formatMoney(r.amount)}</span></div>`;
-                }).join('');
-            }
+            else { cashList.innerHTML = upcomingFlow.map(r => { const acc = accounts.find(a => a.id === r.modeId); let dueText = ''; let dueClass = ''; if(r.date < todayStr) { dueText = 'OVERDUE'; dueClass = 'text-red-500 font-bold'; } else if(r.date === todayStr) { dueText = 'Due Today'; dueClass = 'text-orange-400 font-bold'; } else { dueText = 'Due Tomorrow'; dueClass = 'text-yellow-400'; } return `<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-corp-900/50 p-2.5 rounded border border-corp-700 gap-2"><div class="flex-1 w-full"><p class="text-sm text-gray-200 font-medium">${r.name}</p><p class="text-xs text-gray-500">💳 ${acc?acc.name:''} • <span class="${dueClass}">${dueText}</span></p></div><span class="text-red-400 font-bold text-sm">-₹${formatMoney(r.amount)}</span></div>`; }).join(''); }
 
-            const docAlertsContainer = document.getElementById('home-doc-alerts');
-            const docList = document.getElementById('home-doc-list');
-            let expiringDocs = docsDB.filter(d => {
-                if(!d.expiry) return false;
-                const expDate = new Date(d.expiry + 'T00:00:00'); const todayDate = new Date(todayStr + 'T00:00:00'); const diffDays = Math.round((expDate - todayDate) / (1000 * 60 * 60 * 24));
-                return diffDays <= 30; 
-            });
+            const docAlertsContainer = document.getElementById('home-doc-alerts'); const docList = document.getElementById('home-doc-list');
+            let expiringDocs = docsDB.filter(d => { if(!d.expiry) return false; const expDate = new Date(d.expiry + 'T00:00:00'); const todayDate = new Date(todayStr + 'T00:00:00'); const diffDays = Math.round((expDate - todayDate) / (1000 * 60 * 60 * 24)); return diffDays <= 30; });
+            if(expiringDocs.length > 0) { docAlertsContainer.classList.remove('hidden'); docList.innerHTML = expiringDocs.map(d => { const expDate = new Date(d.expiry + 'T00:00:00'); const diffDays = Math.round((expDate - new Date(todayStr + 'T00:00:00')) / (1000 * 60 * 60 * 24)); let expText = ''; let expClass = ''; if (diffDays < 0) { expText = 'Expired'; expClass = 'text-red-500 font-bold'; } else if (diffDays === 0) { expText = 'Expiring Today'; expClass = 'text-orange-500 font-bold'; } else { expText = `Exp in ${diffDays} days`; expClass = 'text-yellow-500 font-bold'; } return `<div class="flex items-center justify-between bg-corp-900/50 p-2.5 rounded border border-orange-900/30"><p class="text-sm text-gray-200 font-medium">${d.name}</p><span class="text-xs ${expClass} bg-corp-900 px-2 py-1 rounded border border-corp-700">${expText}</span></div>`; }).join(''); } else { docAlertsContainer.classList.add('hidden'); }
 
-            if(expiringDocs.length > 0) {
-                docAlertsContainer.classList.remove('hidden');
-                docList.innerHTML = expiringDocs.map(d => {
-                    const expDate = new Date(d.expiry + 'T00:00:00'); const todayDate = new Date(todayStr + 'T00:00:00'); const diffDays = Math.round((expDate - todayDate) / (1000 * 60 * 60 * 24));
-                    let expText = ''; let expClass = '';
-                    if (diffDays < 0) { expText = 'Expired'; expClass = 'text-red-500 font-bold'; }
-                    else if (diffDays === 0) { expText = 'Expiring Today'; expClass = 'text-orange-500 font-bold'; }
-                    else { expText = `Exp in ${diffDays} days`; expClass = 'text-yellow-500 font-bold'; }
-                    return `<div class="flex items-center justify-between bg-corp-900/50 p-2.5 rounded border border-orange-900/30"><p class="text-sm text-gray-200 font-medium">${d.name}</p><span class="text-xs ${expClass} bg-corp-900 px-2 py-1 rounded border border-corp-700">${expText}</span></div>`;
-                }).join('');
-            } else { docAlertsContainer.classList.add('hidden'); }
-
-            let monthExp = 0;
-            transactionsDB.forEach(tx => { if(tx.date.startsWith(currMonth) && tx.type === 'expense') monthExp += tx.amount; });
-            recDB.forEach(r => { if(r.done && r.date.startsWith(currMonth) && !r.tags.includes('Investments') && r.type !== 'Investments') monthExp += Number(r.amount); });
-            
-            document.getElementById('home-bud-spent').innerText = `₹${formatMoney(monthExp)}`;
-            document.getElementById('home-bud-limit').innerText = `₹${formatMoney(userBudget.global)}`;
-            
-            let budPct = userBudget.global > 0 ? (monthExp / userBudget.global) * 100 : 100;
-            if(budPct > 100) budPct = 100;
-            const bar = document.getElementById('home-bud-bar');
-            bar.style.width = `${budPct}%`;
-            bar.className = `h-full transition-all ${budPct > 90 ? 'bg-red-500' : (budPct > 75 ? 'bg-yellow-500' : 'bg-corp-500')}`;
-            
-            const remaining = userBudget.global - monthExp;
-            let statusText = `₹${formatMoney(Math.abs(remaining))} ${remaining >= 0 ? 'Remaining' : 'Over Budget'}`;
-            document.getElementById('home-bud-text').innerText = isPrivate ? "Hidden" : statusText;
+            let monthExp = 0; transactionsDB.forEach(tx => { if(tx.date.startsWith(currMonth) && tx.type === 'expense') monthExp += tx.amount; }); recDB.forEach(r => { if(r.done && r.date.startsWith(currMonth) && !r.tags.includes('Investments') && r.type !== 'Investments') monthExp += Number(r.amount); });
+            document.getElementById('home-bud-spent').innerText = `₹${formatMoney(monthExp)}`; document.getElementById('home-bud-limit').innerText = `₹${formatMoney(userBudget.global)}`;
+            let budPct = userBudget.global > 0 ? (monthExp / userBudget.global) * 100 : 100; if(budPct > 100) budPct = 100;
+            document.getElementById('home-bud-bar').style.width = `${budPct}%`; document.getElementById('home-bud-bar').className = `h-full transition-all ${budPct > 90 ? 'bg-red-500' : (budPct > 75 ? 'bg-yellow-500' : 'bg-corp-500')}`;
+            const remaining = userBudget.global - monthExp; document.getElementById('home-bud-text').innerText = isPrivate ? "Hidden" : `₹${formatMoney(Math.abs(remaining))} ${remaining >= 0 ? 'Remaining' : 'Over Budget'}`;
         }
-
         function saveScratchpad() {
             const input = document.getElementById('home-scratchpad'); const text = input.value.trim(); if(!text) return;
             const targetFolderId = document.getElementById('scratch-folder').value;
             notesDB.push({ id: 'n_' + Date.now(), folderId: targetFolderId, title: `Quick Note (${TODAY.toLocaleDateString()})`, content: text.replace(/\n/g, '<br>') });
             input.value = ''; const status = document.getElementById('scratch-status'); status.classList.remove('hidden'); setTimeout(() => status.classList.add('hidden'), 3000);
-            renderNotesSidebar();
+            renderNotesSidebar(); triggerSync();
         }
 
         // ==========================================
-        // DOCUMENTS VAULT
+        // MODULE: DOCUMENTS
         // ==========================================
-        let docsDB = [];
-
         function addDocument(e) {
-            e.preventDefault(); const tagsInput = document.getElementById('doc-tags').value;
-            docsDB.push({ id: 'd_' + Date.now(), name: document.getElementById('doc-name').value, category: document.getElementById('doc-cat').value, expiry: document.getElementById('doc-exp').value, link: document.getElementById('doc-link').value, tags: parseTags(tagsInput) });
-            document.getElementById('doc-form').reset(); renderDocs(); renderHomeWidgets();
+            e.preventDefault(); docsDB.push({ id: 'd_' + Date.now(), name: document.getElementById('doc-name').value, category: document.getElementById('doc-cat').value, expiry: document.getElementById('doc-exp').value, link: document.getElementById('doc-link').value, tags: parseTags(document.getElementById('doc-tags').value) });
+            document.getElementById('doc-form').reset(); renderDocs(); renderHomeWidgets(); triggerSync();
         }
-
-        function delDoc(id) { if(confirm("Remove this document from the vault?")) { docsDB = docsDB.filter(d => d.id !== id); renderDocs(); renderHomeWidgets(); } }
-
+        function delDoc(id) { if(confirm("Remove this document?")) { docsDB = docsDB.filter(d => d.id !== id); renderDocs(); renderHomeWidgets(); triggerSync(); } }
         function renderDocs() {
-            const grid = document.getElementById('docs-grid'); const filterText = (document.getElementById('doc-search').value || '').toLowerCase(); const todayStr = todayISO().split('T')[0];
+            const grid = document.getElementById('docs-grid'); const filterText = (document.getElementById('doc-search').value || '').toLowerCase(); const todayStr = TODAY.toISOString().split('T')[0];
             let filtered = docsDB.filter(d => d.name.toLowerCase().includes(filterText) || d.category.toLowerCase().includes(filterText) || (d.tags && d.tags.join(' ').toLowerCase().includes(filterText)));
-            grid.innerHTML = '';
-            if(filtered.length === 0) { grid.innerHTML = `<p class="text-sm text-gray-500 italic col-span-full">No documents found.</p>`; return; }
-            const icons = { 'Identity':'🪪', 'Vehicle':'🚗', 'Education':'🎓', 'Health':'🏥', 'Property':'🏠', 'Office':'💼', 'Other':'📄' };
-
+            grid.innerHTML = ''; if(filtered.length === 0) { grid.innerHTML = `<p class="text-sm text-gray-500 italic col-span-full">No documents found.</p>`; return; }
+            const icons = { 'Identity':'🪪', 'Vehicle':'🚗', 'Education':'🎓', 'Health':'🏥', 'Property':'🏠', 'Other':'📄' };
             filtered.forEach(d => {
-                let expHtml = '';
-                if(d.expiry) {
-                    const expDate = new Date(d.expiry + 'T00:00:00'); const todayDate = new Date(todayStr + 'T00:00:00'); const diffDays = Math.round((expDate - todayDate) / (1000 * 60 * 60 * 24));
-                    if (diffDays < 0) expHtml = `<span class="text-xs bg-red-900/40 text-red-400 border border-red-800 px-2 py-0.5 rounded font-bold">Expired</span>`;
-                    else if (diffDays === 0) expHtml = `<span class="text-xs bg-orange-900/40 text-orange-400 border border-orange-800 px-2 py-0.5 rounded font-bold">Expiring Today</span>`;
-                    else if (diffDays <= 30) expHtml = `<span class="text-xs bg-yellow-900/40 text-yellow-400 border border-yellow-800 px-2 py-0.5 rounded font-bold">Exp in ${diffDays}d</span>`;
-                    else expHtml = `<span class="text-xs text-gray-500">Exp: ${expDate.toLocaleDateString()}</span>`;
-                }
-                grid.innerHTML += `
-                    <div class="bg-corp-800 border border-corp-700 rounded-xl p-5 shadow-lg flex flex-col hover:border-corp-500 transition group">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="flex items-center gap-3"><div class="text-3xl">${icons[d.category] || '📄'}</div><div><h3 class="text-white font-bold text-sm line-clamp-1" title="${d.name}">${d.name}</h3><span class="text-xs text-corp-400 bg-corp-900/50 px-2 py-0.5 rounded border border-corp-700">${d.category}</span></div></div>
-                            <button onclick="delDoc('${d.id}')" class="text-gray-500 hover:text-red-400 opacity-100 lg:opacity-0 group-hover:opacity-100 transition">✕</button>
-                        </div>
-                        <div class="mt-2 mb-4 flex-1">${expHtml}<div class="mt-2 flex flex-wrap gap-1">${renderTagBadges(d.tags)}</div></div>
-                        <a href="${d.link}" target="_blank" class="block w-full text-center bg-corp-900 hover:bg-corp-700 text-gray-300 border border-corp-600 rounded-lg py-2 text-sm font-bold transition">Open File ↗</a>
-                    </div>
-                `;
+                let expHtml = ''; if(d.expiry) { const expDate = new Date(d.expiry + 'T00:00:00'); const diffDays = Math.round((expDate - new Date(todayStr + 'T00:00:00')) / (1000 * 60 * 60 * 24)); if (diffDays < 0) expHtml = `<span class="text-xs bg-red-900/40 text-red-400 border border-red-800 px-2 py-0.5 rounded font-bold">Expired</span>`; else if (diffDays === 0) expHtml = `<span class="text-xs bg-orange-900/40 text-orange-400 border border-orange-800 px-2 py-0.5 rounded font-bold">Expiring Today</span>`; else if (diffDays <= 30) expHtml = `<span class="text-xs bg-yellow-900/40 text-yellow-400 border border-yellow-800 px-2 py-0.5 rounded font-bold">Exp in ${diffDays}d</span>`; else expHtml = `<span class="text-xs text-gray-500">Exp: ${expDate.toLocaleDateString()}</span>`; }
+                grid.innerHTML += `<div class="bg-corp-800 border border-corp-700 rounded-xl p-5 shadow-lg flex flex-col hover:border-corp-500 transition group"><div class="flex justify-between items-start mb-3"><div class="flex items-center gap-3"><div class="text-3xl">${icons[d.category] || '📄'}</div><div><h3 class="text-white font-bold text-sm line-clamp-1">${d.name}</h3><span class="text-xs text-corp-400 bg-corp-900/50 px-2 py-0.5 rounded border border-corp-700">${d.category}</span></div></div><button onclick="delDoc('${d.id}')" class="text-gray-500 hover:text-red-400 opacity-100 lg:opacity-0 group-hover:opacity-100 transition">✕</button></div><div class="mt-2 mb-4 flex-1">${expHtml}<div class="mt-2 flex flex-wrap gap-1">${renderTagBadges(d.tags)}</div></div><a href="${d.link}" target="_blank" class="block w-full text-center bg-corp-900 hover:bg-corp-700 text-gray-300 border border-corp-600 rounded-lg py-2 text-sm font-bold transition">Open File ↗</a></div>`;
             });
         }
 
         // ==========================================
-        // TAGGING SYSTEM HELPER
+        // MODULE: PIVOT TAGS
         // ==========================================
         function parseTags(tagStr) { return tagStr.split(',').map(t => t.trim()).filter(t => t !== ''); }
         function renderTagBadges(tagsArr) { if(!tagsArr || tagsArr.length === 0) return ''; return tagsArr.map(t => `<span onclick="openTagPivot('${t}')" class="bg-corp-600/40 border border-corp-500 text-corp-300 text-[10px] px-1.5 py-0.5 rounded mr-1 cursor-pointer hover:bg-corp-600 transition">#${t}</span>`).join(''); }
-        
         function openTagPivot(tag) {
             document.getElementById('pivot-title').innerText = '#' + tag; const content = document.getElementById('pivot-content'); content.innerHTML = '';
-            const mTasks = tDB.filter(t => t.tags && t.tags.includes(tag));
-            if(mTasks.length > 0) { content.innerHTML += `<h3 class="text-lg font-bold text-gray-300 border-b border-corp-700 pb-2">🎯 Related Tasks</h3><ul class="text-sm space-y-2">` + mTasks.map(t => `<li class="flex justify-between bg-corp-800 p-3 rounded border border-corp-700"><span class="${t.done?'line-through text-gray-500':'text-gray-200'}">${t.name}</span><span class="text-xs text-corp-400 bg-corp-900 px-2 py-1 rounded border border-corp-600">${t.status}</span></li>`).join('') + `</ul>`; }
+            const mTasks = tDB.filter(t => t.tags && t.tags.includes(tag)); if(mTasks.length > 0) { content.innerHTML += `<h3 class="text-lg font-bold text-gray-300 border-b border-corp-700 pb-2">🎯 Related Tasks</h3><ul class="text-sm space-y-2">` + mTasks.map(t => `<li class="flex justify-between bg-corp-800 p-3 rounded border border-corp-700"><span class="${t.done?'line-through text-gray-500':'text-gray-200'}">${t.name}</span><span class="text-xs text-corp-400 bg-corp-900 px-2 py-1 rounded border border-corp-600">${t.status}</span></li>`).join('') + `</ul>`; }
             const mFin = recDB.filter(r => r.tags && r.tags.includes(tag)); const mTx = transactionsDB.filter(e => e.tags && e.tags.includes(tag));
-            if(mFin.length > 0 || mTx.length > 0) {
-                let listHtml = ''; mFin.forEach(r => listHtml += `<li class="flex justify-between bg-corp-800 p-3 rounded border border-corp-700"><span class="text-gray-200">${r.name} (Recurring)</span><span class="text-red-400 font-medium">- ₹${formatMoney(r.amount)}</span></li>`); mTx.forEach(t => listHtml += `<li class="flex justify-between bg-corp-800 p-3 rounded border border-corp-700"><span class="text-gray-200">${t.emoji} ${t.desc || t.category} (Day-to-day)</span><span class="${t.type==='income'?'text-green-400':'text-red-400'} font-medium">${t.type==='income'?'+':'-'} ₹${formatMoney(t.amount)}</span></li>`);
-                content.innerHTML += `<h3 class="text-lg font-bold text-gray-300 border-b border-corp-700 pb-2 mt-4">💰 Financial Impact</h3><ul class="text-sm space-y-2">${listHtml}</ul>`;
-            }
-            const mNotes = notesDB.filter(n => n.content.includes('#' + tag));
-            if(mNotes.length > 0) { content.innerHTML += `<h3 class="text-lg font-bold text-gray-300 border-b border-corp-700 pb-2 mt-4">🧠 Mentions in Knowledge Base</h3><ul class="text-sm space-y-2">` + mNotes.map(n => `<li class="bg-corp-800 p-3 rounded border border-corp-700 text-gray-200 cursor-pointer hover:bg-corp-700 transition" onclick="closePivot(); switchTab('notes'); openNote('${n.id}');">📄 ${n.title || 'Untitled'}</li>`).join('') + `</ul>`; }
-            const mDocs = docsDB.filter(d => d.tags && d.tags.includes(tag));
-            if(mDocs.length > 0) { content.innerHTML += `<h3 class="text-lg font-bold text-gray-300 border-b border-corp-700 pb-2 mt-4">📁 Linked Documents</h3><ul class="text-sm space-y-2">` + mDocs.map(d => `<li class="bg-corp-800 p-3 rounded border border-corp-700 text-gray-200"><a href="${d.link}" target="_blank" class="hover:text-corp-400 transition">📄 ${d.name} ↗</a></li>`).join('') + `</ul>`; }
+            if(mFin.length > 0 || mTx.length > 0) { let listHtml = ''; mFin.forEach(r => listHtml += `<li class="flex justify-between bg-corp-800 p-3 rounded border border-corp-700"><span class="text-gray-200">${r.name} (Recurring)</span><span class="text-red-400 font-medium">- ₹${formatMoney(r.amount)}</span></li>`); mTx.forEach(t => listHtml += `<li class="flex justify-between bg-corp-800 p-3 rounded border border-corp-700"><span class="text-gray-200">${t.emoji} ${t.desc || t.category} (Day-to-day)</span><span class="${t.type==='income'?'text-green-400':'text-red-400'} font-medium">${t.type==='income'?'+':'-'} ₹${formatMoney(t.amount)}</span></li>`); content.innerHTML += `<h3 class="text-lg font-bold text-gray-300 border-b border-corp-700 pb-2 mt-4">💰 Financial Impact</h3><ul class="text-sm space-y-2">${listHtml}</ul>`; }
+            const mNotes = notesDB.filter(n => n.content.includes('#' + tag)); if(mNotes.length > 0) { content.innerHTML += `<h3 class="text-lg font-bold text-gray-300 border-b border-corp-700 pb-2 mt-4">🧠 Mentions in Knowledge Base</h3><ul class="text-sm space-y-2">` + mNotes.map(n => `<li class="bg-corp-800 p-3 rounded border border-corp-700 text-gray-200 cursor-pointer hover:bg-corp-700 transition" onclick="closePivot(); switchTab('notes'); openNote('${n.id}');">📄 ${n.title || 'Untitled'}</li>`).join('') + `</ul>`; }
+            const mDocs = docsDB.filter(d => d.tags && d.tags.includes(tag)); if(mDocs.length > 0) { content.innerHTML += `<h3 class="text-lg font-bold text-gray-300 border-b border-corp-700 pb-2 mt-4">📁 Linked Documents</h3><ul class="text-sm space-y-2">` + mDocs.map(d => `<li class="bg-corp-800 p-3 rounded border border-corp-700 text-gray-200"><a href="${d.link}" target="_blank" class="hover:text-corp-400 transition">📄 ${d.name} ↗</a></li>`).join('') + `</ul>`; }
             if(mTasks.length === 0 && mFin.length === 0 && mNotes.length === 0 && mTx.length === 0 && mDocs.length === 0) content.innerHTML = `<p class="text-gray-500 italic">No records found connected to #${tag}.</p>`;
             document.getElementById('tag-pivot-modal').classList.remove('hidden');
         }
         function closePivot() { document.getElementById('tag-pivot-modal').classList.add('hidden'); }
 
         // ==========================================
-        // RECURRING TRACKER MODULE
+        // MODULE: RECURRING
         // ==========================================
-        let recSortAscending = true;
-        let recCols = [ { id: 'done', label: '✔', fixed: true, width: '40px' }, { id: 'name', label: 'Aa Bill', width: '220px' }, { id: 'tags', label: '🏷 Tags', width: '130px' }, { id: 'type', label: '🗂 Type', width: '130px' }, { id: 'amount', label: '# Amount', width: '110px' }, { id: 'date', label: '📅 Due date', width: '130px' }, { id: 'status', label: '🔆 Status', width: '130px' }, { id: 'mode', label: '💳 Mode', width: '150px' }, { id: 'recurring', label: '🔄 Recurring', width: '100px' }, { id: 'actions', label: '✕', fixed: true, width: '50px' } ];
-        let recDB = [];
-
-        function evalRecStatus(dateStr) { const tgt = new Date(dateStr + 'T00:00:00'); const today = new Date(todayISO().split('T')[0]+'T00:00:00'); if (tgt < today) return 'Overdue'; if (tgt.getMonth() === today.getMonth() && tgt.getFullYear() === today.getFullYear()) return 'Due'; return 'Upcoming'; }
-
-        function addRecurring(e) { e.preventDefault(); const dateStr = document.getElementById('rec-date').value; const tagsInput = document.getElementById('rec-tags-input').value; recDB.push({ id: Date.now(), name: document.getElementById('rec-name').value, type: document.getElementById('rec-type').value, amount: document.getElementById('rec-amount').value, date: dateStr, modeId: document.getElementById('rec-mode').value, recurring: true, done: false, status: evalRecStatus(dateStr), tags: parseTags(tagsInput), custom: {} }); document.getElementById('rec-form').reset(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
-        function toggleRecPaid(id, isChecked) { const item = recDB.find(r => r.id === id); if(!item) return; if(item.done === isChecked) return; const success = processTransaction(item, !isChecked); if(!success) { renderRecTable(); return; } item.done = isChecked; item.status = isChecked ? 'Paid' : evalRecStatus(item.date); if(isChecked && item.recurring) { let oldD = new Date(item.date); oldD.setMonth(oldD.getMonth() + 1); recDB.push({ ...item, id: Date.now() + Math.floor(Math.random()*100), date: oldD.toISOString().split('T')[0], done: false, status: 'Upcoming', custom: {...item.custom} }); } renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
-        function updateRecField(id, field, val) { const item = recDB.find(r => r.id === id); if(!item) return; if(field === 'status') { if(val === 'Paid' && !item.done) { toggleRecPaid(id, true); return; } else if (val !== 'Paid' && item.done) { toggleRecPaid(id, false); item.status = val; renderRecTable(); renderCashflowAnalytics(); return; } item.status = val; } else { item[field] = val; if(field === 'date' && !item.done) item.status = evalRecStatus(val); } if(field === 'tags' || field === 'status' || field === 'date' || field === 'amount') { renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); } }
-        function delRec(id) { const item = recDB.find(r => r.id === id); if(!item) return; if(item.done) { if (!window.confirm(`WARNING: Deleting will refund ₹${item.amount} to your ledger. Proceed?`)) return; processTransaction(item, true); renderAccounts(); renderCashflowAnalytics(); } recDB = recDB.filter(r => r.id !== id); renderRecTable(); renderHomeWidgets(); }
-        function addRecCustomCol() { const name = prompt("Column Name:"); if(name) { recCols.splice(recCols.length-1, 0, { id: 'c_'+Date.now(), label: '📝 '+name, isCustom: true, width: '130px' }); renderRecTable(); } }
-        function toggleRecSort() { recSortAscending = !recSortAscending; renderRecTable(); }
-        function exportRecCSV() { let csv = "data:text/csv;charset=utf-8," + recCols.map(c => `"${c.label}"`).join(",") + "\r\n"; recDB.forEach(r => { let row = recCols.map(c => { if(c.id==='done') return r.done?'Yes':'No'; if(c.id==='name') return `"${r.name}"`; if(c.id==='tags') return `"${r.tags.join(', ')}"`; if(c.id==='type') return `"${r.type}"`; if(c.id==='amount') return `"${r.amount}"`; if(c.id==='date') return `"${r.date}"`; if(c.id==='status') return `"${r.status}"`; if(c.id==='mode') { let acc=accounts.find(a=>a.id===r.modeId); return acc?`"${acc.name}"`:'""'; } if(c.id==='recurring') return r.recurring?'Yes':'No'; if(c.id==='actions') return '""'; return `"${r.custom[c.id]||''}"`; }); csv += row.join(",") + "\r\n"; }); const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", "Recurring_Ledger.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
-
-        let rRsz=false, rTh=null, rSx=0, rSw=0, rDrag=null;
-        function initRRes(e, th, i) { e.stopPropagation(); rRsz=true; rTh=th; rSx=e.pageX; rSw=th.offsetWidth; rTh.classList.add('resizing'); document.body.style.cursor='col-resize'; document.addEventListener('mousemove', rMM); document.addEventListener('mouseup', rMU); }
-        function rMM(e) { if(!rRsz) return; const w=Math.max(60, rSw+(e.pageX-rSx)); rTh.style.width=`${w}px`; rTh.style.minWidth=`${w}px`; recCols[Array.from(rTh.parentNode.children).indexOf(rTh)].width = `${w}px`; }
-        function rMU() { rRsz=false; if(rTh) rTh.classList.remove('resizing'); rTh=null; document.body.style.cursor='default'; document.removeEventListener('mousemove', rMM); document.removeEventListener('mouseup', rMU); }
-        function rDStart(e,i){ if(recCols[i].fixed||e.target.classList.contains('resizer')){e.preventDefault();return;} rDrag=i; e.target.classList.add('opacity-50'); e.dataTransfer.effectAllowed='move';}
-        function rDDrop(e,i){ e.stopPropagation(); e.target.closest('th').classList.remove('drag-over'); if(rDrag!==null && rDrag!==i && !recCols[i].fixed && !recCols[rDrag].fixed){ recCols.splice(i, 0, recCols.splice(rDrag,1)[0]); renderRecTable(); } return false;}
-
+        let recCols = [ { id: 'done', label: '✔', fixed: true, width: '40px' }, { id: 'name', label: 'Aa Bill', width: '220px' }, { id: 'type', label: '🗂 Type', width: '130px' }, { id: 'amount', label: '# Amount', width: '110px' }, { id: 'date', label: '📅 Due date', width: '130px' }, { id: 'status', label: '🔆 Status', width: '130px' }, { id: 'actions', label: '✕', fixed: true, width: '50px' } ];
+        function evalRecStatus(dateStr) { const tgt = new Date(dateStr + 'T00:00:00'); const today = new Date(TODAY.toISOString().split('T')[0]+'T00:00:00'); if (tgt < today) return 'Overdue'; if (tgt.getMonth() === today.getMonth() && tgt.getFullYear() === today.getFullYear()) return 'Due'; return 'Upcoming'; }
+        function addRecurring(e) { e.preventDefault(); const dateStr = document.getElementById('rec-date').value; recDB.push({ id: Date.now(), name: document.getElementById('rec-name').value, type: document.getElementById('rec-type').value, amount: document.getElementById('rec-amount').value, date: dateStr, modeId: document.getElementById('rec-mode').value, recurring: true, done: false, status: evalRecStatus(dateStr), tags: parseTags(document.getElementById('rec-tags-input').value), custom: {} }); document.getElementById('rec-form').reset(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); triggerSync(); }
+        function updateRecField(id, field, val) { const item = recDB.find(r => r.id === id); if(!item) return; if(field === 'status') { if(val === 'Paid' && !item.done) { toggleRecPaid(id, true); return; } else if (val !== 'Paid' && item.done) { toggleRecPaid(id, false); item.status = val; renderRecTable(); renderCashflowAnalytics(); triggerSync(); return; } item.status = val; } else { item[field] = val; if(field === 'date' && !item.done) item.status = evalRecStatus(val); } if(field === 'tags' || field === 'status' || field === 'date' || field === 'amount') { renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); } triggerSync(); }
+        function toggleRecPaid(id, isChecked) { const item = recDB.find(r => r.id === id); if(!item || item.done === isChecked) return; const success = processTransaction(item, !isChecked); if(!success) { renderRecTable(); return; } item.done = isChecked; item.status = isChecked ? 'Paid' : evalRecStatus(item.date); if(isChecked && item.recurring) { let oldD = new Date(item.date); oldD.setMonth(oldD.getMonth() + 1); recDB.push({ ...item, id: Date.now() + Math.floor(Math.random()*100), date: oldD.toISOString().split('T')[0], done: false, status: 'Upcoming', custom: {...item.custom} }); } renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); triggerSync(); }
+        function delRec(id) { const item = recDB.find(r => r.id === id); if(!item) return; if(item.done) { if (!window.confirm(`Refund ₹${item.amount} to your ledger?`)) return; processTransaction(item, true); renderAccounts(); renderCashflowAnalytics(); } recDB = recDB.filter(r => r.id !== id); renderRecTable(); renderHomeWidgets(); triggerSync(); }
         function renderRecTable() {
-            const head = document.getElementById('rec-header'); head.innerHTML='';
-            recCols.forEach((col, i) => { const th = document.createElement('th'); th.className = `p-2 border-r border-corp-700 relative bg-corp-900 ${col.fixed?'text-center':'cursor-grab hover:bg-corp-800'}`; th.style.width=col.width; th.style.minWidth=col.width; if(col.fixed) { th.textContent=col.label; } else { th.draggable=true; th.ondragstart=(e)=>rDStart(e,i); th.ondragover=(e)=>{e.preventDefault(); e.target.closest('th').classList.add('drag-over'); return false;}; th.ondragleave=(e)=>e.target.closest('th').classList.remove('drag-over'); th.ondrop=(e)=>rDDrop(e,i); th.ondragend=(e)=>e.target.classList.remove('opacity-50'); th.innerHTML = `<input type="text" value="${col.label}" onchange="recCols[${i}].label=this.value" class="bg-transparent font-medium text-gray-400 focus:text-white focus:outline-none w-full cursor-pointer focus:cursor-text text-sm">`; const r = document.createElement('div'); r.className='resizer'; r.onmousedown=(e)=>initRRes(e,th,i); th.appendChild(r); } head.appendChild(th); });
-
-            const filterText = (document.getElementById('rec-search-filter').value || '').toLowerCase();
-            let dRecs = recDB.filter(r => { let acc=accounts.find(a=>a.id===r.modeId); return r.name.toLowerCase().includes(filterText) || r.type.toLowerCase().includes(filterText) || r.status.toLowerCase().includes(filterText) || (r.tags&&r.tags.join(' ').toLowerCase().includes(filterText)) || (acc&&acc.name.toLowerCase().includes(filterText)); });
-            dRecs.sort((a,b) => recSortAscending ? new Date(a.date)-new Date(b.date) : new Date(b.date)-new Date(a.date));
+            const head = document.getElementById('rec-header'); head.innerHTML=''; recCols.forEach(col => { const th = document.createElement('th'); th.className = `p-2 border-r border-corp-700 bg-corp-900 ${col.fixed?'text-center':''}`; th.style.width=col.width; th.textContent=col.label; head.appendChild(th); });
+            const filterText = (document.getElementById('rec-search-filter').value || '').toLowerCase(); let dRecs = recDB.filter(r => r.name.toLowerCase().includes(filterText) || r.type.toLowerCase().includes(filterText) || r.status.toLowerCase().includes(filterText)); dRecs.sort((a,b) => new Date(a.date)-new Date(b.date));
             const grouped = {}; dRecs.forEach(r => { if(!r.done) r.status = evalRecStatus(r.date); const my = new Date(r.date).toLocaleString('en-US', {month:'long', year:'numeric'}); if(!grouped[my]) grouped[my]=[]; grouped[my].push(r); });
-
-            const list = document.getElementById('rec-list'); list.innerHTML='';
-            if(Object.keys(grouped).length===0) { list.innerHTML=`<tr><td colspan="${recCols.length}" class="p-4 text-center text-gray-500 italic text-sm">No records.</td></tr>`; return; }
-
+            const list = document.getElementById('rec-list'); list.innerHTML=''; if(Object.keys(grouped).length===0) { list.innerHTML=`<tr><td colspan="${recCols.length}" class="p-4 text-center text-gray-500 italic text-sm">No records.</td></tr>`; return; }
             Object.keys(grouped).forEach(m => {
                 list.innerHTML += `<tr class="bg-corp-800 border-b border-corp-700 select-none"><td colspan="${recCols.length}" class="p-3 font-semibold text-corp-400 text-sm tracking-wide">🗓 ${m}</td></tr>`;
-                let mProj = 0, mSp = 0;
                 grouped[m].forEach(r => {
-                    mProj += Number(r.amount); if(r.done) mSp += Number(r.amount);
                     const tr = document.createElement('tr'); tr.className = `hover:bg-corp-800/80 transition border-b border-corp-700 ${r.done?'opacity-50':''}`;
                     recCols.forEach(c => {
                         const td = document.createElement('td'); td.className = "p-1.5 border-r border-corp-700 overflow-hidden";
                         if(c.id==='done') td.innerHTML = `<div class="text-center"><input type="checkbox" ${r.done?'checked':''} onchange="updateRecField(${r.id},'status', this.checked ? 'Paid' : 'Upcoming')" class="w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 cursor-pointer"></div>`;
                         else if(c.id==='name') td.innerHTML = `<div class="flex items-center gap-1.5 px-1"><span class="text-gray-500 text-xs">📄</span><input type="text" value="${r.name}" onchange="updateRecField(${r.id},'name',this.value)" class="bg-transparent text-gray-200 border-none focus:outline-none w-full text-sm ${r.done?'line-through':''}"></div>`;
-                        else if(c.id==='tags') td.innerHTML = `<div class="px-1 py-1 flex flex-col gap-1"><div class="flex flex-wrap gap-1">${renderTagBadges(r.tags)}</div><input type="text" value="${(r.tags||[]).join(', ')}" onchange="updateRecField(${r.id},'tags',parseTags(this.value))" class="bg-transparent text-gray-500 hover:text-gray-300 focus:text-white border-none focus:outline-none w-full text-xs placeholder-gray-600" placeholder="+ add tags"></div>`;
                         else if(c.id==='type') td.innerHTML = `<select onchange="updateRecField(${r.id},'type',this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm text-gray-300 cursor-pointer"><option class="bg-corp-900" ${r.type==='Rent'?'selected':''}>Rent</option><option class="bg-corp-900" ${r.type==='Utility'?'selected':''}>Utility</option><option class="bg-corp-900" ${r.type==='Subscription'?'selected':''}>Subscription</option><option class="bg-corp-900" ${r.type==='Investments'?'selected':''}>Investments</option><option class="bg-corp-900" ${r.type==='Credit card'?'selected':''}>Credit card</option></select>`;
                         else if(c.id==='amount') td.innerHTML = `<div class="flex items-center px-1">₹<input type="${isPrivate?'password':'number'}" value="${r.amount}" onchange="updateRecField(${r.id},'amount',this.value)" class="bg-transparent text-gray-200 border-none focus:outline-none w-full px-1 text-sm font-medium" ${isPrivate?'disabled':''}></div>`;
                         else if(c.id==='date') td.innerHTML = `<input type="date" value="${r.date}" onchange="updateRecField(${r.id},'date',this.value)" class="bg-transparent text-gray-200 border-none focus:outline-none w-full px-1 text-sm">`;
                         else if(c.id==='status') td.innerHTML = `<select onchange="updateRecField(${r.id},'status',this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm ${r.status==='Paid'?'text-green-400':r.status==='Overdue'?'text-red-400 font-bold':r.status==='Due'?'text-yellow-400':'text-gray-400'} cursor-pointer font-medium"><option class="bg-corp-900 text-gray-400" ${r.status==='Upcoming'?'selected':''}>Upcoming</option><option class="bg-corp-900 text-yellow-400" ${r.status==='Due'?'selected':''}>Due</option><option class="bg-corp-900 text-red-400" ${r.status==='Overdue'?'selected':''}>Overdue</option><option class="bg-corp-900 text-green-400" ${r.status==='Paid'?'selected':''}>Paid</option></select>`;
-                        else if(c.id==='mode') td.innerHTML = `<select onchange="updateRecField(${r.id},'modeId',this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm text-gray-300 cursor-pointer">${accounts.map(a=>`<option value="${a.id}" class="bg-corp-900" ${r.modeId===a.id?'selected':''}>${a.name}</option>`).join('')}</select>`;
-                        else if(c.id==='recurring') td.innerHTML = `<div class="text-center"><input type="checkbox" ${r.recurring?'checked':''} onchange="updateRecField(${r.id},'recurring',this.checked)" class="w-4 h-4 accent-corp-500 rounded bg-corp-900 border-corp-700 cursor-pointer"></div>`;
                         else if(c.id==='actions') td.innerHTML = `<div class="text-center"><button onclick="delRec(${r.id})" class="text-gray-500 hover:text-red-400">✕</button></div>`;
-                        else if(c.isCustom) td.innerHTML = `<input type="text" value="${r.custom[c.id]||''}" onchange="recDB.find(x=>x.id==${r.id}).custom['${c.id}']=this.value" class="bg-transparent border-none text-gray-200 focus:text-white focus:outline-none w-full px-2 text-sm">`;
                         tr.appendChild(td);
                     }); list.appendChild(tr);
                 });
-                list.innerHTML += `<tr class="bg-corp-900 border-b border-corp-700 select-none"><td colspan="${recCols.length}" class="p-3 text-right font-medium text-sm text-gray-400"><span class="mr-6">Projected Outflow: <span class="text-gray-200">₹${formatMoney(mProj)}</span></span><span class="text-corp-400 bg-corp-600/20 px-3 py-1 rounded">Total Spent: ₹${formatMoney(mSp)}</span></td></tr>`;
             });
         }
 
         // ==========================================
-        // TASKS MODULE
+        // MODULE: TASKS
         // ==========================================
-        let tSortAsc = true;
-        let tCols = [ { id: 'done', label: '✔', fixed: true, width: '40px' }, { id: 'name', label: 'Aa Task Name', width: '220px' }, { id: 'client_name', label: '🏢 Client Name', width: '160px' }, { id: 'tags', label: '🏷 Tags', width: '130px' }, { id: 'category', label: '🗂 Category', width: '110px' }, { id: 'status', label: '🔆 Status', width: '180px' }, { id: 'date', label: '📅 Due Date', width: '130px' }, { id: 'recurring', label: '🔄 Recurring', width: '100px' }, { id: 'actions', label: '✕', fixed: true, width: '50px' } ];
-        let tDB = [];
-
-        function addTask(e) { e.preventDefault(); const tagsIn = document.getElementById('task-tags-input').value; tDB.push({ id: Date.now(), name: document.getElementById('task-name').value, client_name: document.getElementById('task-client-name').value || "-", category: document.getElementById('task-category').value, tags: parseTags(tagsIn), date: document.getElementById('task-date').value, status: document.getElementById('task-status').value, recurring: document.getElementById('task-recurring').checked, done: (document.getElementById('task-status').value === "Done"), customData: {} }); document.getElementById('task-form').reset(); renderTaskTable(); renderHomeWidgets(); }
-        function toggleTaskDone(id) { const t = tDB.find(x => x.id === id); if(!t) return; t.done = !t.done; t.status = t.done ? "Done" : "Not started"; if(t.done && t.recurring) { let old = new Date(t.date); old.setMonth(old.getMonth()+1); tDB.push({...t, id:Date.now(), date:old.toISOString().split('T')[0], done:false, status:"Not started", customData:{...t.customData}}); } renderTaskTable(); renderHomeWidgets(); }
-        function updateTaskField(id, f, v) { const t = tDB.find(x => x.id === id); if(t) { t[f] = v; if(f === 'status') t.done = (v === 'Done'); if(f === 'status' || f === 'date' || f === 'tags') { renderTaskTable(); renderHomeWidgets(); } } }
-        function delTask(id) { tDB = tDB.filter(x => x.id !== id); renderTaskTable(); renderHomeWidgets(); }
-        function addTaskCustomCol() { const n = prompt("Column Name:"); if(n) { tCols.splice(tCols.length-1, 0, { id: 'c_'+Date.now(), label: '📝 '+n, isCustom: true, width: '150px' }); renderTaskTable(); } }
-        function toggleTaskSort() { tSortAsc = !tSortAsc; renderTaskTable(); }
-        function exportTaskCSV() { let csv = "data:text/csv;charset=utf-8," + tCols.map(c => `"${c.label}"`).join(",") + "\r\n"; tDB.forEach(t => { let row = tCols.map(c => { if (c.id === 'done') return t.done ? '"Yes"' : '"No"'; if (c.id === 'name') return `"${t.name}"`; if (c.id === 'client_name') return `"${t.client_name}"`; if(c.id === 'tags') return `"${(t.tags||[]).join(', ')}"`; if (c.id === 'category') return `"${t.category}"`; if (c.id === 'status') return `"${t.status}"`; if (c.id === 'date') return `"${t.date}"`; if (c.id === 'recurring') return t.recurring ? '"Yes"' : '"No"'; if (c.id === 'actions') return '""'; return `"${t.customData[c.id] || ''}"`; }); csv += row.join(",") + "\r\n"; }); const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", "Tasks.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
-
-        let tRsz=false, tTh=null, tSx=0, tSw=0, tDrag=null;
-        function initTRes(e, th, i) { e.stopPropagation(); tRsz=true; tTh=th; tSx=e.pageX; tSw=th.offsetWidth; tTh.classList.add('resizing'); document.body.style.cursor='col-resize'; document.addEventListener('mousemove', tMM); document.addEventListener('mouseup', tMU); }
-        function tMM(e) { if(!tRsz) return; const w=Math.max(60, tSw+(e.pageX-tSx)); tTh.style.width=`${w}px`; tTh.style.minWidth=`${w}px`; tCols[Array.from(tTh.parentNode.children).indexOf(tTh)].width = `${w}px`; }
-        function tMU() { tRsz=false; if(tTh) tTh.classList.remove('resizing'); tTh=null; document.body.style.cursor='default'; document.removeEventListener('mousemove', tMM); document.removeEventListener('mouseup', tMU); }
-        function tDStart(e,i){ if(tCols[i].fixed||e.target.classList.contains('resizer')){e.preventDefault();return;} tDrag=i; e.target.classList.add('opacity-50'); e.dataTransfer.effectAllowed='move';}
-        function tDDrop(e,i){ e.stopPropagation(); e.target.closest('th').classList.remove('drag-over'); if(tDrag!==null && tDrag!==i && !tCols[i].fixed && !tCols[tDrag].fixed){ tCols.splice(i, 0, tCols.splice(tDrag,1)[0]); renderTaskTable(); } return false;}
-
-        function getTColClass(s) { switch(s){ case 'Not started': return 'text-gray-400'; case 'Preparation': return 'text-corp-400'; case 'Awaiting information': return 'text-yellow-400'; case 'Open points': return 'text-orange-400'; case 'Partner review': return 'text-purple-400'; case 'Client approval': return 'text-pink-400'; case 'Done': return 'text-green-400'; default: return 'text-gray-300'; } }
-
+        let tCols = [ { id: 'done', label: '✔', fixed: true, width: '40px' }, { id: 'name', label: 'Aa Task Name', width: '220px' }, { id: 'category', label: '🗂 Category', width: '110px' }, { id: 'status', label: '🔆 Status', width: '180px' }, { id: 'date', label: '📅 Due Date', width: '130px' }, { id: 'actions', label: '✕', fixed: true, width: '50px' } ];
+        function addTask(e) { e.preventDefault(); tDB.push({ id: Date.now(), name: document.getElementById('task-name').value, category: document.getElementById('task-category').value, tags: parseTags(document.getElementById('task-tags-input').value), date: document.getElementById('task-date').value, status: document.getElementById('task-status').value, done: (document.getElementById('task-status').value === "Done"), customData: {} }); document.getElementById('task-form').reset(); renderTaskTable(); renderHomeWidgets(); triggerSync(); }
+        function toggleTaskDone(id) { const t = tDB.find(x => x.id === id); if(!t) return; t.done = !t.done; t.status = t.done ? "Done" : "Not started"; renderTaskTable(); renderHomeWidgets(); triggerSync(); }
+        function updateTaskField(id, f, v) { const t = tDB.find(x => x.id === id); if(t) { t[f] = v; if(f === 'status') t.done = (v === 'Done'); if(f === 'status' || f === 'date' || f === 'tags') { renderTaskTable(); renderHomeWidgets(); } triggerSync(); } }
+        function delTask(id) { tDB = tDB.filter(x => x.id !== id); renderTaskTable(); renderHomeWidgets(); triggerSync(); }
+        function getTColClass(s) { switch(s){ case 'In Progress': return 'text-corp-400'; case 'Done': return 'text-green-400'; default: return 'text-gray-300'; } }
         function renderTaskTable() {
-            const head = document.getElementById('task-header'); head.innerHTML='';
-            tCols.forEach((col, i) => {
-                const th = document.createElement('th'); th.className = `p-2 border-r border-corp-700 relative bg-corp-900 ${col.fixed?'text-center':'cursor-grab hover:bg-corp-800'}`; th.style.width=col.width; th.style.minWidth=col.width;
-                if(col.fixed) { th.textContent=col.label; } else {
-                    th.draggable=true; th.ondragstart=(e)=>tDStart(e,i); th.ondragover=(e)=>{e.preventDefault(); e.target.closest('th').classList.add('drag-over'); return false;}; th.ondragleave=(e)=>e.target.closest('th').classList.remove('drag-over'); th.ondrop=(e)=>tDDrop(e,i); th.ondragend=(e)=>e.target.classList.remove('opacity-50');
-                    th.innerHTML = `<input type="text" value="${col.label}" onchange="tCols[${i}].label=this.value" class="bg-transparent font-medium text-gray-400 focus:text-white focus:outline-none w-full cursor-pointer focus:cursor-text text-sm">`;
-                    const r = document.createElement('div'); r.className='resizer'; r.onmousedown=(e)=>initTRes(e,th,i); th.appendChild(r);
-                } head.appendChild(th);
-            });
-
-            const fTxt = (document.getElementById('task-search-filter').value || '').toLowerCase();
-            let dTs = tDB.filter(t => t.name.toLowerCase().includes(fTxt) || t.client_name.toLowerCase().includes(fTxt) || t.category.toLowerCase().includes(fTxt) || t.status.toLowerCase().includes(fTxt) || (t.tags&&t.tags.join(' ').toLowerCase().includes(fTxt)));
-            dTs.sort((a,b) => tSortAsc ? new Date(a.date)-new Date(b.date) : new Date(b.date)-new Date(a.date));
-            
+            const head = document.getElementById('task-header'); head.innerHTML=''; tCols.forEach(col => { const th = document.createElement('th'); th.className = `p-2 border-r border-corp-700 bg-corp-900 ${col.fixed?'text-center':''}`; th.style.width=col.width; th.textContent=col.label; head.appendChild(th); });
+            const fTxt = (document.getElementById('task-search-filter').value || '').toLowerCase(); let dTs = tDB.filter(t => t.name.toLowerCase().includes(fTxt) || t.category.toLowerCase().includes(fTxt) || t.status.toLowerCase().includes(fTxt)); dTs.sort((a,b) => new Date(a.date)-new Date(b.date));
             const gTs = {}; dTs.forEach(t => { const my = new Date(t.date).toLocaleString('en-US', {month:'long', year:'numeric'}); if(!gTs[my]) gTs[my]=[]; gTs[my].push(t); });
-            const list = document.getElementById('task-list'); list.innerHTML='';
-            if(Object.keys(gTs).length===0) { list.innerHTML=`<tr><td colspan="${tCols.length}" class="p-4 text-center text-gray-500 italic text-sm">No tasks found.</td></tr>`; return; }
-
+            const list = document.getElementById('task-list'); list.innerHTML=''; if(Object.keys(gTs).length===0) { list.innerHTML=`<tr><td colspan="${tCols.length}" class="p-4 text-center text-gray-500 italic text-sm">No tasks found.</td></tr>`; return; }
             Object.keys(gTs).forEach(m => {
                 list.innerHTML += `<tr class="bg-corp-800 border-b border-corp-700 select-none"><td colspan="${tCols.length}" class="p-3 font-semibold text-corp-400 text-sm tracking-wide">🗓 ${m}</td></tr>`;
                 gTs[m].forEach(t => {
@@ -1329,14 +1063,10 @@
                         const td = document.createElement('td'); td.className = "p-1.5 border-r border-corp-700 overflow-hidden";
                         if(c.id==='done') td.innerHTML = `<div class="text-center"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTaskDone(${t.id})" class="w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 cursor-pointer"></div>`;
                         else if(c.id==='name') td.innerHTML = `<div class="flex items-center gap-1.5 px-1"><span class="text-gray-500 text-xs">📄</span><input type="text" value="${t.name}" onchange="updateTaskField(${t.id},'name',this.value)" class="bg-transparent text-gray-200 border-none focus:outline-none w-full text-sm ${t.done?'line-through':''}"></div>`;
-                        else if(c.id==='client_name') td.innerHTML = `<input type="text" value="${t.client_name}" onchange="updateTaskField(${t.id},'client_name',this.value)" class="bg-transparent text-gray-200 border-none focus:outline-none w-full px-2 text-sm">`;
-                        else if(c.id==='tags') td.innerHTML = `<div class="px-1 py-1 flex flex-col gap-1"><div class="flex flex-wrap gap-1">${renderTagBadges(t.tags)}</div><input type="text" value="${(t.tags||[]).join(', ')}" onchange="updateTaskField(${t.id},'tags',parseTags(this.value))" class="bg-transparent text-gray-500 hover:text-gray-300 focus:text-white border-none focus:outline-none w-full text-xs placeholder-gray-600" placeholder="+ add tags"></div>`;
-                        else if(c.id==='category') td.innerHTML = `<select onchange="updateTaskField(${t.id},'category',this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm text-gray-200 cursor-pointer"><option class="bg-corp-900" ${t.category==='Work'?'selected':''}>Work</option><option class="bg-corp-900" ${t.category==='Personal'?'selected':''}>Personal</option><option class="bg-corp-900" ${t.category==='Office'?'selected':''}>Office</option></select>`;
+                        else if(c.id==='category') td.innerHTML = `<select onchange="updateTaskField(${t.id},'category',this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm text-gray-200 cursor-pointer"><option class="bg-corp-900" ${t.category==='Work'?'selected':''}>Work</option><option class="bg-corp-900" ${t.category==='Personal'?'selected':''}>Personal</option><option class="bg-corp-900" ${t.category==='Misc'?'selected':''}>Misc</option></select>`;
                         else if(c.id==='date') td.innerHTML = `<input type="date" value="${t.date}" onchange="updateTaskField(${t.id},'date',this.value)" class="bg-transparent text-gray-200 border-none focus:outline-none w-full px-1 text-sm">`;
-                        else if(c.id==='status') td.innerHTML = `<select onchange="updateTaskField(${t.id},'status',this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm ${getTColClass(t.status)} cursor-pointer font-medium"><option class="bg-corp-900 text-gray-400" ${t.status==='Not started'?'selected':''}>Not started</option><option class="bg-corp-900 text-corp-400" ${t.status==='Preparation'?'selected':''}>Preparation</option><option class="bg-corp-900 text-yellow-400" ${t.status==='Awaiting information'?'selected':''}>Awaiting information</option><option class="bg-corp-900 text-orange-400" ${t.status==='Open points'?'selected':''}>Open points</option><option class="bg-corp-900 text-purple-400" ${t.status==='Partner review'?'selected':''}>Partner review</option><option class="bg-corp-900 text-pink-400" ${t.status==='Client approval'?'selected':''}>Client approval</option><option class="bg-corp-900 text-green-400" ${t.status==='Done'?'selected':''}>Done</option></select>`;
-                        else if(c.id==='recurring') td.innerHTML = `<div class="text-center"><input type="checkbox" ${t.recurring?'checked':''} onchange="updateTaskField(${t.id},'recurring',this.checked)" class="w-4 h-4 accent-corp-500 rounded bg-corp-900 border-corp-700 cursor-pointer"></div>`;
+                        else if(c.id==='status') td.innerHTML = `<select onchange="updateTaskField(${t.id},'status',this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm ${getTColClass(t.status)} cursor-pointer font-medium"><option class="bg-corp-900 text-gray-400" ${t.status==='Not started'?'selected':''}>Not started</option><option class="bg-corp-900 text-corp-400" ${t.status==='In Progress'?'selected':''}>In Progress</option><option class="bg-corp-900 text-green-400" ${t.status==='Done'?'selected':''}>Done</option></select>`;
                         else if(c.id==='actions') td.innerHTML = `<div class="text-center"><button onclick="delTask(${t.id})" class="text-gray-500 hover:text-red-400">✕</button></div>`;
-                        else if(c.isCustom) td.innerHTML = `<input type="text" value="${t.customData[c.id]||''}" onchange="tDB.find(x=>x.id==${t.id}).customData['${c.id}']=this.value" class="bg-transparent border-none text-gray-200 focus:text-white focus:outline-none w-full px-2 text-sm">`;
                         tr.appendChild(td);
                     }); list.appendChild(tr);
                 });
@@ -1344,373 +1074,24 @@
         }
 
         // ==========================================
-        // KNOWLEDGE BASE (NOTES) MODULE & DRAG/DROP
+        // MODULE: NOTES
         // ==========================================
-        let folders = [];
-        let notesDB = [];
         let activeNoteId = null;
-
         function renderNotesSidebar() {
             const sb = document.getElementById('folder-sidebar'); sb.innerHTML = '';
             folders.forEach(f => {
                 const fNotes = notesDB.filter(n => n.folderId === f.id);
-                sb.innerHTML += `<div class="folder-dropzone rounded-lg pb-2 transition" ondragover="dragOverFolder(event)" ondragleave="dragLeaveFolder(event)" ondrop="dropNoteOnFolder(event, '${f.id}')">
-                    <div class="flex items-center justify-between mt-3 mb-2 px-2 group"><input type="text" value="${f.name}" onchange="updateFolder('${f.id}', this.value)" class="bg-transparent text-xs font-bold text-gray-400 hover:text-gray-200 focus:text-white uppercase tracking-wider focus:outline-none w-full mr-2 transition"><button onclick="createNote('${f.id}')" title="Add Note to ${f.name}" class="text-gray-500 hover:text-corp-400 opacity-100 lg:opacity-0 group-hover:opacity-100 transition text-lg leading-none">+</button></div>
-                    ${fNotes.length === 0 ? `<div class="text-xs text-gray-600 italic px-4 py-1">Empty</div>` : fNotes.map(n => {
-                        const isActive = n.id === activeNoteId;
-                        return `<button draggable="true" ondragstart="dragNoteStart(event, '${n.id}')" onclick="openNote('${n.id}')" class="w-full text-left px-4 py-2 text-sm rounded-md truncate transition cursor-grab active:cursor-grabbing ${isActive ? 'bg-corp-600/20 text-corp-400 font-medium' : 'text-gray-300 hover:bg-corp-700'}">📄 ${n.title || 'Untitled Note'}</button>`;
-                    }).join('')}
-                </div>`;
+                sb.innerHTML += `<div class="rounded-lg pb-2"><div class="flex items-center justify-between mt-3 mb-2 px-2 group"><input type="text" value="${f.name}" onchange="updateFolder('${f.id}', this.value)" class="bg-transparent text-xs font-bold text-gray-400 hover:text-gray-200 focus:text-white uppercase tracking-wider focus:outline-none w-full mr-2 transition"><button onclick="createNote('${f.id}')" class="text-gray-500 hover:text-corp-400 opacity-100 lg:opacity-0 group-hover:opacity-100 transition text-lg leading-none">+</button></div>${fNotes.length === 0 ? `<div class="text-xs text-gray-600 italic px-4 py-1">Empty</div>` : fNotes.map(n => { const isActive = n.id === activeNoteId; return `<button onclick="openNote('${n.id}')" class="w-full text-left px-4 py-2 text-sm rounded-md truncate transition ${isActive ? 'bg-corp-600/20 text-corp-400 font-medium' : 'text-gray-300 hover:bg-corp-700'}">📄 ${n.title || 'Untitled Note'}</button>`; }).join('')}</div>`;
             });
             if(!activeNoteId) { document.getElementById('no-note-screen').classList.remove('hidden'); document.getElementById('editor-container').classList.add('hidden'); } 
             else { document.getElementById('no-note-screen').classList.add('hidden'); document.getElementById('editor-container').classList.remove('hidden'); }
         }
-
-        function dragNoteStart(e, noteId) { e.dataTransfer.setData("text/plain", noteId); e.dataTransfer.effectAllowed = "move"; }
-        function dragOverFolder(e) { e.preventDefault(); e.currentTarget.classList.add('drag-active'); }
-        function dragLeaveFolder(e) { e.currentTarget.classList.remove('drag-active'); }
-        function dropNoteOnFolder(e, folderId) {
-            e.preventDefault(); e.currentTarget.classList.remove('drag-active');
-            const noteId = e.dataTransfer.getData("text/plain"); const note = notesDB.find(n => n.id === noteId);
-            if (note && note.folderId !== folderId) { note.folderId = folderId; saveNoteState(); }
-        }
-
-        function addFolder() { const newName = prompt("Enter new folder name:"); if(newName && newName.trim() !== "") { folders.push({ id: 'f_' + Date.now(), name: '📁 ' + newName }); renderNotesSidebar(); } }
-        function updateFolder(id, newName) { const f = folders.find(x => x.id === id); if(f) { f.name = newName; renderNotesSidebar(); renderHomeWidgets(); } }
-        function createNote(folderId) { const newId = 'n_' + Date.now(); notesDB.push({ id: newId, folderId: folderId, title: '', content: '' }); openNote(newId); }
+        function addFolder() { const newName = prompt("Enter new folder name:"); if(newName && newName.trim() !== "") { folders.push({ id: 'f_' + Date.now(), name: '📁 ' + newName }); renderNotesSidebar(); triggerSync(); } }
+        function updateFolder(id, newName) { const f = folders.find(x => x.id === id); if(f) { f.name = newName; renderNotesSidebar(); renderHomeWidgets(); triggerSync(); } }
+        function createNote(folderId) { const newId = 'n_' + Date.now(); notesDB.push({ id: newId, folderId: folderId, title: '', content: '' }); openNote(newId); triggerSync(); }
         function openNote(id) { activeNoteId = id; const note = notesDB.find(n => n.id === id); if(!note) return; document.getElementById('note-title').value = note.title; const folder = folders.find(f => f.id === note.folderId); document.getElementById('note-folder-badge').innerText = folder ? folder.name : 'Unsorted'; document.getElementById('note-editor').innerHTML = note.content; renderNotesSidebar(); }
-        function saveNoteState() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(note) { note.title = document.getElementById('note-title').value; note.content = document.getElementById('note-editor').innerHTML; renderNotesSidebar(); const status = document.getElementById('save-status'); status.innerHTML = `<span class="text-corp-400">Saving...</span>`; setTimeout(() => { status.innerHTML = `<i>✔</i> Auto-saved locally`; }, 400); } }
-        function deleteCurrentNote() { if(!activeNoteId) return; if(!confirm("Are you sure you want to delete this note?")) return; notesDB = notesDB.filter(n => n.id !== activeNoteId); activeNoteId = null; renderNotesSidebar(); }
-        function handleEditorShortcuts(e) { if(e.code === 'Space') { const sel = window.getSelection(); if (!sel.rangeCount) return; const node = sel.anchorNode; if(node.nodeType === 3 && node.textContent.endsWith('[ ]')) { e.preventDefault(); node.textContent = node.textContent.slice(0, -3); const range = sel.getRangeAt(0); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)'); const span = document.createElement('span'); span.className = 'task-text'; span.innerHTML = '&#8203;'; range.insertNode(span); range.insertNode(cb); range.setStart(span, 1); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); saveNoteState(); } } }
-        function toggleNoteTask(cb) { if(cb.nextSibling && cb.nextSibling.classList.contains('task-text')) { if(cb.checked) { cb.nextSibling.style.textDecoration = 'line-through'; cb.nextSibling.style.opacity = '0.5'; } else { cb.nextSibling.style.textDecoration = 'none'; cb.nextSibling.style.opacity = '1'; } } const taskId = cb.getAttribute('data-task-id'); if(taskId) { const t = tDB.find(x => x.id == taskId); if(t) { t.done = cb.checked; t.status = t.done ? 'Done' : 'Not started'; renderTaskTable(); renderHomeWidgets(); } } saveNoteState(); }
-        function syncTasksToApp() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(!note) return; const editor = document.getElementById('note-editor'); const checkboxes = editor.querySelectorAll('.note-cb'); let count = 0; checkboxes.forEach(cb => { if(!cb.hasAttribute('data-task-id')) { const textNode = cb.nextSibling; const taskName = textNode ? textNode.textContent.replace(/\u200B/g, '').trim() : ''; if(taskName) { const newTaskId = Date.now() + count; cb.setAttribute('data-task-id', newTaskId); tDB.push({ id: newTaskId, name: taskName, client_name: note.title || "Note Sync", category: "Work", date: todayISO().split('T')[0], status: cb.checked ? "Done" : "Not started", recurring: false, done: cb.checked, tags: [], customData: {} }); count++; } } }); saveNoteState(); if(count > 0) { alert(`⚡ Magic Sync Complete!\n\nSuccessfully beamed ${count} new action item(s) to your Task Tracker.`); renderTaskTable(); renderHomeWidgets(); } else { alert(`No new unsynced to-dos found.\n\nTip: Type "[ ] " and hit space to create a new task.`); } }
-
-        // ==========================================================
-        // PAYMENT MODE DROPDOWN
-        // Fills the Record and Recurring forms with the user's accounts.
-        // ==========================================================
-        function populateModeDropdown() {
-            const opts = accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-            const tx = document.getElementById('tx-mode'); if (tx) tx.innerHTML = opts;
-            const rec = document.getElementById('rec-mode'); if (rec) rec.innerHTML = opts;
-        }
-
-        // ==========================================================
-        // UNIFIED STATE (LOCAL + GOOGLE DRIVE)
-        // All data lives in one object saved to localStorage and to a
-        // single backup.json inside a "Rishab OS" folder in your Drive.
-        // The Drive logic mirrors the synchronisation engine you supplied.
-        // ==========================================================
-        const LOCAL_KEY = 'rishab_os_state_v1';
-        const DRIVE_FOLDER = 'Rishab OS';
-        const DRIVE_FILE = 'backup.json';
-
-        let googleToken = null;
-        let driveFolderId = null;
-        let driveFileId = null;
-        let useCloud = false;
-        let syncing = false;
-        let needsSync = false;
-        let saveTimer = null;
-        let hydrating = true;        // true while loading; blocks saves so cloud data is never overwritten by blanks
-        let authMode = 'interactive';
-        let tokenClient = null;
-
-        function collectState() {
-            return {
-                accounts, transactionsDB, recDB, recCols, tDB, tCols,
-                notesDB, folders, docsDB, userBudget,
-                savedAt: new Date().toISOString()
-            };
-        }
-
-        function applyState(d) {
-            if (!d || typeof d !== 'object') return;
-            if (Array.isArray(d.accounts)) accounts = d.accounts;
-            if (Array.isArray(d.transactionsDB)) transactionsDB = d.transactionsDB;
-            if (Array.isArray(d.recDB)) recDB = d.recDB;
-            if (Array.isArray(d.recCols)) recCols = d.recCols;
-            if (Array.isArray(d.tDB)) tDB = d.tDB;
-            if (Array.isArray(d.tCols)) tCols = d.tCols;
-            if (Array.isArray(d.notesDB)) notesDB = d.notesDB;
-            if (Array.isArray(d.folders)) folders = d.folders;
-            if (Array.isArray(d.docsDB)) docsDB = d.docsDB;
-            if (d.userBudget && typeof d.userBudget === 'object') userBudget = d.userBudget;
-            populateModeDropdown();
-            renderAccounts(); renderRecTable(); renderTaskTable(); renderDocs();
-            renderNotesSidebar(); renderCashflowAnalytics(); renderHomeWidgets();
-        }
-
-        function persistLocal() {
-            try { localStorage.setItem(LOCAL_KEY, JSON.stringify(collectState())); } catch (e) {}
-        }
-
-        function scheduleSave() {
-            if (hydrating) return;            // never save mid load
-            persistLocal();                   // local copy is always immediate
-            if (!useCloud) return;
-            if (saveTimer) clearTimeout(saveTimer);
-            saveTimer = setTimeout(syncToCloud, 1500);   // debounced cloud push
-        }
-
-        function setSyncStatus(text) {
-            const el = document.getElementById('sync-status');
-            if (el) el.textContent = text;
-        }
-
-        // ----- Google Drive engine (adapted from the supplied study.html) -----
-        async function initializeCloudSync() {
-            const headers = { Authorization: `Bearer ${googleToken}` };
-
-            // Find or create the Rishab OS folder.
-            const fQ = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent("name='" + DRIVE_FOLDER + "' and mimeType='application/vnd.google-apps.folder' and trashed=false")}&fields=files(id)`, { headers });
-            const fData = await fQ.json();
-            if (fData.files && fData.files.length > 0) {
-                driveFolderId = fData.files[0].id;
-            } else {
-                const cr = await fetch('https://www.googleapis.com/drive/v3/files', {
-                    method: 'POST', headers: { ...headers, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: DRIVE_FOLDER, mimeType: 'application/vnd.google-apps.folder' })
-                });
-                driveFolderId = (await cr.json()).id;
-            }
-
-            // Find the backup file inside that folder.
-            const bQ = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`'${driveFolderId}' in parents and name='${DRIVE_FILE}' and trashed=false`)}&fields=files(id)`, { headers });
-            const bData = await bQ.json();
-            if (bData.files && bData.files.length > 0) {
-                driveFileId = bData.files[0].id;
-                const cloudRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, { headers });
-                const cloudData = await cloudRes.json();
-                if (cloudData && typeof cloudData === 'object') {
-                    applyState(cloudData);
-                    persistLocal();
-                }
-            }
-        }
-
-        async function syncToCloud() {
-            if (!googleToken || !driveFolderId) return;
-            if (syncing) { needsSync = true; return; }
-            syncing = true; needsSync = false;
-            setSyncStatus('Syncing...');
-            try {
-                const boundary = 'rishab_boundary_' + Date.now();
-                const metadata = { name: DRIVE_FILE, mimeType: 'application/json' };
-                if (!driveFileId) metadata.parents = [driveFolderId];
-
-                const blob = new Blob([JSON.stringify(collectState())], { type: 'application/json' });
-                const delimiter = `\r\n--${boundary}\r\n`;
-                const closeDelimiter = `\r\n--${boundary}--`;
-                const body = new Blob([
-                    delimiter,
-                    'Content-Type: application/json; charset=UTF-8\r\n\r\n',
-                    JSON.stringify(metadata),
-                    delimiter,
-                    'Content-Type: application/json\r\n\r\n',
-                    blob,
-                    closeDelimiter
-                ]);
-
-                const url = driveFileId
-                    ? `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=multipart`
-                    : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
-
-                const res = await fetch(url, {
-                    method: driveFileId ? 'PATCH' : 'POST',
-                    headers: { Authorization: `Bearer ${googleToken}`, 'Content-Type': `multipart/related; boundary=${boundary}` },
-                    body: body
-                });
-
-                if (res.status === 401 || res.status === 403) {
-                    // Token expired during a long session. Refresh silently then re sync.
-                    needsSync = true;
-                    setSyncStatus('Reconnecting...');
-                    googleAuth(false);
-                    return;
-                }
-                if (!res.ok) { const er = await res.json().catch(() => ({})); throw new Error((er.error && er.error.message) || 'Sync failed'); }
-
-                const data = await res.json();
-                if (data.id) {
-                    driveFileId = data.id;
-                    const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    setSyncStatus('Cloud synced ' + t);
-                }
-            } catch (e) {
-                console.error('Sync Error:', e);
-                setSyncStatus('Sync error, will retry');
-            } finally {
-                syncing = false;
-                if (needsSync) syncToCloud();
-            }
-        }
-
-        // ----- Authentication (OAuth token client, can reach Drive) -----
-        function whenGoogleReady(cb, tries) {
-            tries = tries || 0;
-            if (window.google && google.accounts && google.accounts.oauth2) return cb();
-            if (tries > 60) { setSyncStatus('Google not reachable'); return; }
-            setTimeout(() => whenGoogleReady(cb, tries + 1), 100);
-        }
-
-        function initTokenClientOnce() {
-            if (tokenClient) return;
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                callback: async (res) => {
-                    if (res && res.error) {
-                        if (authMode === 'silent') {
-                            // Could not restore quietly. Keep the user in the app with their cached data.
-                            hydrating = false; useCloud = false;
-                            setSyncStatus('Cloud paused, click Log out then sign in to reconnect');
-                        } else {
-                            document.getElementById('auth-error').classList.remove('hidden');
-                        }
-                        return;
-                    }
-                    googleToken = res.access_token;
-                    localStorage.setItem('rishab_cloud', 'true');
-                    if (authMode === 'interactive') revealApp();
-                    await finalizeCloud();
-                }
-            });
-        }
-
-        function googleAuth(interactive) {
-            if (!CLIENT_ID || CLIENT_ID.indexOf('PASTE_YOUR') !== -1) {
-                document.getElementById('client-missing').classList.remove('hidden');
-                return;
-            }
-            authMode = interactive ? 'interactive' : 'silent';
-            whenGoogleReady(() => {
-                initTokenClientOnce();
-                interactive ? tokenClient.requestAccessToken() : tokenClient.requestAccessToken({ prompt: 'none' });
-            });
-        }
-
-        function revealApp() {
-            const auth = document.getElementById('auth-screen');
-            auth.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => auth.classList.add('hidden'), 500);
-            document.getElementById('main-app').classList.remove('hidden');
-            const am = document.getElementById('analytics-month');
-            if (am && !am.value) am.value = todayISO().slice(0, 7);
-            switchTab('home');
-        }
-
-        async function finalizeCloud() {
-            try {
-                if (googleToken) { useCloud = true; await initializeCloudSync(); }
-            } catch (e) {
-                console.error('Cloud init error:', e);
-                setSyncStatus('Cloud error, using local copy');
-            } finally {
-                populateModeDropdown();
-                hydrating = false;
-                persistLocal();
-                if (useCloud) {
-                    if (!driveFileId) { syncToCloud(); }   // create backup.json on first ever login
-                    else { setSyncStatus('Cloud synced'); }
-                } else {
-                    setSyncStatus('Local only');
-                }
-            }
-        }
-
-        function logout() {
-            if (!confirm('Log out and lock this workspace on this device? Your data stays safe in your Google Drive and returns when you sign in again.')) return;
-            try { if (googleToken && window.google && google.accounts && google.accounts.oauth2) google.accounts.oauth2.revoke(googleToken, () => {}); } catch (e) {}
-            // Wipe the local cache so a shared computer keeps nothing. Drive remains the trusted source.
-            localStorage.removeItem(LOCAL_KEY);
-            localStorage.removeItem('rishab_cloud');
-            localStorage.removeItem('rishab_budget');
-            googleToken = null;
-            location.reload();
-        }
-
-        // ----- Theme control -----
-        function setThemeMode(mode) {
-            localStorage.setItem('rishab_theme', mode);
-            applyTheme(mode);
-            updateThemeButtons(mode);
-        }
-        function applyTheme(mode) {
-            let resolved = mode;
-            if (mode === 'system') {
-                resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-            document.documentElement.setAttribute('data-theme', resolved);
-        }
-        function updateThemeButtons(mode) {
-            ['light', 'dark', 'system'].forEach(m => {
-                const b = document.getElementById('thm-' + m);
-                if (!b) return;
-                if (m === mode) { b.classList.add('bg-corp-600', 'text-white'); b.classList.remove('text-gray-400'); }
-                else { b.classList.remove('bg-corp-600', 'text-white'); b.classList.add('text-gray-400'); }
-            });
-        }
-        // Keep the System option live if the device switches appearance.
-        try {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if ((localStorage.getItem('rishab_theme') || 'system') === 'system') applyTheme('system');
-            });
-        } catch (e) {}
-
-        // ==========================================================
-        // AUTO SAVE: wrap the existing render functions so every data
-        // change is persisted. Calculations are untouched; we only add
-        // a save after each redraw. Saves are blocked while hydrating.
-        // ==========================================================
-        (function () {
-            const toWrap = ['renderAccounts', 'renderRecTable', 'renderTaskTable', 'renderDocs', 'renderNotesSidebar', 'saveNoteState', 'renderCashflowAnalytics', 'renderHomeWidgets'];
-            toWrap.forEach(name => {
-                const orig = window[name];
-                if (typeof orig !== 'function') return;
-                window[name] = function () {
-                    const r = orig.apply(this, arguments);
-                    scheduleSave();
-                    return r;
-                };
-            });
-        })();
-
-        // ==========================================================
-        // BOOTSTRAP
-        // ==========================================================
-        (function init() {
-            // Default the analytics month to the current month before anything renders.
-            try { const am = document.getElementById('analytics-month'); if (am && !am.value) am.value = todayISO().slice(0, 7); } catch (e) {}
-
-            // Theme buttons reflect the saved choice.
-            const themeMode = localStorage.getItem('rishab_theme') || 'system';
-            updateThemeButtons(themeMode);
-
-            // Load the last local copy first so the app shows instantly.
-            hydrating = true;
-            try {
-                const cached = localStorage.getItem(LOCAL_KEY);
-                if (cached) applyState(JSON.parse(cached));
-            } catch (e) {}
-
-            const wasCloud = localStorage.getItem('rishab_cloud') === 'true';
-            if (wasCloud) {
-                // Returning user: skip the sign in screen and restore the Drive session silently.
-                revealApp();
-                setSyncStatus('Reconnecting to Drive...');
-                googleAuth(false);
-                // Safety net: if the silent restore stalls, unlock local saving so edits are not lost.
-                setTimeout(() => { if (hydrating) { hydrating = false; if (!useCloud) setSyncStatus('Cloud paused, working locally'); } }, 9000);
-            } else {
-                // First visit on this device: show the sign in screen.
-                hydrating = false;
-                if (!CLIENT_ID || CLIENT_ID.indexOf('PASTE_YOUR') !== -1) {
-                    const cm = document.getElementById('client-missing');
-                    if (cm) cm.classList.remove('hidden');
-                }
-            }
-        })();
+        function saveNoteState() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(note) { note.title = document.getElementById('note-title').value; note.content = document.getElementById('note-editor').innerHTML; renderNotesSidebar(); const status = document.getElementById('save-status'); status.innerHTML = `<span class="text-corp-400">Saving...</span>`; setTimeout(() => { status.innerHTML = `<i>✔</i> Auto-saved locally`; }, 400); triggerSync(); } }
+        function deleteCurrentNote() { if(!activeNoteId || !confirm("Delete this note?")) return; notesDB = notesDB.filter(n => n.id !== activeNoteId); activeNoteId = null; renderNotesSidebar(); triggerSync(); }
 
     </script>
 </body>
