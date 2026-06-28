@@ -123,6 +123,23 @@
             .mobile-sidebar-hidden { transform: translateX(-100%); }
             .mobile-sidebar-visible { transform: translateX(0); }
         }
+
+        /* ============================================================
+           MOBILE FIT: keep the page from ever scrolling sideways, and
+           let wide tables scroll inside their own card instead of
+           pushing content off the screen.
+           ============================================================ */
+        html, body { overflow-x: hidden; max-width: 100%; }
+        .overflow-x-auto { -webkit-overflow-scrolling: touch; max-width: 100%; }
+        @media (max-width: 768px) {
+            main > section { padding-left: 1rem !important; padding-right: 1rem !important; max-width: 100% !important; }
+            /* Tables keep their own horizontal scroll, never the page */
+            #main-table, #rec-table, table { max-width: none; }
+            /* Modals breathe on small screens */
+            #budget-modal > div { max-height: 92vh; }
+            /* Comfortable tap targets */
+            button, .tx-chip, select { min-height: 38px; }
+        }
     </style>
     <script>
         // Apply the saved theme immediately so there is no flash of the wrong theme.
@@ -156,6 +173,34 @@
             </button>
             <p id="auth-error" class="text-red-400 text-xs mt-4 hidden font-medium text-center">Authentication failed. Please try again.</p>
             <p id="client-missing" class="text-amber-400 text-xs mt-4 hidden font-medium text-center">Google Client ID is not set yet. Open the file and paste it where marked near the top of the script.</p>
+        </div>
+    </div>
+
+    <div id="lock-screen" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-corp-900/95 backdrop-blur-md p-4">
+        <div class="bg-corp-800 p-8 md:p-10 rounded-2xl shadow-2xl border border-corp-700 flex flex-col items-center w-full max-w-sm">
+            <div class="w-16 h-16 bg-corp-900 rounded-full flex items-center justify-center border border-corp-700 shadow-inner mb-5">
+                <span class="text-3xl">🔒</span>
+            </div>
+            <h1 class="text-xl font-bold text-white mb-1 tracking-tight">Workspace locked</h1>
+            <p id="lock-msg" class="text-corp-400 text-sm mb-6 text-center font-medium">Enter your six digit PIN</p>
+
+            <div class="flex items-center justify-center gap-3 mb-6">
+                <span id="lock-dot-1" class="w-3.5 h-3.5 rounded-full bg-corp-700 transition-colors"></span>
+                <span id="lock-dot-2" class="w-3.5 h-3.5 rounded-full bg-corp-700 transition-colors"></span>
+                <span id="lock-dot-3" class="w-3.5 h-3.5 rounded-full bg-corp-700 transition-colors"></span>
+                <span id="lock-dot-4" class="w-3.5 h-3.5 rounded-full bg-corp-700 transition-colors"></span>
+                <span id="lock-dot-5" class="w-3.5 h-3.5 rounded-full bg-corp-700 transition-colors"></span>
+                <span id="lock-dot-6" class="w-3.5 h-3.5 rounded-full bg-corp-700 transition-colors"></span>
+            </div>
+
+            <input id="lock-input" type="password" inputmode="numeric" maxlength="6" autocomplete="off" oninput="onLockInput()" onkeydown="if(event.key==='Enter')verifyAndUnlock()" class="w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-3 text-center text-2xl tracking-[0.5em] text-white outline-none focus:border-corp-500 transition mb-4" placeholder="••••••">
+
+            <button onclick="verifyAndUnlock()" class="w-full bg-corp-600 hover:bg-corp-500 text-white font-semibold py-3 px-4 rounded-lg shadow transition mb-4">Unlock</button>
+
+            <div class="flex items-center justify-between w-full text-xs">
+                <button onclick="forgotPin()" class="text-gray-400 hover:text-white transition font-medium">Forgot PIN</button>
+                <button onclick="logout()" class="text-gray-400 hover:text-white transition font-medium">Log out</button>
+            </div>
         </div>
     </div>
 
@@ -216,36 +261,33 @@
                     <div class="group flex items-center justify-between px-3 py-2 rounded hover:bg-corp-700 transition cursor-pointer text-gray-300 hover:text-white" onclick="switchTab('documents')" id="nav-documents">
                         <div class="flex items-center gap-2"><span class="text-lg">📁</span> <span contenteditable="false" class="outline-none focus:bg-corp-900 focus:px-1 rounded text-sm font-medium transition-all">Documents Vault</span></div>
                     </div>
+
+                    <div class="group flex items-center justify-between px-3 py-2 rounded hover:bg-corp-700 transition cursor-pointer text-gray-300 hover:text-white" onclick="switchTab('settings')" id="nav-settings">
+                        <div class="flex items-center gap-2"><span class="text-lg">⚙️</span> <span contenteditable="false" class="outline-none focus:bg-corp-900 focus:px-1 rounded text-sm font-medium transition-all">Settings</span></div>
+                    </div>
                 </div>
 
             </nav>
 
             <div class="absolute bottom-0 left-0 w-full border-t border-corp-700 bg-corp-800">
-                <div class="flex items-center justify-between gap-2 px-4 pt-3 pb-2">
-                    <div class="flex items-center gap-0.5 bg-corp-900 border border-corp-700 rounded-lg p-0.5" title="Appearance">
-                        <button onclick="setThemeMode('light')" id="thm-light" class="px-2 py-1 rounded text-xs transition" title="Light">☀️</button>
-                        <button onclick="setThemeMode('dark')" id="thm-dark" class="px-2 py-1 rounded text-xs transition" title="Dark">🌙</button>
-                        <button onclick="setThemeMode('system')" id="thm-system" class="px-2 py-1 rounded text-xs transition" title="System">💻</button>
-                    </div>
-                    <button onclick="logout()" class="flex items-center gap-1.5 text-xs font-medium text-gray-300 hover:text-white bg-corp-900 hover:bg-corp-700 border border-corp-700 rounded-lg px-3 py-1.5 transition" title="Log out and lock the workspace">
-                        <span class="leading-none">⏻</span> Log out
-                    </button>
-                </div>
-                <div class="px-4 pb-1">
+                <div class="px-4 pt-3 pb-1">
                     <span id="sync-status" class="text-[10px] text-gray-500 font-medium tracking-wide truncate block">Local only</span>
                 </div>
-                <div class="flex items-center justify-between px-4 pb-3 pt-1 border-t border-corp-700/60">
-                    <span class="text-xs text-gray-500 font-medium tracking-wide">Master Build V25</span>
-                    <button onclick="togglePrivacy()" class="text-gray-500 hover:text-gray-300 transition text-lg leading-none" title="Toggle Global Privacy Mode">
-                        <span id="eye-icon">👁️</span>
-                    </button>
+                <div class="flex items-center justify-between px-4 pb-3 pt-1">
+                    <button onclick="switchTab('settings')" class="text-xs text-gray-400 hover:text-white transition flex items-center gap-1.5" title="Open Settings"><span>⚙️</span> Settings</button>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-gray-500 font-medium tracking-wide">Master Build V25</span>
+                        <button onclick="togglePrivacy()" class="text-gray-500 hover:text-gray-300 transition text-lg leading-none" title="Toggle Global Privacy Mode">
+                            <span id="eye-icon">👁️</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </aside>
 
         <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
 
-        <main class="flex-1 overflow-y-auto w-full relative bg-corp-900 pt-[60px] md:pt-0">
+        <main class="flex-1 overflow-y-auto overflow-x-hidden w-full relative bg-corp-900 pt-[60px] md:pt-0">
 
             <section id="home" class="block w-full max-w-6xl p-4 md:p-10 mx-auto">
                 <h2 id="home-greeting" class="text-3xl md:text-4xl font-bold mb-6 text-white tracking-tight">Good morning.</h2>
@@ -300,7 +342,7 @@
 
                         <div class="bg-corp-800 rounded-xl p-5 md:p-6 border border-corp-700 shadow-lg">
                             <h3 class="text-white font-bold mb-4 flex items-center justify-between">
-                                <span class="flex items-center gap-2"><span class="text-green-400">📊</span> Global Budget</span>
+                                <span class="flex items-center gap-2"><span class="text-green-400">📊</span> Overall Budget</span>
                                 <button onclick="switchTab('analytics')" class="text-xs text-gray-400 hover:text-white transition">Manage →</button>
                             </h3>
                             <div class="space-y-4">
@@ -564,6 +606,82 @@
                 <div id="docs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </section>
 
+            <section id="settings" class="hidden w-full max-w-3xl p-4 md:p-10 mx-auto">
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-1">Settings</h2>
+                <p class="text-gray-400 text-sm mb-8">Appearance, security, sync, and account, all in one place.</p>
+
+                <div class="space-y-6">
+
+                    <div class="bg-corp-800 border border-corp-700 rounded-2xl p-5 md:p-6">
+                        <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">🎨 Appearance</h3>
+                        <p class="text-gray-400 text-xs mb-4">Choose how the workspace looks. System follows your device.</p>
+                        <div class="inline-flex items-center gap-1 bg-corp-900 border border-corp-700 rounded-xl p-1">
+                            <button onclick="setThemeMode('light')" id="thm-light" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 transition">☀️ Light</button>
+                            <button onclick="setThemeMode('dark')" id="thm-dark" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 transition">🌙 Dark</button>
+                            <button onclick="setThemeMode('system')" id="thm-system" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 transition">💻 System</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-corp-800 border border-corp-700 rounded-2xl p-5 md:p-6">
+                        <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">🔒 Security</h3>
+                        <p class="text-gray-400 text-xs mb-4">A six digit PIN that locks the workspace on this and every device, on top of your Google sign in.</p>
+
+                        <div class="flex flex-wrap items-center gap-3 mb-4">
+                            <span id="set-pin-state" class="text-sm font-medium text-gray-200">PIN lock is OFF</span>
+                            <button id="set-pin-btn" onclick="openPinSetup()" class="bg-corp-600 hover:bg-corp-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow">Set PIN</button>
+                            <button id="set-pin-off" onclick="turnOffPin()" class="hidden text-sm font-medium text-red-400 hover:text-red-300 transition px-2 py-2">Turn off</button>
+                            <button id="set-lock-now" onclick="lockNow()" class="hidden text-sm font-medium text-gray-300 hover:text-white bg-corp-900 border border-corp-700 rounded-lg px-4 py-2 transition">Lock now</button>
+                        </div>
+
+                        <div id="pin-setup-wrap" class="hidden bg-corp-900 border border-corp-700 rounded-xl p-4 mb-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs text-gray-400 mb-1">New six digit PIN</label>
+                                    <input id="pin-new" type="password" inputmode="numeric" maxlength="6" placeholder="• • • • • •" class="w-full bg-corp-800 border border-corp-600 rounded-lg px-3 py-2 text-lg tracking-[0.4em] text-white outline-none focus:border-corp-500 transition" oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-400 mb-1">Confirm PIN</label>
+                                    <input id="pin-confirm" type="password" inputmode="numeric" maxlength="6" placeholder="• • • • • •" class="w-full bg-corp-800 border border-corp-600 rounded-lg px-3 py-2 text-lg tracking-[0.4em] text-white outline-none focus:border-corp-500 transition" oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)">
+                                </div>
+                            </div>
+                            <p id="pin-setup-err" class="hidden text-red-400 text-xs mt-2 font-medium"></p>
+                            <div class="flex items-center gap-3 mt-4">
+                                <button onclick="savePinSetup()" class="bg-corp-600 hover:bg-corp-500 text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow">Save PIN</button>
+                                <button onclick="cancelPinSetup()" class="text-sm text-gray-400 hover:text-white transition px-2 py-2">Cancel</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1 font-bold tracking-wide uppercase">Ask for the PIN after inactivity</label>
+                            <select id="set-lock-minutes" onchange="setLockMinutes(this.value)" class="bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition">
+                                <option value="1">After 1 minute</option>
+                                <option value="5">After 5 minutes</option>
+                                <option value="15">After 15 minutes</option>
+                                <option value="0">Never by inactivity</option>
+                            </select>
+                            <p class="text-[11px] text-gray-500 mt-2">The PIN is always asked after a refresh, and whenever you leave the app and come back, regardless of this setting.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-corp-800 border border-corp-700 rounded-2xl p-5 md:p-6">
+                        <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">☁️ Sync</h3>
+                        <p class="text-gray-400 text-xs mb-4">Your data is saved to a private Rishab OS folder in your Google Drive.</p>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span id="settings-sync-status" class="text-sm font-medium text-gray-200">Local only</span>
+                            <button onclick="syncToCloud()" class="text-sm font-medium text-gray-300 hover:text-white bg-corp-900 border border-corp-700 rounded-lg px-4 py-2 transition">Sync now</button>
+                            <button onclick="reconnectCloud()" class="text-sm font-medium text-gray-300 hover:text-white bg-corp-900 border border-corp-700 rounded-lg px-4 py-2 transition">Reconnect</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-corp-800 border border-corp-700 rounded-2xl p-5 md:p-6">
+                        <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">👤 Account</h3>
+                        <p id="set-account-state" class="text-gray-400 text-xs mb-4">Working locally</p>
+                        <button onclick="logout()" class="flex items-center gap-2 text-sm font-medium text-white bg-red-600 hover:bg-red-500 rounded-lg px-5 py-2 transition shadow">⏻ Log out</button>
+                    </div>
+
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -586,7 +704,7 @@
             </div>
             <div class="p-5 overflow-y-auto flex-1 flex flex-col gap-4">
                 <div class="bg-corp-800 p-4 rounded-xl border border-corp-700">
-                    <label class="block text-xs text-gray-400 mb-1 font-bold tracking-wide uppercase">Global Monthly Ceiling (₹)</label>
+                    <label class="block text-xs text-gray-400 mb-1 font-bold tracking-wide uppercase">Overall Monthly Ceiling (₹)</label>
                     <input type="number" id="bm-global" oninput="calcUnallocated()" class="w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-xl font-bold text-white outline-none focus:border-corp-500 transition">
                 </div>
                 
@@ -598,6 +716,16 @@
                     <p class="text-[10px] text-gray-500 mt-1" id="bm-warning">Assign these funds to your categories below.</p>
                 </div>
                 
+                <div class="bg-corp-800 p-3 rounded-xl border border-corp-700">
+                    <label class="block text-xs text-gray-400 mb-2 font-bold tracking-wide uppercase">Add a category and its budget</label>
+                    <div class="flex gap-2 items-center">
+                        <input id="bm-new-cat" type="text" placeholder="Category name" class="flex-1 min-w-0 bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition">
+                        <input id="bm-new-amt" type="number" placeholder="₹" class="w-24 bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition text-right">
+                        <button type="button" onclick="addBudgetCategory()" class="bg-corp-600 hover:bg-corp-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow shrink-0">Add</button>
+                    </div>
+                    <p class="text-[10px] text-gray-500 mt-2">Categories you add here also appear as one tap buttons on the Record Transaction screen.</p>
+                </div>
+
                 <div id="bm-categories" class="space-y-3 mt-2 border-t border-corp-800 pt-4">
                     </div>
             </div>
@@ -658,20 +786,9 @@
 
         function openBudgetManager() {
             document.getElementById('bm-global').value = userBudget.global;
-            const container = document.getElementById('bm-categories');
-            container.innerHTML = '';
-            
-            Object.keys(userBudget.categories).forEach(cat => {
-                container.innerHTML += `
-                    <div class="flex justify-between items-center gap-4 bg-corp-800 p-2.5 rounded-lg border border-corp-700">
-                        <span class="text-sm text-gray-300 font-medium w-24 truncate">${cat}</span>
-                        <div class="flex items-center gap-2 flex-1">
-                            <span class="text-gray-500 text-xs">₹</span>
-                            <input type="number" data-cat="${cat}" value="${userBudget.categories[cat]}" oninput="calcUnallocated()" class="bm-cat-input w-full bg-corp-900 border border-corp-600 rounded px-2 py-1.5 text-sm text-white outline-none focus:border-corp-500 text-right">
-                        </div>
-                    </div>
-                `;
-            });
+            const nc = document.getElementById('bm-new-cat'); if (nc) nc.value = '';
+            const na = document.getElementById('bm-new-amt'); if (na) na.value = '';
+            renderBudgetRows();
             calcUnallocated();
             document.getElementById('budget-modal').classList.remove('hidden');
         }
@@ -693,7 +810,7 @@
             unEl.innerText = `₹ ${formatMoney(unallocated)}`;
             if (unallocated < 0) {
                 unEl.classList.replace('text-green-400', 'text-red-400');
-                warnEl.innerText = "⚠️ Global Budget Exceeded. Reduce a category limit.";
+                warnEl.innerText = "⚠️ Overall Budget Exceeded. Reduce a category limit.";
                 warnEl.classList.add('text-red-400');
                 saveBtn.disabled = true;
             } else {
@@ -765,7 +882,7 @@
         }
 
         function switchTab(tabId) {
-            ['home', 'finance', 'record', 'analytics', 'recurring', 'tasks', 'notes', 'documents'].forEach(id => {
+            ['home', 'finance', 'record', 'analytics', 'recurring', 'tasks', 'notes', 'documents', 'settings'].forEach(id => {
                 const sec = document.getElementById(id); if(sec) sec.classList.add('hidden');
                 const navEl = document.getElementById(`nav-${id}`);
                 if(navEl) {
@@ -791,6 +908,7 @@
             if(tabId === 'tasks') renderTaskTable();
             if(tabId === 'notes') renderNotesSidebar();
             if(tabId === 'documents') renderDocs();
+            if(tabId === 'settings') renderSettings();
             
             // Auto close sidebar on mobile after clicking tab
             if(window.innerWidth <= 768) {
@@ -857,7 +975,7 @@
         }
 
         function renderTxChips() {
-            const container = document.getElementById('tx-chips-container'); const data = currTxType === 'expense' ? expChipsData : incChipsData; const activeColor = currTxType === 'expense' ? 'bg-red-600/20 border-red-500 text-red-400' : 'bg-green-600/20 border-green-500 text-green-400';
+            const container = document.getElementById('tx-chips-container'); const data = currTxType === 'expense' ? expenseChipData() : incChipsData; const activeColor = currTxType === 'expense' ? 'bg-red-600/20 border-red-500 text-red-400' : 'bg-green-600/20 border-green-500 text-green-400';
             container.innerHTML = data.map((d, i) => `<button type="button" onclick="selectTxCategory(this, '${d.cat}', '${d.emo}')" class="tx-chip ${i===0 ? activeColor + ' active-chip' : 'bg-corp-900 border-corp-700 hover:border-corp-500 text-gray-300'} border px-3 py-1.5 rounded-full text-sm font-medium transition">${d.emo} ${d.cat}</button>`).join('');
             document.getElementById('tx-category').value = data[0].cat; document.getElementById('tx-emoji').value = data[0].emo;
         }
@@ -1415,11 +1533,21 @@
         let hydrating = true;        // true while loading; blocks saves so cloud data is never overwritten by blanks
         let authMode = 'interactive';
         let tokenClient = null;
+        let lastSyncedJSON = null;   // skip uploads when nothing actually changed
+        let tokenRefreshTimer = null;
+        let cloudPaused = false;     // true when a silent restore failed and a one tap reconnect is offered
+
+        // Security (PIN lock). The PIN is never stored; only a salted hash travels in the backup.
+        let security = { pinEnabled: false, pinHash: '', pinSalt: '', lockMinutes: 5 };
+        let locked = false;
+        let inactivityTimer = null;
+        let pinBusy = false;
+        let wrongPinCount = 0;
 
         function collectState() {
             return {
                 accounts, transactionsDB, recDB, recCols, tDB, tCols,
-                notesDB, folders, docsDB, userBudget,
+                notesDB, folders, docsDB, userBudget, security,
                 savedAt: new Date().toISOString()
             };
         }
@@ -1436,9 +1564,13 @@
             if (Array.isArray(d.folders)) folders = d.folders;
             if (Array.isArray(d.docsDB)) docsDB = d.docsDB;
             if (d.userBudget && typeof d.userBudget === 'object') userBudget = d.userBudget;
+            if (d.security && typeof d.security === 'object') {
+                security = Object.assign({ pinEnabled: false, pinHash: '', pinSalt: '', lockMinutes: 5 }, d.security);
+            }
             populateModeDropdown();
             renderAccounts(); renderRecTable(); renderTaskTable(); renderDocs();
             renderNotesSidebar(); renderCashflowAnalytics(); renderHomeWidgets();
+            if (typeof renderSettings === 'function') renderSettings();
         }
 
         function persistLocal() {
@@ -1450,12 +1582,26 @@
             persistLocal();                   // local copy is always immediate
             if (!useCloud) return;
             if (saveTimer) clearTimeout(saveTimer);
-            saveTimer = setTimeout(syncToCloud, 1500);   // debounced cloud push
+            // Short coalescing window: collapses the few redraws of one action into a single upload that feels instant.
+            saveTimer = setTimeout(syncToCloud, 500);
         }
 
-        function setSyncStatus(text) {
-            const el = document.getElementById('sync-status');
-            if (el) el.textContent = text;
+        function setSyncStatus(text, opts) {
+            opts = opts || {};
+            const targets = [document.getElementById('sync-status'), document.getElementById('settings-sync-status')];
+            targets.forEach(el => {
+                if (!el) return;
+                el.textContent = text;
+                el.classList.toggle('cursor-pointer', !!opts.reconnect);
+                el.classList.toggle('underline', !!opts.reconnect);
+                el.onclick = opts.reconnect ? reconnectCloud : null;
+            });
+        }
+
+        // Offered when a silent restore could not refresh the pass. One tap always works because the user starts it.
+        function reconnectCloud() {
+            setSyncStatus('Reconnecting...');
+            googleAuth(true);
         }
 
         // ----- Google Drive engine (adapted from the supplied study.html) -----
@@ -1485,6 +1631,7 @@
                 if (cloudData && typeof cloudData === 'object') {
                     applyState(cloudData);
                     persistLocal();
+                    lastSyncedJSON = JSON.stringify(collectState());
                 }
             }
         }
@@ -1492,14 +1639,22 @@
         async function syncToCloud() {
             if (!googleToken || !driveFolderId) return;
             if (syncing) { needsSync = true; return; }
+
+            // If nothing changed since the last successful upload, skip the network entirely.
+            const payload = JSON.stringify(collectState());
+            if (payload === lastSyncedJSON && driveFileId) {
+                setSyncStatus('Saved ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                return;
+            }
+
             syncing = true; needsSync = false;
-            setSyncStatus('Syncing...');
+            setSyncStatus('Saving...');
             try {
                 const boundary = 'rishab_boundary_' + Date.now();
                 const metadata = { name: DRIVE_FILE, mimeType: 'application/json' };
                 if (!driveFileId) metadata.parents = [driveFolderId];
 
-                const blob = new Blob([JSON.stringify(collectState())], { type: 'application/json' });
+                const blob = new Blob([payload], { type: 'application/json' });
                 const delimiter = `\r\n--${boundary}\r\n`;
                 const closeDelimiter = `\r\n--${boundary}--`;
                 const body = new Blob([
@@ -1523,7 +1678,7 @@
                 });
 
                 if (res.status === 401 || res.status === 403) {
-                    // Token expired during a long session. Refresh silently then re sync.
+                    // The pass expired during a long session. Refresh it silently, then re sync.
                     needsSync = true;
                     setSyncStatus('Reconnecting...');
                     googleAuth(false);
@@ -1534,16 +1689,23 @@
                 const data = await res.json();
                 if (data.id) {
                     driveFileId = data.id;
-                    const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    setSyncStatus('Cloud synced ' + t);
+                    lastSyncedJSON = payload;
+                    cloudPaused = false;
+                    setSyncStatus('Saved ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
                 }
             } catch (e) {
                 console.error('Sync Error:', e);
-                setSyncStatus('Sync error, will retry');
+                setSyncStatus('Save pending, tap to retry', { reconnect: true });
             } finally {
                 syncing = false;
                 if (needsSync) syncToCloud();
             }
+        }
+
+        // Refresh the access pass a little before it expires so renewals rarely fail.
+        function scheduleTokenRefresh() {
+            if (tokenRefreshTimer) clearTimeout(tokenRefreshTimer);
+            tokenRefreshTimer = setTimeout(() => { if (useCloud) googleAuth(false); }, 50 * 60 * 1000);
         }
 
         // ----- Authentication (OAuth token client, can reach Drive) -----
@@ -1562,16 +1724,18 @@
                 callback: async (res) => {
                     if (res && res.error) {
                         if (authMode === 'silent') {
-                            // Could not restore quietly. Keep the user in the app with their cached data.
-                            hydrating = false; useCloud = false;
-                            setSyncStatus('Cloud paused, click Log out then sign in to reconnect');
+                            // Could not restore quietly. Keep the user in the app with cached data and offer one tap reconnect.
+                            hydrating = false; useCloud = false; cloudPaused = true;
+                            setSyncStatus('Cloud paused, tap to reconnect', { reconnect: true });
                         } else {
                             document.getElementById('auth-error').classList.remove('hidden');
                         }
                         return;
                     }
                     googleToken = res.access_token;
+                    cloudPaused = false;
                     localStorage.setItem('rishab_cloud', 'true');
+                    scheduleTokenRefresh();
                     if (authMode === 'interactive') revealApp();
                     await finalizeCloud();
                 }
@@ -1612,16 +1776,22 @@
                 persistLocal();
                 if (useCloud) {
                     if (!driveFileId) { syncToCloud(); }   // create backup.json on first ever login
-                    else { setSyncStatus('Cloud synced'); }
+                    else { setSyncStatus('Saved ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); }
                 } else {
                     setSyncStatus('Local only');
                 }
+                if (typeof renderSettings === 'function') renderSettings();
+                // Apply the PIN gate once the security settings are known from the backup.
+                gateLockOnEntry();
             }
         }
 
         function logout() {
             if (!confirm('Log out and lock this workspace on this device? Your data stays safe in your Google Drive and returns when you sign in again.')) return;
             try { if (googleToken && window.google && google.accounts && google.accounts.oauth2) google.accounts.oauth2.revoke(googleToken, () => {}); } catch (e) {}
+            if (tokenRefreshTimer) clearTimeout(tokenRefreshTimer);
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            locked = false;
             // Wipe the local cache so a shared computer keeps nothing. Drive remains the trusted source.
             localStorage.removeItem(LOCAL_KEY);
             localStorage.removeItem('rishab_cloud');
@@ -1659,6 +1829,285 @@
         } catch (e) {}
 
         // ==========================================================
+        // SECURITY: SIX DIGIT PIN LOCK
+        // The PIN is never stored. Only a salted, heavily hashed
+        // fingerprint travels in the Drive backup, so the same PIN
+        // works on every device signed into the same Google account.
+        // ==========================================================
+        function _bytesToHex(b) { return Array.from(b).map(x => x.toString(16).padStart(2, '0')).join(''); }
+        function _hexToBytes(h) { const a = new Uint8Array(h.length / 2); for (let i = 0; i < a.length; i++) a[i] = parseInt(h.substr(i * 2, 2), 16); return a; }
+        function _randHex(n) { const a = new Uint8Array(n); crypto.getRandomValues(a); return _bytesToHex(a); }
+        async function _pinHash(pin, saltHex) {
+            const enc = new TextEncoder();
+            const km = await crypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveBits']);
+            const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: _hexToBytes(saltHex), iterations: 150000, hash: 'SHA-256' }, km, 256);
+            return _bytesToHex(new Uint8Array(bits));
+        }
+
+        let pendingAfterAuth = null;
+
+        async function setPin(newPin) {
+            const salt = _randHex(16);
+            const hash = await _pinHash(newPin, salt);
+            security.pinEnabled = true;
+            security.pinHash = hash;
+            security.pinSalt = salt;
+            if (!security.lockMinutes && security.lockMinutes !== 0) security.lockMinutes = 5;
+            persistLocal();
+            scheduleSave();
+            renderSettings();
+        }
+
+        function disablePin() {
+            security.pinEnabled = false;
+            security.pinHash = '';
+            security.pinSalt = '';
+            persistLocal();
+            scheduleSave();
+            renderSettings();
+        }
+
+        function setLockMinutes(v) {
+            security.lockMinutes = Number(v);
+            persistLocal();
+            scheduleSave();
+            resetInactivity();
+        }
+
+        function isAppVisible() {
+            const app = document.getElementById('main-app');
+            const auth = document.getElementById('auth-screen');
+            return app && !app.classList.contains('hidden') && auth && auth.classList.contains('hidden');
+        }
+
+        function showLock() {
+            if (!security.pinEnabled || locked) return;
+            locked = true;
+            const ls = document.getElementById('lock-screen');
+            if (!ls) return;
+            ls.classList.remove('hidden');
+            const inp = document.getElementById('lock-input');
+            if (inp) { inp.disabled = false; inp.value = ''; updateLockDots(0); setTimeout(() => inp.focus(), 50); }
+            const msg = document.getElementById('lock-msg');
+            if (msg) { msg.textContent = 'Enter your six digit PIN'; msg.classList.remove('text-red-400'); }
+        }
+
+        function hideLock() {
+            locked = false;
+            const ls = document.getElementById('lock-screen');
+            if (ls) ls.classList.add('hidden');
+            resetInactivity();
+        }
+
+        function updateLockDots(n) {
+            for (let i = 1; i <= 6; i++) {
+                const d = document.getElementById('lock-dot-' + i);
+                if (d) {
+                    d.classList.toggle('bg-corp-400', i <= n);
+                    d.classList.toggle('bg-corp-700', i > n);
+                }
+            }
+        }
+
+        function onLockInput() {
+            const inp = document.getElementById('lock-input');
+            if (!inp) return;
+            inp.value = inp.value.replace(/\D/g, '').slice(0, 6);
+            updateLockDots(inp.value.length);
+            if (inp.value.length === 6) verifyAndUnlock();
+        }
+
+        async function verifyAndUnlock() {
+            if (pinBusy) return;
+            const inp = document.getElementById('lock-input');
+            const msg = document.getElementById('lock-msg');
+            const entered = inp ? inp.value : '';
+            if (entered.length !== 6) return;
+            pinBusy = true;
+            const hash = await _pinHash(entered, security.pinSalt);
+            if (hash === security.pinHash) {
+                wrongPinCount = 0;
+                pinBusy = false;
+                hideLock();
+            } else {
+                wrongPinCount++;
+                if (inp) inp.value = '';
+                updateLockDots(0);
+                if (msg) { msg.textContent = 'Incorrect PIN, please try again'; msg.classList.add('text-red-400'); }
+                if (wrongPinCount >= 5) {
+                    startLockoutCooldown(30);
+                } else {
+                    pinBusy = false;
+                    if (inp) inp.focus();
+                }
+            }
+        }
+
+        function startLockoutCooldown(seconds) {
+            const inp = document.getElementById('lock-input');
+            const msg = document.getElementById('lock-msg');
+            if (inp) inp.disabled = true;
+            let remain = seconds;
+            const tick = () => {
+                if (msg) { msg.textContent = `Too many attempts. Try again in ${remain}s`; msg.classList.add('text-red-400'); }
+                remain--;
+                if (remain < 0) {
+                    if (inp) { inp.disabled = false; inp.focus(); }
+                    if (msg) { msg.textContent = 'Enter your six digit PIN'; msg.classList.remove('text-red-400'); }
+                    wrongPinCount = 0;
+                    pinBusy = false;
+                } else {
+                    setTimeout(tick, 1000);
+                }
+            };
+            tick();
+        }
+
+        function forgotPin() {
+            if (!confirm('Reset your PIN by confirming your Google sign in? You can set a new PIN afterwards in Settings.')) return;
+            const finishReset = () => { disablePin(); hideLock(); switchTab('settings'); alert('PIN reset. Please set a new PIN in Settings, under Security.'); };
+            authMode = 'interactive';
+            whenGoogleReady(() => {
+                initTokenClientOnce();
+                pendingAfterAuth = finishReset;
+                tokenClient.requestAccessToken();
+            });
+        }
+
+        // Show the lock when entering the app, if a PIN is set.
+        function gateLockOnEntry() {
+            if (pendingAfterAuth) { const f = pendingAfterAuth; pendingAfterAuth = null; try { f(); } catch (e) {} return; }
+            if (security.pinEnabled && isAppVisible()) showLock();
+            else resetInactivity();
+        }
+
+        function resetInactivity() {
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            if (!security.pinEnabled || locked) return;
+            const mins = Number(security.lockMinutes);
+            if (!mins || mins <= 0) return;   // Never means no inactivity lock; leaving and returning still locks
+            inactivityTimer = setTimeout(() => { if (isAppVisible()) showLock(); }, mins * 60 * 1000);
+        }
+
+        // Watchers: lock on leaving and returning, and on inactivity. Google stays signed in throughout.
+        (function setupLockWatchers() {
+            let wasAway = false;
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) { wasAway = true; }
+                else if (wasAway) { wasAway = false; if (security.pinEnabled && isAppVisible()) showLock(); }
+            });
+            window.addEventListener('blur', () => { wasAway = true; });
+            window.addEventListener('focus', () => { if (wasAway) { wasAway = false; if (security.pinEnabled && isAppVisible()) showLock(); } });
+            ['mousemove', 'keydown', 'touchstart', 'click', 'scroll'].forEach(ev => {
+                window.addEventListener(ev, () => { if (!locked) resetInactivity(); }, { passive: true });
+            });
+        })();
+
+        // ==========================================================
+        // SETTINGS PAGE RENDER
+        // ==========================================================
+        function renderSettings() {
+            const themeMode = localStorage.getItem('rishab_theme') || 'system';
+            updateThemeButtons(themeMode);
+
+            const pinState = document.getElementById('set-pin-state');
+            if (pinState) pinState.textContent = security.pinEnabled ? 'PIN lock is ON' : 'PIN lock is OFF';
+            const setBtn = document.getElementById('set-pin-btn');
+            if (setBtn) setBtn.textContent = security.pinEnabled ? 'Change PIN' : 'Set PIN';
+            const offBtn = document.getElementById('set-pin-off');
+            if (offBtn) offBtn.classList.toggle('hidden', !security.pinEnabled);
+            const lockSel = document.getElementById('set-lock-minutes');
+            if (lockSel) lockSel.value = String(security.lockMinutes);
+            const lockNow = document.getElementById('set-lock-now');
+            if (lockNow) lockNow.classList.toggle('hidden', !security.pinEnabled);
+
+            const acc = document.getElementById('set-account-state');
+            if (acc) acc.textContent = useCloud ? 'Signed in with Google, cloud sync on' : (cloudPaused ? 'Signed in, cloud paused' : 'Working locally');
+        }
+
+        function openPinSetup() {
+            document.getElementById('pin-setup-wrap').classList.remove('hidden');
+            const a = document.getElementById('pin-new'); const b = document.getElementById('pin-confirm');
+            if (a) a.value = ''; if (b) b.value = '';
+            const err = document.getElementById('pin-setup-err'); if (err) err.classList.add('hidden');
+            if (a) a.focus();
+        }
+        function cancelPinSetup() { document.getElementById('pin-setup-wrap').classList.add('hidden'); }
+        async function savePinSetup() {
+            const a = (document.getElementById('pin-new').value || '').replace(/\D/g, '');
+            const b = (document.getElementById('pin-confirm').value || '').replace(/\D/g, '');
+            const err = document.getElementById('pin-setup-err');
+            const show = (m) => { if (err) { err.textContent = m; err.classList.remove('hidden'); } };
+            if (a.length !== 6) return show('PIN must be exactly six digits.');
+            if (a !== b) return show('The two entries do not match.');
+            await setPin(a);
+            cancelPinSetup();
+            alert('Your PIN is set. It will be asked after a refresh, after inactivity, and whenever you return to the app.');
+        }
+        function turnOffPin() {
+            if (!confirm('Turn off the PIN lock? Anyone with access to your signed in device will be able to open the workspace.')) return;
+            disablePin();
+        }
+        function lockNow() { showLock(); }
+
+        // ==========================================================
+        // BUDGET: add and remove categories up front, no expense needed
+        // ==========================================================
+        function snapshotBudgetInputs() {
+            userBudget.global = Number(document.getElementById('bm-global').value) || 0;
+            document.querySelectorAll('.bm-cat-input').forEach(input => {
+                const catName = input.getAttribute('data-cat');
+                if (catName) userBudget.categories[catName] = Number(input.value) || 0;
+            });
+        }
+        function addBudgetCategory() {
+            const nameEl = document.getElementById('bm-new-cat');
+            const amtEl = document.getElementById('bm-new-amt');
+            const name = (nameEl.value || '').trim();
+            if (!name) { nameEl.focus(); return; }
+            snapshotBudgetInputs();
+            if (userBudget.categories[name] === undefined) userBudget.categories[name] = Number(amtEl.value) || 0;
+            nameEl.value = ''; amtEl.value = '';
+            renderBudgetRows();
+            calcUnallocated();
+        }
+        function removeBudgetCategory(cat) {
+            snapshotBudgetInputs();
+            delete userBudget.categories[cat];
+            renderBudgetRows();
+            calcUnallocated();
+        }
+        function renderBudgetRows() {
+            const container = document.getElementById('bm-categories');
+            container.innerHTML = '';
+            Object.keys(userBudget.categories).forEach(cat => {
+                const safe = cat.replace(/'/g, "\\'");
+                container.innerHTML += `
+                    <div class="flex justify-between items-center gap-3 bg-corp-800 p-2.5 rounded-lg border border-corp-700">
+                        <span class="text-sm text-gray-300 font-medium w-24 truncate">${cat}</span>
+                        <div class="flex items-center gap-2 flex-1">
+                            <span class="text-gray-500 text-xs">₹</span>
+                            <input type="number" data-cat="${cat}" value="${userBudget.categories[cat]}" oninput="calcUnallocated()" class="bm-cat-input w-full bg-corp-900 border border-corp-600 rounded px-2 py-1.5 text-sm text-white outline-none focus:border-corp-500 text-right">
+                            <button type="button" onclick="removeBudgetCategory('${safe}')" class="text-gray-500 hover:text-red-400 transition text-lg leading-none px-1" title="Remove category">&times;</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Expense chips include any categories you defined in the budget, so logging against them is one tap.
+        function expenseChipData() {
+            const base = expChipsData.slice();
+            const have = new Set(base.map(c => c.cat));
+            const otherIdx = base.findIndex(c => c.cat === 'Other');
+            const insertAt = otherIdx === -1 ? base.length : otherIdx;
+            Object.keys(userBudget.categories || {}).forEach(cat => {
+                if (!have.has(cat)) { base.splice(insertAt, 0, { cat: cat, emo: '🏷️' }); have.add(cat); }
+            });
+            return base;
+        }
+
+        // ==========================================================
         // AUTO SAVE: wrap the existing render functions so every data
         // change is persisted. Calculations are untouched; we only add
         // a save after each redraw. Saves are blocked while hydrating.
@@ -1694,14 +2143,23 @@
                 if (cached) applyState(JSON.parse(cached));
             } catch (e) {}
 
+            renderSettings();
+
             const wasCloud = localStorage.getItem('rishab_cloud') === 'true';
             if (wasCloud) {
                 // Returning user: skip the sign in screen and restore the Drive session silently.
                 revealApp();
+                // If a PIN was set, lock immediately on this fresh load, even before Drive reconnects.
+                if (security.pinEnabled) showLock();
                 setSyncStatus('Reconnecting to Drive...');
                 googleAuth(false);
-                // Safety net: if the silent restore stalls, unlock local saving so edits are not lost.
-                setTimeout(() => { if (hydrating) { hydrating = false; if (!useCloud) setSyncStatus('Cloud paused, working locally'); } }, 9000);
+                // Safety net: if the silent restore stalls, unlock local saving and offer a one tap reconnect.
+                setTimeout(() => {
+                    if (hydrating) {
+                        hydrating = false;
+                        if (!useCloud) { cloudPaused = true; setSyncStatus('Cloud paused, tap to reconnect', { reconnect: true }); }
+                    }
+                }, 9000);
             } else {
                 // First visit on this device: show the sign in screen.
                 hydrating = false;
