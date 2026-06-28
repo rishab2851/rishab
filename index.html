@@ -2,8 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Rishab OS</title>
+    <meta name="theme-color" content="#0A1128">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Rishab OS">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20180%20180'%3E%3Crect%20width='180'%20height='180'%20rx='40'%20fill='%230A1128'/%3E%3Cpath%20d='M90%20104%20L150%20134%20L90%20164%20L30%20134%20Z'%20fill='%232F569C'/%3E%3Cpath%20d='M90%2075%20L150%20105%20L90%20135%20L30%20105%20Z'%20fill='%233D63B5'/%3E%3Cpath%20d='M90%2046%20L150%2076%20L90%20106%20L30%2076%20Z'%20fill='%23608DE8'/%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
@@ -189,6 +195,18 @@
             <h1 class="text-xl font-bold text-white mb-1 tracking-tight">Workspace locked</h1>
             <p id="lock-msg" class="text-corp-400 text-sm mb-6 text-center font-medium">Enter your six digit PIN</p>
 
+            <div id="lock-fp-wrap" class="hidden w-full mb-5">
+                <button onclick="tryFingerprintUnlock(false)" class="w-full flex items-center justify-center gap-2 bg-corp-900 hover:bg-corp-700 border border-corp-600 text-white font-semibold py-3 px-4 rounded-lg transition">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11c0 3 0 6-1 9"/><path d="M5 13a7 7 0 0 1 12-5"/><path d="M3 9a11 11 0 0 1 18 0"/><path d="M8 12a4 4 0 0 1 8 0c0 2 0 4-.5 6"/><path d="M19 12c0 4-1 7-1 7"/></svg>
+                    Unlock with fingerprint
+                </button>
+                <div class="flex items-center gap-3 my-4">
+                    <span class="h-px bg-corp-700 flex-1"></span>
+                    <span class="text-[11px] text-gray-500 uppercase tracking-wide">or enter PIN</span>
+                    <span class="h-px bg-corp-700 flex-1"></span>
+                </div>
+            </div>
+
             <div class="flex items-center justify-center gap-3 mb-6">
                 <span id="lock-dot-1" class="w-3.5 h-3.5 rounded-full bg-corp-700 transition-colors"></span>
                 <span id="lock-dot-2" class="w-3.5 h-3.5 rounded-full bg-corp-700 transition-colors"></span>
@@ -238,7 +256,7 @@
                     </div>
                     <div id="acc-wealth" class="flex flex-col ml-7 mt-1 border-l border-corp-700 pl-2 gap-1 hidden">
                         <button onclick="switchTab('finance')" id="nav-finance" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Financial Dashboard</button>
-                        <button onclick="switchTab('record')" id="nav-record" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Record Transactions</button>
+                        <button onclick="openRecord()" id="nav-record" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Record Transactions</button>
                         <button onclick="switchTab('analytics')" id="nav-analytics" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Cashflow Analytics</button>
                         <button onclick="switchTab('recurring')" id="nav-recurring" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Recurring Tracker</button>
                     </div>
@@ -409,8 +427,12 @@
                 </div>
             </section>
 
-            <section id="record" class="hidden w-full max-w-4xl p-4 md:p-10 mx-auto">
-                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white text-center tracking-tight">Record Transaction</h2>
+            <div id="record" class="hidden fixed inset-0 z-[120] bg-corp-900/90 backdrop-blur-sm overflow-y-auto p-4">
+              <div class="w-full max-w-2xl mx-auto my-6 md:my-10">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Record Transaction</h2>
+                    <button type="button" onclick="closeRecord()" class="text-gray-400 hover:text-white text-3xl font-bold leading-none">&times;</button>
+                </div>
                 <div class="bg-corp-800 rounded-2xl p-6 md:p-8 border border-corp-700 shadow-2xl">
                     <div class="flex gap-4 mb-8 bg-corp-900 p-1.5 rounded-xl border border-corp-700">
                         <button type="button" id="btn-tx-exp" onclick="setTxType('expense')" class="flex-1 bg-red-500/20 text-red-400 border border-red-500/50 rounded-lg py-2 font-bold transition shadow-sm">📉 Log Expense</button>
@@ -426,7 +448,8 @@
                         <div class="flex flex-col sm:flex-row items-end gap-4 border-t border-corp-700 pt-6"><div class="w-full sm:w-1/3"><label class="block text-xs text-gray-400 mb-1">Mode of Payment</label><select id="tx-mode" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div><div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1">Pivot Tags (Optional, comma split)</label><input type="text" id="tx-tags" placeholder="e.g. GIES-Closure, Audit" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div><button type="submit" id="btn-tx-submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]">Log Expense</button></div>
                     </form>
                 </div>
-            </section>
+              </div>
+            </div>
 
             <section id="analytics" class="hidden w-full max-w-6xl p-4 md:p-10 mx-auto">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -672,6 +695,16 @@
                             </select>
                             <p class="text-[11px] text-gray-500 mt-2">Time spent on another tab, in another app, or with your laptop locked all count toward this idle time. A plain refresh never asks for the PIN.</p>
                         </div>
+
+                        <div id="fp-row" class="hidden mt-5 border-t border-corp-700 pt-5">
+                            <label class="block text-xs text-gray-400 mb-2 font-bold tracking-wide uppercase">Fingerprint unlock on this device</label>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <span id="fp-state" class="text-sm font-medium text-gray-200">Off</span>
+                                <button id="fp-enable" onclick="enableFingerprint()" class="bg-corp-600 hover:bg-corp-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow">Enable fingerprint</button>
+                                <button id="fp-disable" onclick="disableFingerprint()" class="hidden text-sm font-medium text-red-400 hover:text-red-300 transition px-2 py-2">Turn off</button>
+                            </div>
+                            <p id="fp-note" class="text-[11px] text-gray-500 mt-2">Registered per device. Your PIN keeps working everywhere and is always the fallback.</p>
+                        </div>
                     </div>
 
                     <div class="bg-corp-800 border border-corp-700 rounded-2xl p-5 md:p-6">
@@ -695,6 +728,11 @@
             </section>
 
         </main>
+
+        <button id="fab-record" onclick="openRecord()" title="Record a transaction" aria-label="Record a transaction"
+            class="fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full bg-corp-600 hover:bg-corp-500 active:scale-95 text-white shadow-2xl flex items-center justify-center transition">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
     </div>
 
     <div id="tag-pivot-modal" class="hidden fixed inset-0 bg-corp-900/90 z-50 flex items-center justify-center p-4 md:p-10 backdrop-blur-sm">
@@ -922,7 +960,7 @@
         }
 
         function switchTab(tabId) {
-            ['home', 'finance', 'record', 'analytics', 'recurring', 'tasks', 'notes', 'documents', 'settings'].forEach(id => {
+            ['home', 'finance', 'analytics', 'recurring', 'tasks', 'notes', 'documents', 'settings'].forEach(id => {
                 const sec = document.getElementById(id); if(sec) sec.classList.add('hidden');
                 const navEl = document.getElementById(`nav-${id}`);
                 if(navEl) {
@@ -943,7 +981,6 @@
             if(tabId === 'home') { updateGreeting(); renderHomeWidgets(); }
             if(tabId === 'finance') renderAccounts();
             if(tabId === 'recurring') { populateModeDropdown(); renderRecTable(); }
-            if(tabId === 'record') renderRecordForm();
             if(tabId === 'analytics') renderCashflowAnalytics();
             if(tabId === 'tasks') renderTaskTable();
             if(tabId === 'notes') renderNotesSidebar();
@@ -1005,6 +1042,19 @@
         const incChipsData = [ { cat: 'Salary', emo: '💼' }, { cat: 'Freelance', emo: '💻' }, { cat: 'Dividend', emo: '📈' }, { cat: 'Commission', emo: '🤝' }, { cat: 'Gift', emo: '🎁' }, { cat: 'Refund', emo: '🔄' }, { cat: 'Other', emo: '➕' } ];
 
         function renderRecordForm() { populateModeDropdown(); document.getElementById('tx-date').value = todayISO().split('T')[0]; renderTxChips(); }
+
+        // The Record popup, opened from the floating button, the sidebar, or a phone shortcut.
+        function openRecord() {
+            renderRecordForm();
+            document.getElementById('record').classList.remove('hidden');
+            setTimeout(() => { const a = document.getElementById('tx-amount'); if (a) a.focus(); }, 60);
+            if (window.innerWidth <= 768) {
+                const sb = document.getElementById('sidebar'); const ov = document.getElementById('sidebar-overlay');
+                if (sb) { sb.classList.add('mobile-sidebar-hidden'); sb.classList.remove('mobile-sidebar-visible'); }
+                if (ov) ov.classList.add('hidden');
+            }
+        }
+        function closeRecord() { document.getElementById('record').classList.add('hidden'); }
 
         function setTxType(type) {
             currTxType = type;
@@ -1854,6 +1904,7 @@
                 if (pendingAfterAuth) { const f = pendingAfterAuth; pendingAfterAuth = null; try { f(); } catch (e) {} }
                 else if (firstStart && authMode === 'interactive' && security.pinEnabled) showLock();
                 lastActivity = Date.now();
+                runPendingAction();
             }
         }
 
@@ -1956,9 +2007,18 @@
             if (!ls) return;
             ls.classList.remove('hidden');
             const inp = document.getElementById('lock-input');
-            if (inp) { inp.disabled = false; inp.value = ''; updateLockDots(0); setTimeout(() => inp.focus(), 50); }
+            if (inp) { inp.disabled = false; inp.value = ''; updateLockDots(0); }
             const msg = document.getElementById('lock-msg');
             if (msg) { msg.textContent = 'Enter your six digit PIN'; msg.classList.remove('text-red-400'); }
+            // Offer fingerprint first when this device has it registered. The PIN stays available beneath.
+            const fpWrap = document.getElementById('lock-fp-wrap');
+            if (fpWrap) fpWrap.classList.toggle('hidden', !fingerprintRegistered());
+            if (fingerprintRegistered()) {
+                if (msg) msg.textContent = 'Use your fingerprint, or enter your PIN';
+                setTimeout(() => { tryFingerprintUnlock(true); }, 200);
+            } else {
+                setTimeout(() => { if (inp) inp.focus(); }, 50);
+            }
         }
 
         function hideLock() {
@@ -1966,6 +2026,7 @@
             const ls = document.getElementById('lock-screen');
             if (ls) ls.classList.add('hidden');
             markActivity();
+            runPendingAction();
         }
 
         function updateLockDots(n) {
@@ -2097,6 +2158,17 @@
             // The Lock button in the sidebar only appears once a PIN exists.
             const lb = document.getElementById('lock-btn');
             if (lb) lb.classList.toggle('hidden', !security.pinEnabled);
+
+            // Fingerprint controls appear only where the device offers the check and a PIN is set.
+            const fpRow = document.getElementById('fp-row');
+            if (fpRow) {
+                const show = security.pinEnabled && fpPlatformAvailable;
+                fpRow.classList.toggle('hidden', !show);
+                const reg = fingerprintRegistered();
+                const st = document.getElementById('fp-state'); if (st) st.textContent = reg ? 'On for this device' : 'Off';
+                const en = document.getElementById('fp-enable'); if (en) en.classList.toggle('hidden', reg);
+                const di = document.getElementById('fp-disable'); if (di) di.classList.toggle('hidden', !reg);
+            }
         }
 
         function openPinSetup() {
@@ -2125,6 +2197,151 @@
         function lockNow() {
             if (!security.pinEnabled) { alert('Set a PIN first in Settings, under Security, then you can lock the workspace.'); switchTab('settings'); return; }
             showLock();
+        }
+
+        // ==========================================================
+        // FINGERPRINT UNLOCK (per device, layered on top of the PIN)
+        // Uses the device passkey check. The print never leaves the
+        // phone and is never stored by the app. The PIN stays as the
+        // fallback everywhere, so you can never be locked out.
+        // ==========================================================
+        const FP_KEY = 'rishab_fp_cred';
+        let fpPlatformAvailable = false;
+
+        function _b64urlFromBuf(buf) {
+            const bytes = new Uint8Array(buf);
+            let s = '';
+            for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+            return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
+        function _bufFromB64url(b64) {
+            b64 = b64.replace(/-/g, '+').replace(/_/g, '/');
+            while (b64.length % 4) b64 += '=';
+            const s = atob(b64);
+            const bytes = new Uint8Array(s.length);
+            for (let i = 0; i < s.length; i++) bytes[i] = s.charCodeAt(i);
+            return bytes.buffer;
+        }
+        function fingerprintRegistered() { try { return !!localStorage.getItem(FP_KEY); } catch (e) { return false; } }
+
+        async function detectPlatformAuthenticator() {
+            try {
+                if (window.PublicKeyCredential && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+                    fpPlatformAvailable = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                } else { fpPlatformAvailable = false; }
+            } catch (e) { fpPlatformAvailable = false; }
+            renderSettings();
+        }
+
+        async function enableFingerprint() {
+            if (!security.pinEnabled) { alert('Please set a PIN first, then add fingerprint as a quick unlock.'); return; }
+            if (!fpPlatformAvailable) { alert('This device or browser does not offer a fingerprint or face check here.'); return; }
+            try {
+                const challenge = crypto.getRandomValues(new Uint8Array(32));
+                const userId = crypto.getRandomValues(new Uint8Array(16));
+                const cred = await navigator.credentials.create({
+                    publicKey: {
+                        challenge,
+                        rp: { name: 'Rishab OS', id: location.hostname },
+                        user: { id: userId, name: profile.googleEmail || 'rishab', displayName: displayName() },
+                        pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+                        authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' },
+                        timeout: 60000,
+                        attestation: 'none'
+                    }
+                });
+                if (cred && cred.rawId) {
+                    localStorage.setItem(FP_KEY, _b64urlFromBuf(cred.rawId));
+                    renderSettings();
+                    alert('Fingerprint unlock is on for this device. Your PIN still works everywhere.');
+                }
+            } catch (e) {
+                console.error('Fingerprint registration failed:', e);
+                alert('Fingerprint setup was not completed. You can try again any time.');
+            }
+        }
+
+        function disableFingerprint() {
+            try { localStorage.removeItem(FP_KEY); } catch (e) {}
+            renderSettings();
+        }
+
+        async function tryFingerprintUnlock(silentFail) {
+            if (!fingerprintRegistered()) return;
+            const msg = document.getElementById('lock-msg');
+            try {
+                const challenge = crypto.getRandomValues(new Uint8Array(32));
+                const idBuf = _bufFromB64url(localStorage.getItem(FP_KEY));
+                const assertion = await navigator.credentials.get({
+                    publicKey: {
+                        challenge,
+                        allowCredentials: [{ type: 'public-key', id: idBuf, transports: ['internal'] }],
+                        userVerification: 'required',
+                        timeout: 60000,
+                        rpId: location.hostname
+                    }
+                });
+                if (assertion) { wrongPinCount = 0; hideLock(); }
+            } catch (e) {
+                // The user can always fall back to the PIN field beneath.
+                if (!silentFail && msg) { msg.textContent = 'Fingerprint not recognised, please enter your PIN'; msg.classList.add('text-red-400'); }
+                const inp = document.getElementById('lock-input'); if (inp) inp.focus();
+            }
+        }
+
+        // ==========================================================
+        // INSTALL AND PHONE SHORTCUTS
+        // A web app manifest lets you add Rishab OS to the home screen.
+        // A long press on the installed icon then offers New Transaction.
+        // ==========================================================
+        function setupManifest() {
+            try {
+                const base = location.origin + location.pathname;
+                const icon = "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20512%20512'%3E%3Crect%20width='512'%20height='512'%20rx='112'%20fill='%230A1128'/%3E%3Cpath%20d='M256%20300%20L420%20382%20L256%20464%20L92%20382%20Z'%20fill='%232F569C'/%3E%3Cpath%20d='M256%20218%20L420%20300%20L256%20382%20L92%20300%20Z'%20fill='%233D63B5'/%3E%3Cpath%20d='M256%20136%20L420%20218%20L256%20300%20L92%20218%20Z'%20fill='%23608DE8'/%3E%3C/svg%3E";
+                const manifest = {
+                    name: 'Rishab OS',
+                    short_name: 'Rishab OS',
+                    start_url: base,
+                    scope: base,
+                    display: 'standalone',
+                    background_color: '#0A1128',
+                    theme_color: '#0A1128',
+                    icons: [
+                        { src: icon, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+                        { src: icon, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+                    ],
+                    shortcuts: [
+                        { name: 'New Transaction', short_name: 'Record', url: base + '?action=record', icons: [{ src: icon, sizes: '192x192', type: 'image/svg+xml' }] },
+                        { name: 'New Note', short_name: 'Note', url: base + '?action=note', icons: [{ src: icon, sizes: '192x192', type: 'image/svg+xml' }] }
+                    ]
+                };
+                const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+                const link = document.createElement('link');
+                link.rel = 'manifest';
+                link.href = URL.createObjectURL(blob);
+                document.head.appendChild(link);
+            } catch (e) { /* install is optional */ }
+        }
+
+        let pendingAction = null;
+        function capturePendingAction() {
+            try {
+                const a = new URLSearchParams(location.search).get('action');
+                if (a === 'record' || a === 'note') {
+                    pendingAction = a;
+                    // Clean the address so a later refresh does not reopen the action.
+                    history.replaceState({}, '', location.origin + location.pathname);
+                }
+            } catch (e) {}
+        }
+        function runPendingAction() {
+            if (!pendingAction || locked || !appStarted) return;
+            const a = pendingAction; pendingAction = null;
+            if (a === 'record') openRecord();
+            else if (a === 'note') {
+                switchTab('notes');
+                if (folders && folders.length) createNote(folders[0].id);
+            }
         }
 
         // ==========================================================
@@ -2288,6 +2505,10 @@
         (function init() {
             // Default the analytics month to the current month before anything renders.
             try { const am = document.getElementById('analytics-month'); if (am && !am.value) am.value = todayISO().slice(0, 7); } catch (e) {}
+
+            setupManifest();
+            capturePendingAction();
+            detectPlatformAuthenticator();
 
             // Theme buttons reflect the saved choice.
             const themeMode = localStorage.getItem('rishab_theme') || 'system';
