@@ -161,8 +161,12 @@
 
     <div id="auth-screen" class="absolute inset-0 z-50 flex items-center justify-center bg-corp-900 backdrop-blur-md transition-opacity duration-500">
         <div class="bg-corp-800 p-10 rounded-2xl shadow-2xl border border-corp-700 flex flex-col items-center w-full max-w-md mx-4">
-            <div class="w-16 h-16 bg-corp-900 rounded-full flex items-center justify-center border border-corp-700 shadow-inner mb-6">
-                <span class="text-3xl">🌐</span>
+            <div class="w-16 h-16 bg-corp-900 rounded-2xl flex items-center justify-center border border-corp-700 shadow-inner mb-6">
+                <svg width="38" height="38" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                    <path d="M24 31 L43 40.5 L24 50 L5 40.5 Z" fill="#2F569C"/>
+                    <path d="M24 22 L43 31.5 L24 41 L5 31.5 Z" fill="#3D63B5"/>
+                    <path d="M24 13 L43 22.5 L24 32 L5 22.5 Z" fill="#608DE8"/>
+                </svg>
             </div>
             <h1 class="text-2xl font-bold text-white mb-2 tracking-tight">Rishab OS</h1>
             <p class="text-corp-400 text-sm mb-8 text-center font-medium">Securely access your workspace</p>
@@ -171,6 +175,7 @@
                 <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
                 Sign in with Google
             </button>
+            <p class="text-gray-500 text-[11px] mt-4 text-center leading-relaxed">We request your name, email, and profile photo only to show your profile inside the app. If you prefer not to share them, you can set your name and photo by hand in Settings.</p>
             <p id="auth-error" class="text-red-400 text-xs mt-4 hidden font-medium text-center">Authentication failed. Please try again.</p>
             <p id="client-missing" class="text-amber-400 text-xs mt-4 hidden font-medium text-center">Google Client ID is not set yet. Open the file and paste it where marked near the top of the script.</p>
         </div>
@@ -213,7 +218,7 @@
             </button>
         </div>
 
-        <aside id="sidebar" class="w-64 bg-corp-800 border-r border-corp-700 flex flex-col flex-shrink-0 z-50 overflow-y-auto absolute md:relative h-full transition-transform duration-300 mobile-sidebar-hidden md:translate-x-0 mt-[60px] md:mt-0 pb-[130px] md:pb-0">
+        <aside id="sidebar" class="w-64 bg-corp-800 border-r border-corp-700 flex flex-col flex-shrink-0 z-50 overflow-y-auto absolute md:relative h-full transition-transform duration-300 mobile-sidebar-hidden md:translate-x-0 mt-[60px] md:mt-0 pb-[210px] md:pb-[200px]">
             <div class="p-5 pb-2 hidden md:block">
                 <h1 class="text-xl font-bold text-white tracking-wide">Rishab OS</h1>
             </div>
@@ -261,22 +266,28 @@
                     <div class="group flex items-center justify-between px-3 py-2 rounded hover:bg-corp-700 transition cursor-pointer text-gray-300 hover:text-white" onclick="switchTab('documents')" id="nav-documents">
                         <div class="flex items-center gap-2"><span class="text-lg">📁</span> <span contenteditable="false" class="outline-none focus:bg-corp-900 focus:px-1 rounded text-sm font-medium transition-all">Documents Vault</span></div>
                     </div>
-
-                    <div class="group flex items-center justify-between px-3 py-2 rounded hover:bg-corp-700 transition cursor-pointer text-gray-300 hover:text-white" onclick="switchTab('settings')" id="nav-settings">
-                        <div class="flex items-center gap-2"><span class="text-lg">⚙️</span> <span contenteditable="false" class="outline-none focus:bg-corp-900 focus:px-1 rounded text-sm font-medium transition-all">Settings</span></div>
-                    </div>
                 </div>
 
             </nav>
 
             <div class="absolute bottom-0 left-0 w-full border-t border-corp-700 bg-corp-800">
-                <div class="px-4 pt-3 pb-1">
+                <button onclick="openProfileEditor()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-corp-700 transition text-left">
+                    <span id="profile-avatar" class="w-9 h-9 rounded-full bg-corp-600 flex items-center justify-center text-white text-sm font-bold overflow-hidden shrink-0">R</span>
+                    <span class="min-w-0 flex-1">
+                        <span id="profile-name" class="block text-sm font-semibold text-white truncate">Rishab OS</span>
+                        <span id="profile-email" class="block text-[11px] text-gray-400 truncate">Tap to edit profile</span>
+                    </span>
+                </button>
+                <div class="px-4 pt-2 pb-1 border-t border-corp-700/60">
                     <span id="sync-status" class="text-[10px] text-gray-500 font-medium tracking-wide truncate block">Local only</span>
                 </div>
                 <div class="flex items-center justify-between px-4 pb-3 pt-1">
-                    <button onclick="switchTab('settings')" class="text-xs text-gray-400 hover:text-white transition flex items-center gap-1.5" title="Open Settings"><span>⚙️</span> Settings</button>
                     <div class="flex items-center gap-3">
-                        <span class="text-xs text-gray-500 font-medium tracking-wide">Master Build V25</span>
+                        <button onclick="switchTab('settings')" class="text-xs text-gray-400 hover:text-white transition flex items-center gap-1.5" title="Open Settings"><span>⚙️</span> Settings</button>
+                        <button id="lock-btn" onclick="lockNow()" class="hidden text-xs text-gray-400 hover:text-white transition flex items-center gap-1.5" title="Lock the workspace now"><span>🔒</span> Lock</button>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-gray-500 font-medium tracking-wide">V25</span>
                         <button onclick="togglePrivacy()" class="text-gray-500 hover:text-gray-300 transition text-lg leading-none" title="Toggle Global Privacy Mode">
                             <span id="eye-icon">👁️</span>
                         </button>
@@ -654,12 +665,12 @@
                         <div>
                             <label class="block text-xs text-gray-400 mb-1 font-bold tracking-wide uppercase">Ask for the PIN after inactivity</label>
                             <select id="set-lock-minutes" onchange="setLockMinutes(this.value)" class="bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition">
-                                <option value="1">After 1 minute</option>
                                 <option value="5">After 5 minutes</option>
+                                <option value="10">After 10 minutes</option>
                                 <option value="15">After 15 minutes</option>
                                 <option value="0">Never by inactivity</option>
                             </select>
-                            <p class="text-[11px] text-gray-500 mt-2">The PIN is always asked after a refresh, and whenever you leave the app and come back, regardless of this setting.</p>
+                            <p class="text-[11px] text-gray-500 mt-2">Time spent on another tab, in another app, or with your laptop locked all count toward this idle time. A plain refresh never asks for the PIN.</p>
                         </div>
                     </div>
 
@@ -675,7 +686,8 @@
 
                     <div class="bg-corp-800 border border-corp-700 rounded-2xl p-5 md:p-6">
                         <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">👤 Account</h3>
-                        <p id="set-account-state" class="text-gray-400 text-xs mb-4">Working locally</p>
+                        <p id="set-account-state" class="text-gray-400 text-xs mb-1">Working locally</p>
+                        <p id="set-account-email" class="text-gray-400 text-xs mb-4">Email not shared yet.</p>
                         <button onclick="logout()" class="flex items-center gap-2 text-sm font-medium text-white bg-red-600 hover:bg-red-500 rounded-lg px-5 py-2 transition shadow">⏻ Log out</button>
                     </div>
 
@@ -693,6 +705,34 @@
             </div>
             <div class="p-6 overflow-y-auto flex-1 flex flex-col gap-6" id="pivot-content">
                 </div>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="hidden fixed inset-0 bg-corp-900/90 z-[120] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-corp-800 border border-corp-700 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-corp-800 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-white">Edit profile</h2>
+                <button onclick="closeProfileEditor()" class="text-gray-400 hover:text-white text-2xl font-bold leading-none">&times;</button>
+            </div>
+            <div class="p-5 flex flex-col items-center gap-4">
+                <span id="pf-preview" class="w-20 h-20 rounded-full bg-corp-600 flex items-center justify-center text-white text-2xl font-bold overflow-hidden">R</span>
+                <div class="flex items-center gap-3">
+                    <label class="cursor-pointer text-sm font-medium text-white bg-corp-600 hover:bg-corp-500 rounded-lg px-4 py-2 transition shadow">
+                        Upload photo
+                        <input type="file" accept="image/*" class="hidden" onchange="onProfilePhoto(this)">
+                    </label>
+                    <button onclick="useGooglePhoto()" class="text-sm font-medium text-gray-300 hover:text-white bg-corp-900 border border-corp-700 rounded-lg px-4 py-2 transition">Use Google photo</button>
+                </div>
+                <div class="w-full">
+                    <label class="block text-xs text-gray-400 mb-1 font-bold tracking-wide uppercase">Display name</label>
+                    <input id="pf-name" type="text" placeholder="Your name" class="w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition">
+                    <p class="text-[11px] text-gray-500 mt-2">Leave blank to use your Google name.</p>
+                </div>
+            </div>
+            <div class="p-5 border-t border-corp-800 flex justify-end gap-3">
+                <button onclick="closeProfileEditor()" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition">Cancel</button>
+                <button onclick="saveProfile()" class="bg-corp-600 hover:bg-corp-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition shadow">Save</button>
+            </div>
         </div>
     </div>
 
@@ -743,7 +783,7 @@
         //  Keep the quotes. Nothing else here needs to change.
         // ==========================================================
         const CLIENT_ID = "652853887650-v3g4851d8tpc6b1dtv1dc5ckrcjqaegu.apps.googleusercontent.com";
-        const SCOPES = "https://www.googleapis.com/auth/drive.file";
+        const SCOPES = "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid";
         // ==========================================================
 
         // ==========================================
@@ -1534,20 +1574,24 @@
         let authMode = 'interactive';
         let tokenClient = null;
         let lastSyncedJSON = null;   // skip uploads when nothing actually changed
-        let tokenRefreshTimer = null;
-        let cloudPaused = false;     // true when a silent restore failed and a one tap reconnect is offered
+        let cloudPaused = false;     // true when the access pass expired and a one tap reconnect is offered
+        let appStarted = false;      // becomes true once the workspace is first revealed
 
         // Security (PIN lock). The PIN is never stored; only a salted hash travels in the backup.
-        let security = { pinEnabled: false, pinHash: '', pinSalt: '', lockMinutes: 5 };
+        let security = { pinEnabled: false, pinHash: '', pinSalt: '', lockMinutes: 10 };
         let locked = false;
-        let inactivityTimer = null;
         let pinBusy = false;
         let wrongPinCount = 0;
+        let lastActivity = Date.now();   // timestamp based idle tracking, robust across hidden tabs
+
+        // Profile shown in the sidebar. Google name, email and photo fill in after sign in,
+        // and the user can override the name and photo manually.
+        let profile = { name: '', photo: '', useCustomName: false, useCustomPhoto: false, googleName: '', googleEmail: '', googlePhoto: '' };
 
         function collectState() {
             return {
                 accounts, transactionsDB, recDB, recCols, tDB, tCols,
-                notesDB, folders, docsDB, userBudget, security,
+                notesDB, folders, docsDB, userBudget, security, profile,
                 savedAt: new Date().toISOString()
             };
         }
@@ -1565,25 +1609,34 @@
             if (Array.isArray(d.docsDB)) docsDB = d.docsDB;
             if (d.userBudget && typeof d.userBudget === 'object') userBudget = d.userBudget;
             if (d.security && typeof d.security === 'object') {
-                security = Object.assign({ pinEnabled: false, pinHash: '', pinSalt: '', lockMinutes: 5 }, d.security);
+                security = Object.assign({ pinEnabled: false, pinHash: '', pinSalt: '', lockMinutes: 10 }, d.security);
+            }
+            if (d.profile && typeof d.profile === 'object') {
+                profile = Object.assign({ name: '', photo: '', useCustomName: false, useCustomPhoto: false, googleName: '', googleEmail: '', googlePhoto: '' }, d.profile);
             }
             populateModeDropdown();
             renderAccounts(); renderRecTable(); renderTaskTable(); renderDocs();
             renderNotesSidebar(); renderCashflowAnalytics(); renderHomeWidgets();
             if (typeof renderSettings === 'function') renderSettings();
+            if (typeof renderProfile === 'function') renderProfile();
         }
 
         function persistLocal() {
             try { localStorage.setItem(LOCAL_KEY, JSON.stringify(collectState())); } catch (e) {}
         }
 
-        function scheduleSave() {
+        function scheduleSave(immediate) {
             if (hydrating) return;            // never save mid load
             persistLocal();                   // local copy is always immediate
             if (!useCloud) return;
             if (saveTimer) clearTimeout(saveTimer);
-            // Short coalescing window: collapses the few redraws of one action into a single upload that feels instant.
-            saveTimer = setTimeout(syncToCloud, 500);
+            if (immediate === false) {
+                // Typing path: a short debounce avoids uploading on every keystroke.
+                saveTimer = setTimeout(syncToCloud, 1200);
+            } else {
+                // Discrete actions upload at once, the way the trusted study file does.
+                syncToCloud();
+            }
         }
 
         function setSyncStatus(text, opts) {
@@ -1678,10 +1731,10 @@
                 });
 
                 if (res.status === 401 || res.status === 403) {
-                    // The pass expired during a long session. Refresh it silently, then re sync.
-                    needsSync = true;
-                    setSyncStatus('Reconnecting...');
-                    googleAuth(false);
+                    // The access pass expired. Do not loop on a silent refresh, which Chrome often blocks.
+                    // Offer a clear one tap reconnect instead, which always works because the user starts it.
+                    cloudPaused = true;
+                    setSyncStatus('Cloud paused, tap to reconnect', { reconnect: true });
                     return;
                 }
                 if (!res.ok) { const er = await res.json().catch(() => ({})); throw new Error((er.error && er.error.message) || 'Sync failed'); }
@@ -1698,14 +1751,8 @@
                 setSyncStatus('Save pending, tap to retry', { reconnect: true });
             } finally {
                 syncing = false;
-                if (needsSync) syncToCloud();
+                if (needsSync && !cloudPaused) syncToCloud();
             }
-        }
-
-        // Refresh the access pass a little before it expires so renewals rarely fail.
-        function scheduleTokenRefresh() {
-            if (tokenRefreshTimer) clearTimeout(tokenRefreshTimer);
-            tokenRefreshTimer = setTimeout(() => { if (useCloud) googleAuth(false); }, 50 * 60 * 1000);
         }
 
         // ----- Authentication (OAuth token client, can reach Drive) -----
@@ -1735,11 +1782,29 @@
                     googleToken = res.access_token;
                     cloudPaused = false;
                     localStorage.setItem('rishab_cloud', 'true');
-                    scheduleTokenRefresh();
-                    if (authMode === 'interactive') revealApp();
-                    await finalizeCloud();
+                    const firstStart = !appStarted;
+                    if (authMode === 'interactive' && firstStart) revealApp();
+                    fetchGoogleProfile();   // fills in name, email and photo when the profile scope is granted
+                    await finalizeCloud(firstStart);
                 }
             });
+        }
+
+        // Pull the signed in name, email and photo. If the user declined the profile scope, this simply does nothing.
+        async function fetchGoogleProfile() {
+            if (!googleToken) return;
+            try {
+                const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: `Bearer ${googleToken}` } });
+                if (!r.ok) return;
+                const info = await r.json();
+                profile.googleName = info.name || '';
+                profile.googleEmail = info.email || '';
+                profile.googlePhoto = info.picture || '';
+                renderProfile();
+                renderSettings();
+                persistLocal();
+                scheduleSave();
+            } catch (e) { /* profile is optional */ }
         }
 
         function googleAuth(interactive) {
@@ -1755,6 +1820,8 @@
         }
 
         function revealApp() {
+            appStarted = true;
+            lastActivity = Date.now();
             const auth = document.getElementById('auth-screen');
             auth.classList.add('opacity-0', 'pointer-events-none');
             setTimeout(() => auth.classList.add('hidden'), 500);
@@ -1762,9 +1829,10 @@
             const am = document.getElementById('analytics-month');
             if (am && !am.value) am.value = todayISO().slice(0, 7);
             switchTab('home');
+            renderProfile();
         }
 
-        async function finalizeCloud() {
+        async function finalizeCloud(firstStart) {
             try {
                 if (googleToken) { useCloud = true; await initializeCloudSync(); }
             } catch (e) {
@@ -1781,16 +1849,17 @@
                     setSyncStatus('Local only');
                 }
                 if (typeof renderSettings === 'function') renderSettings();
-                // Apply the PIN gate once the security settings are known from the backup.
-                gateLockOnEntry();
+                if (typeof renderProfile === 'function') renderProfile();
+                // The lock only appears on the very first interactive sign in, never on a refresh or a reconnect.
+                if (pendingAfterAuth) { const f = pendingAfterAuth; pendingAfterAuth = null; try { f(); } catch (e) {} }
+                else if (firstStart && authMode === 'interactive' && security.pinEnabled) showLock();
+                lastActivity = Date.now();
             }
         }
 
         function logout() {
             if (!confirm('Log out and lock this workspace on this device? Your data stays safe in your Google Drive and returns when you sign in again.')) return;
             try { if (googleToken && window.google && google.accounts && google.accounts.oauth2) google.accounts.oauth2.revoke(googleToken, () => {}); } catch (e) {}
-            if (tokenRefreshTimer) clearTimeout(tokenRefreshTimer);
-            if (inactivityTimer) clearTimeout(inactivityTimer);
             locked = false;
             // Wipe the local cache so a shared computer keeps nothing. Drive remains the trusted source.
             localStorage.removeItem(LOCAL_KEY);
@@ -1871,7 +1940,7 @@
             security.lockMinutes = Number(v);
             persistLocal();
             scheduleSave();
-            resetInactivity();
+            markActivity();
         }
 
         function isAppVisible() {
@@ -1896,7 +1965,7 @@
             locked = false;
             const ls = document.getElementById('lock-screen');
             if (ls) ls.classList.add('hidden');
-            resetInactivity();
+            markActivity();
         }
 
         function updateLockDots(n) {
@@ -1974,33 +2043,32 @@
             });
         }
 
-        // Show the lock when entering the app, if a PIN is set.
-        function gateLockOnEntry() {
-            if (pendingAfterAuth) { const f = pendingAfterAuth; pendingAfterAuth = null; try { f(); } catch (e) {} return; }
-            if (security.pinEnabled && isAppVisible()) showLock();
-            else resetInactivity();
+        // The lock now appears only on the first interactive sign in, on idle timeout, or on the Lock button.
+        // A plain refresh never locks. Forgot PIN still runs its reset through pendingAfterAuth in finalizeCloud.
+        function markActivity() { lastActivity = Date.now(); }
+
+        function idleThresholdMs() {
+            const m = Number(security.lockMinutes);
+            return (!m || m <= 0) ? 0 : m * 60 * 1000;   // zero means Never lock by inactivity
         }
 
-        function resetInactivity() {
-            if (inactivityTimer) clearTimeout(inactivityTimer);
-            if (!security.pinEnabled || locked) return;
-            const mins = Number(security.lockMinutes);
-            if (!mins || mins <= 0) return;   // Never means no inactivity lock; leaving and returning still locks
-            inactivityTimer = setTimeout(() => { if (isAppVisible()) showLock(); }, mins * 60 * 1000);
+        function checkIdleLock() {
+            if (!security.pinEnabled || locked || !appStarted) return;
+            const t = idleThresholdMs();
+            if (!t) return;
+            if (Date.now() - lastActivity >= t) showLock();
         }
 
-        // Watchers: lock on leaving and returning, and on inactivity. Google stays signed in throughout.
+        // Idle watchers. Time spent on another tab, in another app, or with the laptop locked all
+        // count toward the idle time, so returning after the chosen period lands on the PIN screen.
         (function setupLockWatchers() {
-            let wasAway = false;
+            ['mousemove', 'keydown', 'mousedown', 'touchstart', 'click', 'scroll', 'wheel'].forEach(ev => {
+                window.addEventListener(ev, () => { if (!locked) markActivity(); }, { passive: true });
+            });
             document.addEventListener('visibilitychange', () => {
-                if (document.hidden) { wasAway = true; }
-                else if (wasAway) { wasAway = false; if (security.pinEnabled && isAppVisible()) showLock(); }
+                if (!document.hidden) checkIdleLock();   // returning to the page checks how long you were away
             });
-            window.addEventListener('blur', () => { wasAway = true; });
-            window.addEventListener('focus', () => { if (wasAway) { wasAway = false; if (security.pinEnabled && isAppVisible()) showLock(); } });
-            ['mousemove', 'keydown', 'touchstart', 'click', 'scroll'].forEach(ev => {
-                window.addEventListener(ev, () => { if (!locked) resetInactivity(); }, { passive: true });
-            });
+            setInterval(checkIdleLock, 20000);           // and a steady check covers idling on the page itself
         })();
 
         // ==========================================================
@@ -2018,11 +2086,17 @@
             if (offBtn) offBtn.classList.toggle('hidden', !security.pinEnabled);
             const lockSel = document.getElementById('set-lock-minutes');
             if (lockSel) lockSel.value = String(security.lockMinutes);
-            const lockNow = document.getElementById('set-lock-now');
-            if (lockNow) lockNow.classList.toggle('hidden', !security.pinEnabled);
+            const lockNowBtn = document.getElementById('set-lock-now');
+            if (lockNowBtn) lockNowBtn.classList.toggle('hidden', !security.pinEnabled);
 
             const acc = document.getElementById('set-account-state');
             if (acc) acc.textContent = useCloud ? 'Signed in with Google, cloud sync on' : (cloudPaused ? 'Signed in, cloud paused' : 'Working locally');
+            const email = document.getElementById('set-account-email');
+            if (email) email.textContent = profile.googleEmail ? ('Email: ' + profile.googleEmail) : 'Email not shared. You can set your name and photo manually below.';
+
+            // The Lock button in the sidebar only appears once a PIN exists.
+            const lb = document.getElementById('lock-btn');
+            if (lb) lb.classList.toggle('hidden', !security.pinEnabled);
         }
 
         function openPinSetup() {
@@ -2042,13 +2116,95 @@
             if (a !== b) return show('The two entries do not match.');
             await setPin(a);
             cancelPinSetup();
-            alert('Your PIN is set. It will be asked after a refresh, after inactivity, and whenever you return to the app.');
+            alert('Your PIN is set. It will be asked when you sign in, after the idle time you chose, and whenever you press Lock. A plain refresh will not ask for it.');
         }
         function turnOffPin() {
             if (!confirm('Turn off the PIN lock? Anyone with access to your signed in device will be able to open the workspace.')) return;
             disablePin();
         }
-        function lockNow() { showLock(); }
+        function lockNow() {
+            if (!security.pinEnabled) { alert('Set a PIN first in Settings, under Security, then you can lock the workspace.'); switchTab('settings'); return; }
+            showLock();
+        }
+
+        // ==========================================================
+        // PROFILE: avatar and name in the sidebar, editable by hand
+        // ==========================================================
+        function displayName() {
+            if (profile.useCustomName && profile.name) return profile.name;
+            return profile.googleName || 'Rishab OS';
+        }
+        function displayPhoto() {
+            if (profile.useCustomPhoto && profile.photo) return profile.photo;
+            return profile.googlePhoto || '';
+        }
+        function renderProfile() {
+            const nameEl = document.getElementById('profile-name');
+            const subEl = document.getElementById('profile-email');
+            const av = document.getElementById('profile-avatar');
+            if (nameEl) nameEl.textContent = displayName();
+            if (subEl) subEl.textContent = profile.googleEmail || 'Tap to edit profile';
+            if (av) {
+                const photo = displayPhoto();
+                if (photo) {
+                    av.innerHTML = `<img src="${photo}" alt="" class="w-full h-full object-cover">`;
+                } else {
+                    const initials = (displayName().trim()[0] || 'R').toUpperCase();
+                    av.textContent = initials;
+                }
+            }
+        }
+        function openProfileEditor() {
+            const m = document.getElementById('profile-modal');
+            if (!m) return;
+            document.getElementById('pf-name').value = profile.useCustomName ? (profile.name || '') : '';
+            document.getElementById('pf-name').placeholder = profile.googleName || 'Your name';
+            const prev = document.getElementById('pf-preview');
+            const photo = displayPhoto();
+            prev.innerHTML = photo ? `<img src="${photo}" class="w-full h-full object-cover">` : ((displayName().trim()[0] || 'R').toUpperCase());
+            m.classList.remove('hidden');
+        }
+        function closeProfileEditor() { document.getElementById('profile-modal').classList.add('hidden'); }
+        function onProfilePhoto(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    // Resize to a small square so the photo stays light inside the Drive backup.
+                    const size = 128;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = size; canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    const min = Math.min(img.width, img.height);
+                    const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
+                    ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+                    profile.photo = dataUrl;
+                    profile.useCustomPhoto = true;
+                    document.getElementById('pf-preview').innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover">`;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        function useGooglePhoto() {
+            profile.useCustomPhoto = false;
+            profile.photo = '';
+            const photo = profile.googlePhoto;
+            document.getElementById('pf-preview').innerHTML = photo ? `<img src="${photo}" class="w-full h-full object-cover">` : ((displayName().trim()[0] || 'R').toUpperCase());
+        }
+        function saveProfile() {
+            const nm = (document.getElementById('pf-name').value || '').trim();
+            if (nm) { profile.name = nm; profile.useCustomName = true; }
+            else { profile.useCustomName = false; profile.name = ''; }
+            persistLocal();
+            scheduleSave();
+            renderProfile();
+            renderSettings();
+            closeProfileEditor();
+        }
 
         // ==========================================================
         // BUDGET: add and remove categories up front, no expense needed
@@ -2117,9 +2273,10 @@
             toWrap.forEach(name => {
                 const orig = window[name];
                 if (typeof orig !== 'function') return;
+                const typingSave = (name === 'saveNoteState');   // note typing debounces, everything else uploads at once
                 window[name] = function () {
                     const r = orig.apply(this, arguments);
-                    scheduleSave();
+                    scheduleSave(!typingSave);
                     return r;
                 };
             });
@@ -2144,13 +2301,13 @@
             } catch (e) {}
 
             renderSettings();
+            renderProfile();
 
             const wasCloud = localStorage.getItem('rishab_cloud') === 'true';
             if (wasCloud) {
                 // Returning user: skip the sign in screen and restore the Drive session silently.
+                // A refresh does not lock; the PIN only returns on idle timeout or the Lock button.
                 revealApp();
-                // If a PIN was set, lock immediately on this fresh load, even before Drive reconnects.
-                if (security.pinEnabled) showLock();
                 setSyncStatus('Reconnecting to Drive...');
                 googleAuth(false);
                 // Safety net: if the silent restore stalls, unlock local saving and offer a one tap reconnect.
