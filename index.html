@@ -430,7 +430,7 @@
             <div id="record" class="hidden fixed inset-0 z-[120] bg-corp-900/90 backdrop-blur-sm overflow-y-auto p-4">
               <div class="w-full max-w-2xl mx-auto my-6 md:my-10">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Record Transaction</h2>
+                    <h2 id="record-title" class="text-2xl md:text-3xl font-bold text-white tracking-tight">Record Transaction</h2>
                     <button type="button" onclick="closeRecord()" class="text-gray-400 hover:text-white text-3xl font-bold leading-none">&times;</button>
                 </div>
                 <div class="bg-corp-800 rounded-2xl p-6 md:p-8 border border-corp-700 shadow-2xl">
@@ -457,6 +457,7 @@
                     <div class="flex items-center gap-3">
                         <span class="text-sm text-gray-400">Timeframe:</span>
                         <input type="month" id="analytics-month" onchange="renderCashflowAnalytics()" class="bg-corp-800 border border-corp-700 rounded-lg px-3 py-1.5 text-sm text-white outline-none focus:border-corp-500 cursor-pointer transition">
+                        <button onclick="exportTxCSV()" class="text-sm bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-1.5 rounded-lg transition shadow whitespace-nowrap">📥 Export CSV</button>
                     </div>
                 </div>
 
@@ -474,6 +475,8 @@
                         <p id="ana-income" class="text-3xl font-bold text-green-400 transition-all z-0 relative">₹ 0</p>
                     </div>
                 </div>
+
+                <div id="month-review" class="bg-corp-800 border border-corp-700 rounded-2xl p-5 md:p-6 mb-6"></div>
 
                 <div class="flex gap-6 flex-col lg:flex-row">
                     
@@ -734,6 +737,8 @@
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         </button>
     </div>
+
+    <div id="toast-stack" class="fixed z-[160] bottom-4 inset-x-0 flex flex-col items-center gap-2 px-4 pointer-events-none"></div>
 
     <div id="tag-pivot-modal" class="hidden fixed inset-0 bg-corp-900/90 z-50 flex items-center justify-center p-4 md:p-10 backdrop-blur-sm">
         <div class="bg-corp-900 border border-corp-700 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
@@ -1019,13 +1024,15 @@
                 tr.innerHTML = `<td class="p-2 border-r border-corp-700"><input type="text" value="${a.name}" onchange="updateAccount('${a.id}', 'name', this.value)" class="bg-transparent text-gray-200 focus:text-white border-none focus:outline-none w-full px-1 text-sm font-medium"></td><td class="p-2 w-36"><div class="flex items-center text-${a.type==='asset'?'green':'red'}-400">₹ <input type="${isPrivate?'password':'number'}" value="${a.balance}" onchange="updateAccount('${a.id}', 'balance', this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm font-bold text-inherit" ${isPrivate?'disabled':''}></div></td>`;
                 if(a.type === 'asset') alist.appendChild(tr); else llist.appendChild(tr);
             });
+            if (!alist.children.length) alist.innerHTML = `<tr><td class="p-4 text-sm text-gray-500 italic">No accounts yet. Add your first bank or wallet using the form above.</td></tr>`;
+            if (!llist.children.length) llist.innerHTML = `<tr><td class="p-4 text-sm text-gray-500 italic">No liabilities yet. Add a credit card or a loan above to track it here.</td></tr>`;
             document.getElementById('calc-assets').innerText = `₹ ${formatMoney(ast)}`; document.getElementById('calc-liabilities').innerText = `₹ ${formatMoney(liab)}`; document.getElementById('calc-networth').innerText = `₹ ${formatMoney(ast - liab)}`;
         }
 
         function processTransaction(item, isReversal) {
-            const acc = accounts.find(a => a.id === item.modeId); if(!acc) { alert("Payment mode missing in Ledger!"); return false; }
+            const acc = accounts.find(a => a.id === item.modeId); if(!acc) { showToast('Payment mode missing in the ledger.', 'warning'); return false; }
             let amt = Number(item.amount); if(isReversal) amt = -amt;
-            if(!isReversal && acc.type === 'asset' && acc.balance < amt) { alert(`Insufficient funds in ${acc.name}! Requires ₹${amt}. Available: ₹${acc.balance}.`); return false; }
+            if(!isReversal && acc.type === 'asset' && acc.balance < amt) { showToast(`Insufficient funds in ${acc.name}. Requires ₹${formatMoney(amt)}, available ₹${formatMoney(acc.balance)}.`, 'warning'); return false; }
             
             if(acc.type === 'asset') acc.balance -= amt; else acc.balance += amt; 
             if(item.type === 'Investments') { let mf = accounts.find(a => a.name.toLowerCase().includes('mutual')); if(mf) mf.balance += amt; } else if (item.type === 'Credit card') { let cc = accounts.find(a => a.name === item.name); if(cc) cc.balance -= amt; }
@@ -1041,20 +1048,127 @@
         const expChipsData = [ { cat: 'Food', emo: '🍔' }, { cat: 'Transit', emo: '🚕' }, { cat: 'Petrol', emo: '⛽' }, { cat: 'Flat Exp', emo: '🏠' }, { cat: 'Groceries', emo: '🛒' }, { cat: 'Snacks', emo: '☕' }, { cat: 'Shopping', emo: '🛍️' }, { cat: 'Other', emo: '➕' } ];
         const incChipsData = [ { cat: 'Salary', emo: '💼' }, { cat: 'Freelance', emo: '💻' }, { cat: 'Dividend', emo: '📈' }, { cat: 'Commission', emo: '🤝' }, { cat: 'Gift', emo: '🎁' }, { cat: 'Refund', emo: '🔄' }, { cat: 'Other', emo: '➕' } ];
 
+        let editingTxId = null;
+
+        // ----- Toast notifications (replace the browser alert boxes) -----
+        // Success and info slide away on their own. Warnings, errors and the
+        // deletion notice stay until dismissed, since missing them can be costly.
+        function showToast(message, type, opts) {
+            type = type || 'info'; opts = opts || {};
+            const stack = document.getElementById('toast-stack');
+            if (!stack) { return null; }
+            const persist = (opts.persist === true) || type === 'warning' || type === 'error';
+            const tone = {
+                success: 'border-green-500/70',
+                info: 'border-corp-500',
+                warning: 'border-yellow-500/80',
+                error: 'border-red-500/80'
+            }[type] || 'border-corp-500';
+            const icon = { success: '✅', info: '💡', warning: '⚠️', error: '⛔' }[type] || '💡';
+
+            const el = document.createElement('div');
+            el.className = `pointer-events-auto w-full max-w-md flex items-start gap-3 bg-corp-800 ${tone} border text-gray-100 rounded-xl shadow-2xl px-4 py-3 translate-y-2 opacity-0 transition-all duration-300`;
+
+            const ic = document.createElement('span'); ic.className = 'text-lg leading-none mt-0.5'; ic.textContent = icon;
+            const msg = document.createElement('span'); msg.className = 'flex-1 text-sm leading-snug'; msg.textContent = message;
+            el.appendChild(ic); el.appendChild(msg);
+
+            const remove = () => { el.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => el.remove(), 300); };
+
+            if (opts.actionLabel) {
+                const act = document.createElement('button');
+                act.className = 'shrink-0 text-sm font-bold underline decoration-2 underline-offset-2 hover:opacity-80';
+                act.textContent = opts.actionLabel;
+                act.onclick = () => { try { opts.onAction && opts.onAction(); } finally { remove(); } };
+                el.appendChild(act);
+            }
+            if (persist) {
+                const cl = document.createElement('button');
+                cl.className = 'shrink-0 text-lg leading-none opacity-70 hover:opacity-100';
+                cl.textContent = '×';
+                cl.onclick = remove;
+                el.appendChild(cl);
+            }
+
+            stack.appendChild(el);
+            requestAnimationFrame(() => el.classList.remove('translate-y-2', 'opacity-0'));
+            if (!persist) setTimeout(remove, opts.duration || 5000);
+            return el;
+        }
+
+        // ----- Robust CSV download (UTF 8 marker so Excel shows the rupee sign) -----
+        function downloadCSV(filename, rows) {
+            const esc = v => '"' + (v == null ? '' : String(v)).replace(/"/g, '""') + '"';
+            const body = rows.map(r => r.map(esc).join(',')).join('\r\n');
+            const blob = new Blob(['\uFEFF' + body], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+        }
+
         function renderRecordForm() { populateModeDropdown(); document.getElementById('tx-date').value = todayISO().split('T')[0]; renderTxChips(); }
 
         // The Record popup, opened from the floating button, the sidebar, or a phone shortcut.
         function openRecord() {
+            editingTxId = null;
+            const t = document.getElementById('record-title'); if (t) t.textContent = 'Record Transaction';
+            document.getElementById('tx-amount').value = '';
+            document.getElementById('tx-desc').value = '';
+            document.getElementById('tx-tags').value = '';
+            document.getElementById('custom-cat-input').value = '';
+            document.getElementById('custom-cat-wrapper').classList.add('hidden');
             renderRecordForm();
+            setTxType(currTxType || 'expense');
             document.getElementById('record').classList.remove('hidden');
             setTimeout(() => { const a = document.getElementById('tx-amount'); if (a) a.focus(); }, 60);
+            closeSidebarOnMobile();
+        }
+
+        // Open the popup pre filled to correct a mistake in an existing entry.
+        function openRecordForEdit(id) {
+            const tx = transactionsDB.find(t => t.id === id);
+            if (!tx) return;
+            editingTxId = id;
+            populateModeDropdown();
+            setTxType(tx.type);
+            document.getElementById('tx-amount').value = tx.amount;
+            document.getElementById('tx-date').value = tx.date;
+            document.getElementById('tx-desc').value = tx.desc || '';
+            document.getElementById('tx-tags').value = (tx.tags || []).join(', ');
+            document.getElementById('tx-mode').value = tx.modeId;
+            highlightChip(tx.category, tx.emoji);
+            const t = document.getElementById('record-title'); if (t) t.textContent = 'Edit Transaction';
+            const sb = document.getElementById('btn-tx-submit'); if (sb) sb.innerText = 'Update Entry';
+            document.getElementById('record').classList.remove('hidden');
+            setTimeout(() => { const a = document.getElementById('tx-amount'); if (a) a.focus(); }, 60);
+            closeSidebarOnMobile();
+        }
+
+        // Reflect a category onto the chips, including custom categories typed earlier.
+        function highlightChip(cat, emoji) {
+            const chips = Array.from(document.querySelectorAll('#tx-chips-container .tx-chip'));
+            const matched = chips.find(b => b.textContent.trim().slice(b.textContent.trim().indexOf(' ') + 1) === cat);
+            if (matched && cat !== 'Other') {
+                selectTxCategory(matched, cat, emoji);
+            } else {
+                const other = chips.find(b => b.textContent.trim().endsWith('Other'));
+                if (other) selectTxCategory(other, 'Other', emoji || '➕');
+                document.getElementById('custom-cat-wrapper').classList.remove('hidden');
+                document.getElementById('custom-cat-input').value = (cat === 'Other' ? '' : cat);
+                document.getElementById('tx-emoji').value = emoji || '➕';
+            }
+        }
+
+        function closeSidebarOnMobile() {
             if (window.innerWidth <= 768) {
                 const sb = document.getElementById('sidebar'); const ov = document.getElementById('sidebar-overlay');
                 if (sb) { sb.classList.add('mobile-sidebar-hidden'); sb.classList.remove('mobile-sidebar-visible'); }
                 if (ov) ov.classList.add('hidden');
             }
         }
-        function closeRecord() { document.getElementById('record').classList.add('hidden'); }
+        function closeRecord() { editingTxId = null; document.getElementById('record').classList.add('hidden'); }
 
         function setTxType(type) {
             currTxType = type;
@@ -1080,27 +1194,71 @@
 
         function addTransaction(e) {
             e.preventDefault(); const amt = Number(document.getElementById('tx-amount').value); const modeId = document.getElementById('tx-mode').value; const acc = accounts.find(a => a.id === modeId);
-            if(currTxType === 'expense' && acc && acc.type === 'asset' && acc.balance < amt) { alert(`Insufficient funds in ${acc.name}! Requires ₹${amt}. Available: ₹${acc.balance}.`); return; }
+
+            // Editing an existing entry: first reverse its old effect so the checks and balances are correct.
+            const editing = editingTxId != null;
+            let oldTx = null, oldAcc = null;
+            if (editing) {
+                oldTx = transactionsDB.find(t => t.id === editingTxId);
+                if (oldTx) {
+                    oldAcc = accounts.find(a => a.id === oldTx.modeId);
+                    if (oldAcc) { if (oldTx.type === 'income') { if (oldAcc.type === 'asset') oldAcc.balance -= oldTx.amount; else oldAcc.balance += oldTx.amount; } else { if (oldAcc.type === 'asset') oldAcc.balance += oldTx.amount; else oldAcc.balance -= oldTx.amount; } }
+                }
+            }
+
+            if (currTxType === 'expense' && acc && acc.type === 'asset' && acc.balance < amt) {
+                // Restore the old effect before bailing out, so nothing is left half changed.
+                if (editing && oldTx && oldAcc) { if (oldTx.type === 'income') { if (oldAcc.type === 'asset') oldAcc.balance += oldTx.amount; else oldAcc.balance -= oldTx.amount; } else { if (oldAcc.type === 'asset') oldAcc.balance -= oldTx.amount; else oldAcc.balance += oldTx.amount; } }
+                showToast(`Insufficient funds in ${acc.name}. Requires ₹${formatMoney(amt)}, available ₹${formatMoney(acc.balance)}.`, 'warning');
+                return;
+            }
             let finalCat = document.getElementById('tx-category').value; if (finalCat === 'Other') { const custom = document.getElementById('custom-cat-input').value.trim(); finalCat = custom !== '' ? custom : 'Other'; }
-            
+
             if (currTxType === 'expense' && !userBudget.categories[finalCat]) {
                 userBudget.categories[finalCat] = 0;
                 localStorage.setItem('rishab_budget', JSON.stringify(userBudget));
             }
 
+            if (currTxType === 'income') { if (acc.type === 'asset') acc.balance += amt; else acc.balance -= amt; } else { if (acc.type === 'asset') acc.balance -= amt; else acc.balance += amt; }
+
+            if (editing && oldTx) {
+                // Update the existing entry in place; its old effect was already reversed above.
+                oldTx.type = currTxType; oldTx.amount = amt; oldTx.category = finalCat; oldTx.emoji = document.getElementById('tx-emoji').value; oldTx.desc = document.getElementById('tx-desc').value; oldTx.date = document.getElementById('tx-date').value; oldTx.modeId = modeId; oldTx.tags = parseTags(document.getElementById('tx-tags').value);
+                editingTxId = null;
+                renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+                closeRecord();
+                showToast('Transaction updated.', 'success');
+                return;
+            }
+
             const item = { id: Date.now(), type: currTxType, amount: amt, category: finalCat, emoji: document.getElementById('tx-emoji').value, desc: document.getElementById('tx-desc').value, date: document.getElementById('tx-date').value, modeId: modeId, tags: parseTags(document.getElementById('tx-tags').value) };
-            if (currTxType === 'income') { if(acc.type === 'asset') acc.balance += amt; else acc.balance -= amt; } else { if(acc.type === 'asset') acc.balance -= amt; else acc.balance += amt; }
             transactionsDB.push(item);
             document.getElementById('tx-amount').value = ''; document.getElementById('tx-desc').value = ''; document.getElementById('tx-tags').value = ''; document.getElementById('custom-cat-input').value = ''; document.getElementById('tx-amount').focus();
-            renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets(); alert(`${currTxType === 'income' ? 'Income' : 'Expense'} logged successfully!`);
+            renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+            showToast(`${currTxType === 'income' ? 'Income' : 'Expense'} logged.`, 'success');
         }
 
         function delTransaction(id) {
-            const tx = transactionsDB.find(e => e.id === id); if(!tx) return;
-            if(!window.confirm(`Delete this transaction and reverse ₹${tx.amount} in your ledger?`)) return;
+            const idx = transactionsDB.findIndex(e => e.id === id); if (idx === -1) return;
+            const tx = transactionsDB[idx];
             const acc = accounts.find(a => a.id === tx.modeId);
-            if(acc) { if(tx.type === 'income') { if(acc.type === 'asset') acc.balance -= tx.amount; else acc.balance += tx.amount; } else { if(acc.type === 'asset') acc.balance += tx.amount; else acc.balance -= tx.amount; } }
-            transactionsDB = transactionsDB.filter(e => e.id !== id); renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+            // Reverse the balance effect, exactly as before.
+            if (acc) { if (tx.type === 'income') { if (acc.type === 'asset') acc.balance -= tx.amount; else acc.balance += tx.amount; } else { if (acc.type === 'asset') acc.balance += tx.amount; else acc.balance -= tx.amount; } }
+            const removed = transactionsDB.splice(idx, 1)[0];
+            const removedIndex = idx;
+            renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+            showToast('Entry deleted. The affected balances have been reversed.', 'warning', {
+                persist: true,
+                actionLabel: 'Undo',
+                onAction: () => {
+                    // Re-apply the entry's original effect and restore it in place.
+                    const a2 = accounts.find(a => a.id === removed.modeId);
+                    if (a2) { if (removed.type === 'income') { if (a2.type === 'asset') a2.balance += removed.amount; else a2.balance -= removed.amount; } else { if (a2.type === 'asset') a2.balance -= removed.amount; else a2.balance += removed.amount; } }
+                    transactionsDB.splice(Math.min(removedIndex, transactionsDB.length), 0, removed);
+                    renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+                    showToast('Entry restored.', 'success');
+                }
+            });
         }
 
         // ==========================================
@@ -1195,7 +1353,7 @@
             });
 
             if(recalcStats) {
-                window.currentAnaStats = { catTotals, vendorTotals, totalExp: tTotalExp };
+                window.currentAnaStats = { catTotals, vendorTotals, totalExp: tTotalExp, totalInc: tTotalInc, totalInv: tTotalInv, lmExp: lmTotalExp, selMonth: selMonth };
                 document.getElementById('ana-income').innerText = `₹ ${formatMoney(tTotalInc)}`; 
                 if(!isIncomeRevealed) document.getElementById('ana-income').classList.add('income-blur');
                 document.getElementById('ana-expense').innerText = `₹ ${formatMoney(tTotalExp)}`; document.getElementById('ana-invest').innerText = `₹ ${formatMoney(tTotalInv)}`;
@@ -1237,18 +1395,23 @@
                 }
 
                 renderBreakdownList();
+                renderMonthReview();
             }
 
             const timeline = document.getElementById('analytics-timeline'); timeline.innerHTML = '';
             let sortedDays = Object.keys(dayGroups).sort((a,b) => new Date(b) - new Date(a));
-            if(sortedDays.length === 0) { timeline.innerHTML = `<p class="text-sm text-gray-500 italic text-center mt-10">No transactions match this view.</p>`; return; }
+            if(sortedDays.length === 0) {
+                if (anaTimelineFilter) { timeline.innerHTML = `<p class="text-sm text-gray-500 italic text-center mt-10">No transactions match this view.</p>`; }
+                else { timeline.innerHTML = `<div class="text-center mt-12 px-6"><div class="text-4xl mb-3 opacity-60">🧾</div><p class="text-sm text-gray-400 font-medium mb-1">Nothing logged for this month yet</p><p class="text-xs text-gray-500">Tap the plus button in the corner to record your first transaction.</p></div>`; }
+                return;
+            }
 
             sortedDays.forEach(dateStr => {
                 const dayData = dayGroups[dateStr]; const displayDate = new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
                 let dayHtml = `<div class="mb-4"><h3 class="text-gray-400 font-bold mb-3 border-b border-corp-700 pb-1 text-sm tracking-wide uppercase">📅 ${displayDate}</h3><div class="space-y-2">`;
                 dayData.items.forEach(item => {
                     const acc = accounts.find(a => a.id === item.modeId); const isInc = item.type === 'income'; const amountStr = `${isInc ? '+' : '-'} ₹${formatMoney(item.amount)}`; const colorClass = isInc ? 'text-green-400' : 'text-red-400'; const title = item.isRec ? `${item.name} (${item.type})` : (item.desc || item.category);
-                    dayHtml += `<div class="flex flex-col sm:flex-row sm:items-center justify-between bg-corp-900/50 p-3 rounded-lg border border-corp-700/50 hover:bg-corp-800 transition group gap-2"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-corp-800 flex items-center justify-center text-lg border border-corp-700 shrink-0 shadow-sm">${item.emoji}</div><div><div class="font-medium text-gray-200 text-sm">${title}</div><div class="text-xs text-gray-500 flex gap-2 mt-0.5"><span>💳 ${acc?acc.name:'Unknown'}</span> ${item.isRec ? '<span class="text-corp-400">🔄 Recurring</span>' : ''}</div>${(item.tags && item.tags.length > 0) ? `<div class="mt-1 flex flex-wrap gap-1">${renderTagBadges(item.tags)}</div>` : ''}</div></div><div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 w-full sm:w-auto"><span class="${colorClass} font-bold text-sm tracking-wide">${amountStr}</span>${!item.isRec ? `<button onclick="delTransaction(${item.id})" class="text-gray-500 hover:text-red-400 text-xs opacity-100 sm:opacity-0 group-hover:opacity-100 transition">Refund & Delete</button>` : ''}</div></div>`;
+                    dayHtml += `<div class="flex flex-col sm:flex-row sm:items-center justify-between bg-corp-900/50 p-3 rounded-lg border border-corp-700/50 hover:bg-corp-800 transition group gap-2"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-corp-800 flex items-center justify-center text-lg border border-corp-700 shrink-0 shadow-sm">${item.emoji}</div><div><div class="font-medium text-gray-200 text-sm">${title}</div><div class="text-xs text-gray-500 flex gap-2 mt-0.5"><span>💳 ${acc?acc.name:'Unknown'}</span> ${item.isRec ? '<span class="text-corp-400">🔄 Recurring</span>' : ''}</div>${(item.tags && item.tags.length > 0) ? `<div class="mt-1 flex flex-wrap gap-1">${renderTagBadges(item.tags)}</div>` : ''}</div></div><div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 w-full sm:w-auto"><span class="${colorClass} font-bold text-sm tracking-wide">${amountStr}</span>${!item.isRec ? `<div class="flex items-center gap-3 opacity-100 sm:opacity-0 group-hover:opacity-100 transition"><button onclick="openRecordForEdit(${item.id})" class="text-gray-500 hover:text-corp-300 text-xs font-medium">Edit</button><button onclick="delTransaction(${item.id})" class="text-gray-500 hover:text-red-400 text-xs font-medium">Refund & Delete</button></div>` : ''}</div></div>`;
                 });
                 const netColor = dayData.net >= 0 ? 'text-green-400' : 'text-red-400'; const netSign = dayData.net >= 0 ? '+' : '';
                 dayHtml += `</div><div class="text-right mt-2 mr-2"><span class="text-xs text-gray-500 font-semibold uppercase tracking-wider mr-2">Daily Net:</span><span class="${netColor} font-bold text-sm bg-corp-900 px-2 py-1 rounded border border-corp-700 shadow-inner">${netSign}₹${formatMoney(dayData.net)}</span></div></div>`;
@@ -1273,6 +1436,86 @@
             
             document.getElementById('btn-view-cat').classList.toggle('bg-corp-700', anaBreakdownView === 'category'); document.getElementById('btn-view-cat').classList.toggle('text-white', anaBreakdownView === 'category'); document.getElementById('btn-view-cat').classList.toggle('text-gray-400', anaBreakdownView !== 'category');
             document.getElementById('btn-view-ven').classList.toggle('bg-corp-700', anaBreakdownView === 'vendor'); document.getElementById('btn-view-ven').classList.toggle('text-white', anaBreakdownView === 'vendor'); document.getElementById('btn-view-ven').classList.toggle('text-gray-400', anaBreakdownView !== 'vendor');
+        }
+
+        // ----- Month in Review: a quiet summary of where the money went -----
+        function renderMonthReview() {
+            const box = document.getElementById('month-review');
+            if (!box) return;
+            const s = window.currentAnaStats; if (!s) return;
+            const monthName = (() => { try { const [y, m] = s.selMonth.split('-'); return new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }); } catch (e) { return s.selMonth; } })();
+
+            if ((s.totalInc + s.totalExp + s.totalInv) === 0) {
+                box.innerHTML = `<h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">📊 ${monthName} in Review</h3><p class="text-sm text-gray-400">Nothing recorded for this month yet. Use the plus button to log your first transaction and this summary will come to life.</p>`;
+                return;
+            }
+
+            const net = s.totalInc - s.totalExp - s.totalInv;
+            const netColor = net >= 0 ? 'text-green-400' : 'text-red-400';
+            const netWord = net >= 0 ? 'set aside' : 'overspent by';
+
+            // Top three spending categories.
+            const cats = Object.keys(s.catTotals).map(k => ({ name: k, amount: s.catTotals[k].amount, emoji: s.catTotals[k].emoji })).sort((a, b) => b.amount - a.amount).slice(0, 3);
+            const topHtml = cats.length ? cats.map(c => `<span class="inline-flex items-center gap-1 bg-corp-900 border border-corp-700 rounded-full px-3 py-1 text-xs text-gray-200">${c.emoji} ${c.name} <span class="text-gray-400">₹${formatMoney(c.amount)}</span></span>`).join(' ') : '<span class="text-xs text-gray-500">No expenses logged.</span>';
+
+            // Budgets that slipped this month.
+            const slipped = [];
+            Object.keys(userBudget.categories || {}).forEach(cat => {
+                const limit = userBudget.categories[cat];
+                const spent = s.catTotals[cat] ? s.catTotals[cat].amount : 0;
+                if (limit > 0 && spent > limit) slipped.push({ cat, spent, limit, over: spent - limit });
+            });
+            const overallLimit = Number(userBudget.global) || 0;
+            const overallOver = overallLimit > 0 && s.totalExp > overallLimit;
+            let budgetHtml;
+            if (!overallLimit && slipped.length === 0 && !Object.keys(userBudget.categories || {}).some(c => userBudget.categories[c] > 0)) {
+                budgetHtml = '<span class="text-xs text-gray-500">No budgets set yet. You can set them under Manage.</span>';
+            } else if (slipped.length === 0 && !overallOver) {
+                budgetHtml = '<span class="text-xs text-green-400">Every budget held this month. Nicely done.</span>';
+            } else {
+                let parts = slipped.sort((a, b) => b.over - a.over).slice(0, 4).map(b => `<span class="inline-flex items-center gap-1 bg-red-900/30 border border-red-800 rounded-full px-3 py-1 text-xs text-red-300">${b.cat} over by ₹${formatMoney(b.over)}</span>`);
+                if (overallOver) parts.unshift(`<span class="inline-flex items-center gap-1 bg-red-900/30 border border-red-800 rounded-full px-3 py-1 text-xs text-red-300">Overall over by ₹${formatMoney(s.totalExp - overallLimit)}</span>`);
+                budgetHtml = parts.join(' ');
+            }
+
+            // Trend against last month.
+            let trendHtml;
+            if (s.lmExp > 0) {
+                const diff = s.totalExp - s.lmExp;
+                const pct = Math.abs(diff / s.lmExp * 100);
+                if (Math.abs(diff) < 1) trendHtml = 'Your spending is about the same as last month.';
+                else trendHtml = `Your spending is ${diff > 0 ? 'up' : 'down'} ${pct.toFixed(0)} percent versus last month, a ${diff > 0 ? 'rise' : 'fall'} of ₹${formatMoney(Math.abs(diff))}.`;
+            } else {
+                trendHtml = 'No prior month to compare against yet.';
+            }
+
+            box.innerHTML = `
+                <h3 class="text-base font-bold text-white mb-3 flex items-center gap-2">📊 ${monthName} in Review</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="bg-corp-900 rounded-xl border border-corp-700 p-3 text-center"><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1">Came in</div><div class="text-lg font-bold text-green-400 ${isIncomeRevealed ? '' : 'income-blur'}">₹ ${formatMoney(s.totalInc)}</div></div>
+                    <div class="bg-corp-900 rounded-xl border border-corp-700 p-3 text-center"><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1">Went out</div><div class="text-lg font-bold text-red-400">₹ ${formatMoney(s.totalExp + s.totalInv)}</div></div>
+                    <div class="bg-corp-900 rounded-xl border border-corp-700 p-3 text-center"><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1">${net >= 0 ? 'Net set aside' : 'Net overspend'}</div><div class="text-lg font-bold ${netColor}">₹ ${formatMoney(Math.abs(net))}</div></div>
+                </div>
+                <div class="space-y-3">
+                    <div><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1.5">Top spending</div><div class="flex flex-wrap gap-2">${topHtml}</div></div>
+                    <div><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1.5">Budgets</div><div class="flex flex-wrap gap-2">${budgetHtml}</div></div>
+                    <div><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1.5">Trend</div><p class="text-sm text-gray-300">${trendHtml}</p></div>
+                </div>
+            `;
+        }
+
+        // Export the selected month's day to day transactions as a clean CSV.
+        function exportTxCSV() {
+            const selMonth = document.getElementById('analytics-month').value;
+            const rows = [['Date', 'Type', 'Category', 'Description', 'Amount (INR)', 'Account', 'Tags']];
+            const monthTx = transactionsDB.filter(t => t.date && t.date.startsWith(selMonth)).sort((a, b) => new Date(a.date) - new Date(b.date));
+            if (monthTx.length === 0) { showToast('No transactions to export for this month.', 'info'); return; }
+            monthTx.forEach(t => {
+                const acc = accounts.find(a => a.id === t.modeId);
+                rows.push([t.date, t.type, t.category, t.desc || '', t.amount, acc ? acc.name : '', (t.tags || []).join(', ')]);
+            });
+            downloadCSV(`Transactions_${selMonth}.csv`, rows);
+            showToast('Transactions exported.', 'success');
         }
 
         // ==========================================
@@ -1375,7 +1618,11 @@
             const grid = document.getElementById('docs-grid'); const filterText = (document.getElementById('doc-search').value || '').toLowerCase(); const todayStr = todayISO().split('T')[0];
             let filtered = docsDB.filter(d => d.name.toLowerCase().includes(filterText) || d.category.toLowerCase().includes(filterText) || (d.tags && d.tags.join(' ').toLowerCase().includes(filterText)));
             grid.innerHTML = '';
-            if(filtered.length === 0) { grid.innerHTML = `<p class="text-sm text-gray-500 italic col-span-full">No documents found.</p>`; return; }
+            if(filtered.length === 0) {
+                if (docsDB.length === 0) { grid.innerHTML = `<div class="col-span-full text-center mt-10 px-6"><div class="text-4xl mb-3 opacity-60">📁</div><p class="text-sm text-gray-400 font-medium mb-1">Your vault is empty</p><p class="text-xs text-gray-500">Add your first document above to keep identity, vehicle, and other papers in one place.</p></div>`; }
+                else { grid.innerHTML = `<p class="text-sm text-gray-500 italic col-span-full">No documents match your search.</p>`; }
+                return;
+            }
             const icons = { 'Identity':'🪪', 'Vehicle':'🚗', 'Education':'🎓', 'Health':'🏥', 'Property':'🏠', 'Office':'💼', 'Other':'📄' };
 
             filtered.forEach(d => {
@@ -1439,7 +1686,26 @@
         function delRec(id) { const item = recDB.find(r => r.id === id); if(!item) return; if(item.done) { if (!window.confirm(`WARNING: Deleting will refund ₹${item.amount} to your ledger. Proceed?`)) return; processTransaction(item, true); renderAccounts(); renderCashflowAnalytics(); } recDB = recDB.filter(r => r.id !== id); renderRecTable(); renderHomeWidgets(); }
         function addRecCustomCol() { const name = prompt("Column Name:"); if(name) { recCols.splice(recCols.length-1, 0, { id: 'c_'+Date.now(), label: '📝 '+name, isCustom: true, width: '130px' }); renderRecTable(); } }
         function toggleRecSort() { recSortAscending = !recSortAscending; renderRecTable(); }
-        function exportRecCSV() { let csv = "data:text/csv;charset=utf-8," + recCols.map(c => `"${c.label}"`).join(",") + "\r\n"; recDB.forEach(r => { let row = recCols.map(c => { if(c.id==='done') return r.done?'Yes':'No'; if(c.id==='name') return `"${r.name}"`; if(c.id==='tags') return `"${r.tags.join(', ')}"`; if(c.id==='type') return `"${r.type}"`; if(c.id==='amount') return `"${r.amount}"`; if(c.id==='date') return `"${r.date}"`; if(c.id==='status') return `"${r.status}"`; if(c.id==='mode') { let acc=accounts.find(a=>a.id===r.modeId); return acc?`"${acc.name}"`:'""'; } if(c.id==='recurring') return r.recurring?'Yes':'No'; if(c.id==='actions') return '""'; return `"${r.custom[c.id]||''}"`; }); csv += row.join(",") + "\r\n"; }); const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", "Recurring_Ledger.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
+        function exportRecCSV() {
+            const rows = [recCols.map(c => c.label)];
+            recDB.forEach(r => {
+                rows.push(recCols.map(c => {
+                    if (c.id === 'done') return r.done ? 'Yes' : 'No';
+                    if (c.id === 'name') return r.name;
+                    if (c.id === 'tags') return (r.tags || []).join(', ');
+                    if (c.id === 'type') return r.type;
+                    if (c.id === 'amount') return r.amount;
+                    if (c.id === 'date') return r.date;
+                    if (c.id === 'status') return r.status;
+                    if (c.id === 'mode') { const acc = accounts.find(a => a.id === r.modeId); return acc ? acc.name : ''; }
+                    if (c.id === 'recurring') return r.recurring ? 'Yes' : 'No';
+                    if (c.id === 'actions') return '';
+                    return (r.custom && r.custom[c.id]) || '';
+                }));
+            });
+            downloadCSV('Recurring_Ledger.csv', rows);
+            showToast('Recurring ledger exported.', 'success');
+        }
 
         let rRsz=false, rTh=null, rSx=0, rSw=0, rDrag=null;
         function initRRes(e, th, i) { e.stopPropagation(); rRsz=true; rTh=th; rSx=e.pageX; rSw=th.offsetWidth; rTh.classList.add('resizing'); document.body.style.cursor='col-resize'; document.addEventListener('mousemove', rMM); document.addEventListener('mouseup', rMU); }
@@ -1499,7 +1765,25 @@
         function delTask(id) { tDB = tDB.filter(x => x.id !== id); renderTaskTable(); renderHomeWidgets(); }
         function addTaskCustomCol() { const n = prompt("Column Name:"); if(n) { tCols.splice(tCols.length-1, 0, { id: 'c_'+Date.now(), label: '📝 '+n, isCustom: true, width: '150px' }); renderTaskTable(); } }
         function toggleTaskSort() { tSortAsc = !tSortAsc; renderTaskTable(); }
-        function exportTaskCSV() { let csv = "data:text/csv;charset=utf-8," + tCols.map(c => `"${c.label}"`).join(",") + "\r\n"; tDB.forEach(t => { let row = tCols.map(c => { if (c.id === 'done') return t.done ? '"Yes"' : '"No"'; if (c.id === 'name') return `"${t.name}"`; if (c.id === 'client_name') return `"${t.client_name}"`; if(c.id === 'tags') return `"${(t.tags||[]).join(', ')}"`; if (c.id === 'category') return `"${t.category}"`; if (c.id === 'status') return `"${t.status}"`; if (c.id === 'date') return `"${t.date}"`; if (c.id === 'recurring') return t.recurring ? '"Yes"' : '"No"'; if (c.id === 'actions') return '""'; return `"${t.customData[c.id] || ''}"`; }); csv += row.join(",") + "\r\n"; }); const link = document.createElement("a"); link.setAttribute("href", encodeURI(csv)); link.setAttribute("download", "Tasks.csv"); document.body.appendChild(link); link.click(); document.body.removeChild(link); }
+        function exportTaskCSV() {
+            const rows = [tCols.map(c => c.label)];
+            tDB.forEach(t => {
+                rows.push(tCols.map(c => {
+                    if (c.id === 'done') return t.done ? 'Yes' : 'No';
+                    if (c.id === 'name') return t.name;
+                    if (c.id === 'client_name') return t.client_name;
+                    if (c.id === 'tags') return (t.tags || []).join(', ');
+                    if (c.id === 'category') return t.category;
+                    if (c.id === 'status') return t.status;
+                    if (c.id === 'date') return t.date;
+                    if (c.id === 'recurring') return t.recurring ? 'Yes' : 'No';
+                    if (c.id === 'actions') return '';
+                    return (t.customData && t.customData[c.id]) || '';
+                }));
+            });
+            downloadCSV('Tasks.csv', rows);
+            showToast('Tasks exported.', 'success');
+        }
 
         let tRsz=false, tTh=null, tSx=0, tSw=0, tDrag=null;
         function initTRes(e, th, i) { e.stopPropagation(); tRsz=true; tTh=th; tSx=e.pageX; tSw=th.offsetWidth; tTh.classList.add('resizing'); document.body.style.cursor='col-resize'; document.addEventListener('mousemove', tMM); document.addEventListener('mouseup', tMU); }
@@ -1560,6 +1844,9 @@
 
         function renderNotesSidebar() {
             const sb = document.getElementById('folder-sidebar'); sb.innerHTML = '';
+            if (!folders.length) {
+                sb.innerHTML = `<div class="text-center px-3 py-6"><div class="text-3xl mb-2 opacity-60">🗂️</div><p class="text-xs text-gray-400 mb-3">No folders yet. Notes live inside folders, so create one to begin.</p><button onclick="addFolder()" class="text-sm bg-corp-600 hover:bg-corp-500 text-white px-4 py-2 rounded-lg transition shadow">Create a folder</button></div>`;
+            }
             folders.forEach(f => {
                 const fNotes = notesDB.filter(n => n.folderId === f.id);
                 sb.innerHTML += `<div class="folder-dropzone rounded-lg pb-2 transition" ondragover="dragOverFolder(event)" ondragleave="dragLeaveFolder(event)" ondrop="dropNoteOnFolder(event, '${f.id}')">
@@ -1591,7 +1878,7 @@
         function deleteCurrentNote() { if(!activeNoteId) return; if(!confirm("Are you sure you want to delete this note?")) return; notesDB = notesDB.filter(n => n.id !== activeNoteId); activeNoteId = null; renderNotesSidebar(); }
         function handleEditorShortcuts(e) { if(e.code === 'Space') { const sel = window.getSelection(); if (!sel.rangeCount) return; const node = sel.anchorNode; if(node.nodeType === 3 && node.textContent.endsWith('[ ]')) { e.preventDefault(); node.textContent = node.textContent.slice(0, -3); const range = sel.getRangeAt(0); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)'); const span = document.createElement('span'); span.className = 'task-text'; span.innerHTML = '&#8203;'; range.insertNode(span); range.insertNode(cb); range.setStart(span, 1); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); saveNoteState(); } } }
         function toggleNoteTask(cb) { if(cb.nextSibling && cb.nextSibling.classList.contains('task-text')) { if(cb.checked) { cb.nextSibling.style.textDecoration = 'line-through'; cb.nextSibling.style.opacity = '0.5'; } else { cb.nextSibling.style.textDecoration = 'none'; cb.nextSibling.style.opacity = '1'; } } const taskId = cb.getAttribute('data-task-id'); if(taskId) { const t = tDB.find(x => x.id == taskId); if(t) { t.done = cb.checked; t.status = t.done ? 'Done' : 'Not started'; renderTaskTable(); renderHomeWidgets(); } } saveNoteState(); }
-        function syncTasksToApp() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(!note) return; const editor = document.getElementById('note-editor'); const checkboxes = editor.querySelectorAll('.note-cb'); let count = 0; checkboxes.forEach(cb => { if(!cb.hasAttribute('data-task-id')) { const textNode = cb.nextSibling; const taskName = textNode ? textNode.textContent.replace(/\u200B/g, '').trim() : ''; if(taskName) { const newTaskId = Date.now() + count; cb.setAttribute('data-task-id', newTaskId); tDB.push({ id: newTaskId, name: taskName, client_name: note.title || "Note Sync", category: "Work", date: todayISO().split('T')[0], status: cb.checked ? "Done" : "Not started", recurring: false, done: cb.checked, tags: [], customData: {} }); count++; } } }); saveNoteState(); if(count > 0) { alert(`⚡ Magic Sync Complete!\n\nSuccessfully beamed ${count} new action item(s) to your Task Tracker.`); renderTaskTable(); renderHomeWidgets(); } else { alert(`No new unsynced to-dos found.\n\nTip: Type "[ ] " and hit space to create a new task.`); } }
+        function syncTasksToApp() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(!note) return; const editor = document.getElementById('note-editor'); const checkboxes = editor.querySelectorAll('.note-cb'); let count = 0; checkboxes.forEach(cb => { if(!cb.hasAttribute('data-task-id')) { const textNode = cb.nextSibling; const taskName = textNode ? textNode.textContent.replace(/\u200B/g, '').trim() : ''; if(taskName) { const newTaskId = Date.now() + count; cb.setAttribute('data-task-id', newTaskId); tDB.push({ id: newTaskId, name: taskName, client_name: note.title || "Note Sync", category: "Work", date: todayISO().split('T')[0], status: cb.checked ? "Done" : "Not started", recurring: false, done: cb.checked, tags: [], customData: {} }); count++; } } }); saveNoteState(); if(count > 0) { showToast(`Synced ${count} new action item${count > 1 ? 's' : ''} to your Task Tracker.`, 'success'); renderTaskTable(); renderHomeWidgets(); } else { showToast('No new unsynced to-dos found. Type "[ ] " and a space to create a task.', 'info'); } }
 
         // ==========================================================
         // PAYMENT MODE DROPDOWN
@@ -2095,7 +2382,7 @@
 
         function forgotPin() {
             if (!confirm('Reset your PIN by confirming your Google sign in? You can set a new PIN afterwards in Settings.')) return;
-            const finishReset = () => { disablePin(); hideLock(); switchTab('settings'); alert('PIN reset. Please set a new PIN in Settings, under Security.'); };
+            const finishReset = () => { disablePin(); hideLock(); switchTab('settings'); showToast('PIN reset. Please set a new PIN in Settings, under Security.', 'info'); };
             authMode = 'interactive';
             whenGoogleReady(() => {
                 initTokenClientOnce();
@@ -2188,14 +2475,14 @@
             if (a !== b) return show('The two entries do not match.');
             await setPin(a);
             cancelPinSetup();
-            alert('Your PIN is set. It will be asked when you sign in, after the idle time you chose, and whenever you press Lock. A plain refresh will not ask for it.');
+            showToast('Your PIN is set. It will be asked at sign in, after the idle time you chose, and on Lock.', 'success');
         }
         function turnOffPin() {
             if (!confirm('Turn off the PIN lock? Anyone with access to your signed in device will be able to open the workspace.')) return;
             disablePin();
         }
         function lockNow() {
-            if (!security.pinEnabled) { alert('Set a PIN first in Settings, under Security, then you can lock the workspace.'); switchTab('settings'); return; }
+            if (!security.pinEnabled) { showToast('Set a PIN first in Settings, under Security, then you can lock the workspace.', 'info'); switchTab('settings'); return; }
             showLock();
         }
 
@@ -2234,8 +2521,8 @@
         }
 
         async function enableFingerprint() {
-            if (!security.pinEnabled) { alert('Please set a PIN first, then add fingerprint as a quick unlock.'); return; }
-            if (!fpPlatformAvailable) { alert('This device or browser does not offer a fingerprint or face check here.'); return; }
+            if (!security.pinEnabled) { showToast('Please set a PIN first, then add fingerprint as a quick unlock.', 'info'); return; }
+            if (!fpPlatformAvailable) { showToast('This device or browser does not offer a fingerprint or face check here.', 'warning'); return; }
             try {
                 const challenge = crypto.getRandomValues(new Uint8Array(32));
                 const userId = crypto.getRandomValues(new Uint8Array(16));
@@ -2253,11 +2540,11 @@
                 if (cred && cred.rawId) {
                     localStorage.setItem(FP_KEY, _b64urlFromBuf(cred.rawId));
                     renderSettings();
-                    alert('Fingerprint unlock is on for this device. Your PIN still works everywhere.');
+                    showToast('Fingerprint unlock is on for this device. Your PIN still works everywhere.', 'success');
                 }
             } catch (e) {
                 console.error('Fingerprint registration failed:', e);
-                alert('Fingerprint setup was not completed. You can try again any time.');
+                showToast('Fingerprint setup was not completed. You can try again any time.', 'warning');
             }
         }
 
