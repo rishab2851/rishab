@@ -107,8 +107,10 @@
         ::-webkit-scrollbar-thumb { background: rgb(var(--corp-700)); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgb(var(--corp-600)); }
         
-        .resizer { position: absolute; top: 0; right: 0; width: 6px; height: 100%; cursor: col-resize; user-select: none; z-index: 10; }
-        .resizer:hover, .resizing { background-color: #436BBE; border-right: 1px solid #608DE8; }
+        .resizer { position: absolute; top: 0; right: -7px; width: 14px; height: 100%; cursor: col-resize; user-select: none; z-index: 20; touch-action: none; display: flex; align-items: center; justify-content: center; }
+        .resizer::after { content: ''; width: 2px; height: 55%; background: rgba(255,255,255,0.18); border-radius: 2px; transition: background 0.15s, height 0.15s; }
+        .resizer:hover::after, .resizing::after { background: #608DE8; height: 100%; }
+        .resizer:hover, .resizing { background-color: rgba(67,107,190,0.18); }
         .drag-over { border-left: 2px solid #436BBE; }
         
         #note-editor { font-family: ui-sans-serif, system-ui, sans-serif; min-height: 50vh; }
@@ -145,6 +147,12 @@
             #budget-modal > div { max-height: 92vh; }
             /* Comfortable tap targets */
             button, .tx-chip, select { min-height: 38px; }
+
+            /* Knowledge base on mobile: show folders full screen, then the note full screen */
+            #notes-flex .notes-folders { display: flex; flex: 1 1 auto; height: auto; }
+            #notes-flex .notes-editor { display: none; }
+            #notes-flex.editing .notes-folders { display: none; }
+            #notes-flex.editing .notes-editor { display: flex; }
         }
     </style>
     <script>
@@ -181,7 +189,12 @@
                 <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
                 Sign in with Google
             </button>
-            <p class="text-gray-500 text-[11px] mt-4 text-center leading-relaxed">We request your name, email, and profile photo only to show your profile inside the app. If you prefer not to share them, you can set your name and photo by hand in Settings.</p>
+            <div id="auth-loading" class="hidden flex-col items-center justify-center mt-2">
+                <div class="w-8 h-8 border-2 border-corp-600 border-t-corp-300 rounded-full animate-spin mb-3"></div>
+                <p class="text-gray-300 text-sm font-medium text-center">Setting up your secure workspace</p>
+                <p class="text-gray-500 text-xs mt-1 text-center">Loading your latest data from Drive</p>
+            </div>
+            <p id="signin-note" class="text-gray-500 text-[11px] mt-4 text-center leading-relaxed">We request your name, email, and profile photo only to show your profile inside the app. If you prefer not to share them, you can set your name and photo by hand in Settings.</p>
             <p id="auth-error" class="text-red-400 text-xs mt-4 hidden font-medium text-center">Authentication failed. Please try again.</p>
             <p id="client-missing" class="text-amber-400 text-xs mt-4 hidden font-medium text-center">Google Client ID is not set yet. Open the file and paste it where marked near the top of the script.</p>
         </div>
@@ -336,7 +349,7 @@
                         <div class="bg-corp-800 rounded-xl p-5 md:p-6 border border-corp-700 shadow-lg">
                             <h3 class="text-white font-bold mb-4 flex items-center gap-2"><span class="text-yellow-400">✍️</span> Quick Scratchpad</h3>
                             <div class="flex flex-col sm:flex-row gap-4 items-start">
-                                <textarea id="home-scratchpad" class="flex-1 w-full bg-corp-900 border border-corp-700 rounded-lg p-3 text-sm text-white resize-none h-[88px] outline-none focus:border-corp-500 transition" placeholder="Jot down a quick thought, number, or note..."></textarea>
+                                <textarea id="home-scratchpad" oninput="onScratchInput()" class="flex-1 w-full bg-corp-900 border border-corp-700 rounded-lg p-3 text-sm text-white resize-none h-[88px] outline-none focus:border-corp-500 transition" placeholder="Jot down a quick thought, number, or note..."></textarea>
                                 <div class="flex flex-col gap-2 w-full sm:w-48 shrink-0">
                                     <label class="text-xs text-gray-400">Save to Workspace:</label>
                                     <select id="scratch-folder" class="bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 cursor-pointer">
@@ -589,15 +602,16 @@
 
             <section id="notes" class="hidden h-full flex flex-col p-4 md:p-6">
                 <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white shrink-0 tracking-tight">Knowledge Base</h2>
-                <div class="flex flex-col md:flex-row gap-4 flex-1 min-h-0">
-                    <div class="w-full md:w-72 bg-corp-800 rounded-xl border border-corp-700 flex flex-col shadow-lg overflow-hidden flex-shrink-0 h-48 md:h-auto">
+                <div id="notes-flex" class="flex flex-col md:flex-row gap-4 flex-1 min-h-0">
+                    <div class="notes-folders w-full md:w-72 bg-corp-800 rounded-xl border border-corp-700 flex flex-col shadow-lg overflow-hidden flex-shrink-0 md:h-auto">
                         <div class="p-4 border-b border-corp-700 bg-corp-900/50 flex justify-between items-center"><span class="font-bold text-gray-200">My Workspaces</span></div>
                         <div class="flex-1 overflow-y-auto p-2" id="folder-sidebar"></div>
                         <div class="p-3 border-t border-corp-700 bg-corp-900/50"><button onclick="addFolder()" class="text-sm text-gray-400 hover:text-white transition w-full text-left font-medium flex items-center gap-2"><span>+</span> New Folder</button></div>
                     </div>
-                    <div class="flex-1 bg-corp-800 rounded-xl border border-corp-700 flex flex-col shadow-lg overflow-hidden relative min-h-[400px]">
+                    <div class="notes-editor flex-1 bg-corp-800 rounded-xl border border-corp-700 flex flex-col shadow-lg overflow-hidden relative min-h-[400px]">
                         <div class="h-auto md:h-14 py-3 md:py-0 bg-corp-900/50 border-b border-corp-700 flex flex-col md:flex-row items-start md:items-center justify-between px-6 shrink-0 gap-3">
                             <div class="flex items-center gap-4">
+                                <button onclick="backToFolders()" class="md:hidden text-corp-300 hover:text-white transition text-sm font-medium flex items-center gap-1">← Folders</button>
                                 <span id="note-folder-badge" class="bg-corp-700 text-gray-300 text-xs px-2 py-1 rounded font-medium">🏢 Clients</span>
                                 <span id="save-status" class="text-gray-500 text-xs flex items-center gap-1"><i></i> Auto-saved locally</span>
                             </div>
@@ -738,7 +752,21 @@
         </button>
     </div>
 
-    <div id="toast-stack" class="fixed z-[160] bottom-4 inset-x-0 flex flex-col items-center gap-2 px-4 pointer-events-none"></div>
+    <div id="app-dialog" class="hidden fixed inset-0 z-[170] flex items-center justify-center p-4 bg-corp-900/80 backdrop-blur-sm">
+        <div class="bg-corp-800 border border-corp-700 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
+            <div class="p-5">
+                <h3 id="dlg-title" class="text-lg font-bold text-white mb-2">Please confirm</h3>
+                <p id="dlg-message" class="text-sm text-gray-300 leading-snug mb-3"></p>
+                <input id="dlg-input" type="text" class="hidden w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition">
+            </div>
+            <div class="px-5 pb-5 flex justify-end gap-3">
+                <button id="dlg-cancel" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition">Cancel</button>
+                <button id="dlg-confirm" class="px-5 py-2 rounded-lg text-sm font-medium text-white bg-corp-600 hover:bg-corp-500 transition shadow">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-stack" class="fixed z-[160] top-[70px] md:top-4 inset-x-0 flex flex-col items-center gap-2 px-4 pointer-events-none"></div>
 
     <div id="tag-pivot-modal" class="hidden fixed inset-0 bg-corp-900/90 z-50 flex items-center justify-center p-4 md:p-10 backdrop-blur-sm">
         <div class="bg-corp-900 border border-corp-700 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
@@ -926,6 +954,7 @@
             return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString();
         }
         let isPrivate = false;
+        let scratchDraft = '';
 
         function updateGreeting() {
             const hour = TODAY.getHours();
@@ -1002,8 +1031,25 @@
 
         function togglePrivacy() {
             isPrivate = !isPrivate;
-            document.getElementById('eye-icon').style.opacity = isPrivate ? '0.5' : '1';
+            applyPrivacyUI();
             renderAccounts(); renderRecTable(); renderCashflowAnalytics(false); renderHomeWidgets();
+            scheduleSave();
+        }
+        // Keep the eye indicator in step with the privacy state, on toggle and after a refresh.
+        function applyPrivacyUI() {
+            const eye = document.getElementById('eye-icon');
+            if (eye) eye.style.opacity = isPrivate ? '0.5' : '1';
+        }
+        function applyScratchDraft() {
+            const el = document.getElementById('home-scratchpad');
+            if (el && typeof scratchDraft === 'string' && el.value !== scratchDraft) el.value = scratchDraft;
+        }
+        // Save the in progress scratch text as a draft so nothing is lost on refresh.
+        function onScratchInput() {
+            const el = document.getElementById('home-scratchpad');
+            scratchDraft = el ? el.value : '';
+            persistLocal();
+            scheduleSave(false);
         }
 
         function formatMoney(num) { return isPrivate ? '***,***' : Number(num).toLocaleString('en-IN'); }
@@ -1015,13 +1061,28 @@
 
         function addAccount(e) { e.preventDefault(); accounts.push({ id: 'acc_' + Date.now(), name: document.getElementById('acc-name').value, type: document.getElementById('acc-type').value, balance: Number(document.getElementById('acc-balance').value) }); document.getElementById('finance-form').reset(); renderAccounts(); populateModeDropdown(); }
         function updateAccount(id, field, value) { const acc = accounts.find(a => a.id === id); if(acc) acc[field] = field === 'balance' ? Number(value) : value; renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
+        function delAccount(id) {
+            const idx = accounts.findIndex(a => a.id === id); if (idx === -1) return;
+            const removed = accounts[idx];
+            accounts.splice(idx, 1);
+            renderAccounts(); populateModeDropdown(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets();
+            showToast(`Account "${removed.name}" removed. Existing entries that used it now show Unknown.`, 'warning', {
+                persist: true,
+                actionLabel: 'Undo',
+                onAction: () => {
+                    accounts.splice(Math.min(idx, accounts.length), 0, removed);
+                    renderAccounts(); populateModeDropdown(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets();
+                    showToast('Account restored.', 'success');
+                }
+            });
+        }
         
         function renderAccounts() {
             let ast = 0, liab = 0; const alist = document.getElementById('asset-list'); const llist = document.getElementById('liability-list'); alist.innerHTML = ''; llist.innerHTML = '';
             accounts.forEach(a => {
                 if(a.type === 'asset') ast += a.balance; else liab += a.balance;
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="p-2 border-r border-corp-700"><input type="text" value="${a.name}" onchange="updateAccount('${a.id}', 'name', this.value)" class="bg-transparent text-gray-200 focus:text-white border-none focus:outline-none w-full px-1 text-sm font-medium"></td><td class="p-2 w-36"><div class="flex items-center text-${a.type==='asset'?'green':'red'}-400">₹ <input type="${isPrivate?'password':'number'}" value="${a.balance}" onchange="updateAccount('${a.id}', 'balance', this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm font-bold text-inherit" ${isPrivate?'disabled':''}></div></td>`;
+                tr.innerHTML = `<td class="p-2 border-r border-corp-700"><input type="text" value="${a.name}" onchange="updateAccount('${a.id}', 'name', this.value)" class="bg-transparent text-gray-200 focus:text-white border-none focus:outline-none w-full px-1 text-sm font-medium"></td><td class="p-2 w-32"><div class="flex items-center text-${a.type==='asset'?'green':'red'}-400">₹ <input type="${isPrivate?'password':'number'}" value="${a.balance}" onchange="updateAccount('${a.id}', 'balance', this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm font-bold text-inherit" ${isPrivate?'disabled':''}></div></td><td class="p-2 w-8 text-center"><button onclick="delAccount('${a.id}')" class="text-gray-600 hover:text-red-400 transition leading-none" title="Delete this account">✕</button></td>`;
                 if(a.type === 'asset') alist.appendChild(tr); else llist.appendChild(tr);
             });
             if (!alist.children.length) alist.innerHTML = `<tr><td class="p-4 text-sm text-gray-500 italic">No accounts yet. Add your first bank or wallet using the form above.</td></tr>`;
@@ -1050,6 +1111,39 @@
 
         let editingTxId = null;
 
+        // ----- Themed confirm and prompt dialogs (replace the grey browser boxes) -----
+        function showConfirm(message, opts) {
+            opts = opts || {};
+            const dlg = document.getElementById('app-dialog');
+            document.getElementById('dlg-title').textContent = opts.title || 'Please confirm';
+            document.getElementById('dlg-message').textContent = message;
+            const inp = document.getElementById('dlg-input'); inp.classList.add('hidden');
+            const cancel = document.getElementById('dlg-cancel'); cancel.classList.remove('hidden'); cancel.textContent = opts.cancelLabel || 'Cancel';
+            const confirm = document.getElementById('dlg-confirm'); confirm.textContent = opts.confirmLabel || 'Confirm';
+            confirm.className = `px-5 py-2 rounded-lg text-sm font-medium text-white transition shadow ${opts.danger ? 'bg-red-600 hover:bg-red-500' : 'bg-corp-600 hover:bg-corp-500'}`;
+            const close = () => { dlg.classList.add('hidden'); confirm.onclick = null; cancel.onclick = null; };
+            confirm.onclick = () => { close(); if (opts.onConfirm) opts.onConfirm(); };
+            cancel.onclick = close;
+            dlg.classList.remove('hidden');
+        }
+        function showPrompt(message, opts) {
+            opts = opts || {};
+            const dlg = document.getElementById('app-dialog');
+            document.getElementById('dlg-title').textContent = opts.title || 'Enter a value';
+            document.getElementById('dlg-message').textContent = message || '';
+            const inp = document.getElementById('dlg-input'); inp.classList.remove('hidden'); inp.value = opts.value || ''; inp.placeholder = opts.placeholder || '';
+            const cancel = document.getElementById('dlg-cancel'); cancel.classList.remove('hidden'); cancel.textContent = 'Cancel';
+            const confirm = document.getElementById('dlg-confirm'); confirm.textContent = opts.confirmLabel || 'Save';
+            confirm.className = 'px-5 py-2 rounded-lg text-sm font-medium text-white bg-corp-600 hover:bg-corp-500 transition shadow';
+            const close = () => { dlg.classList.add('hidden'); confirm.onclick = null; cancel.onclick = null; inp.onkeydown = null; };
+            const submit = () => { const v = inp.value.trim(); close(); if (opts.onSubmit) opts.onSubmit(v); };
+            confirm.onclick = submit;
+            cancel.onclick = close;
+            inp.onkeydown = (e) => { if (e.key === 'Enter') submit(); };
+            dlg.classList.remove('hidden');
+            setTimeout(() => inp.focus(), 50);
+        }
+
         // ----- Toast notifications (replace the browser alert boxes) -----
         // Success and info slide away on their own. Warnings, errors and the
         // deletion notice stay until dismissed, since missing them can be costly.
@@ -1067,13 +1161,13 @@
             const icon = { success: '✅', info: '💡', warning: '⚠️', error: '⛔' }[type] || '💡';
 
             const el = document.createElement('div');
-            el.className = `pointer-events-auto w-full max-w-md flex items-start gap-3 bg-corp-800 ${tone} border text-gray-100 rounded-xl shadow-2xl px-4 py-3 translate-y-2 opacity-0 transition-all duration-300`;
+            el.className = `pointer-events-auto w-full max-w-md flex items-start gap-3 bg-corp-800 ${tone} border text-gray-100 rounded-xl shadow-2xl px-4 py-3 -translate-y-2 opacity-0 transition-all duration-300`;
 
             const ic = document.createElement('span'); ic.className = 'text-lg leading-none mt-0.5'; ic.textContent = icon;
             const msg = document.createElement('span'); msg.className = 'flex-1 text-sm leading-snug'; msg.textContent = message;
             el.appendChild(ic); el.appendChild(msg);
 
-            const remove = () => { el.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => el.remove(), 300); };
+            const remove = () => { el.classList.add('opacity-0', '-translate-y-2'); setTimeout(() => el.remove(), 300); };
 
             if (opts.actionLabel) {
                 const act = document.createElement('button');
@@ -1091,7 +1185,7 @@
             }
 
             stack.appendChild(el);
-            requestAnimationFrame(() => el.classList.remove('translate-y-2', 'opacity-0'));
+            requestAnimationFrame(() => el.classList.remove('-translate-y-2', 'opacity-0'));
             if (!persist) setTimeout(remove, opts.duration || 5000);
             return el;
         }
@@ -1194,6 +1288,7 @@
 
         function addTransaction(e) {
             e.preventDefault(); const amt = Number(document.getElementById('tx-amount').value); const modeId = document.getElementById('tx-mode').value; const acc = accounts.find(a => a.id === modeId);
+            if (!acc) { showToast('Add an account first, then you can record against it. Opening Finance now.', 'warning'); closeRecord(); switchTab('finance'); return; }
 
             // Editing an existing entry: first reverse its old effect so the checks and balances are correct.
             const editing = editingTxId != null;
@@ -1595,10 +1690,14 @@
 
         function saveScratchpad() {
             const input = document.getElementById('home-scratchpad'); const text = input.value.trim(); if(!text) return;
-            const targetFolderId = document.getElementById('scratch-folder').value;
+            const folderSel = document.getElementById('scratch-folder');
+            const targetFolderId = folderSel ? folderSel.value : '';
+            if (!targetFolderId) { showToast('Create a folder in the Knowledge Base first, then your note has a home.', 'info'); return; }
             notesDB.push({ id: 'n_' + Date.now(), folderId: targetFolderId, title: `Quick Note (${TODAY.toLocaleDateString()})`, content: text.replace(/\n/g, '<br>') });
-            input.value = ''; const status = document.getElementById('scratch-status'); status.classList.remove('hidden'); setTimeout(() => status.classList.add('hidden'), 3000);
+            input.value = ''; scratchDraft = ''; persistLocal(); scheduleSave();
+            const status = document.getElementById('scratch-status'); if (status) { status.classList.remove('hidden'); setTimeout(() => status.classList.add('hidden'), 3000); }
             renderNotesSidebar();
+            showToast('Saved to your Knowledge Base.', 'success');
         }
 
         // ==========================================
@@ -1612,7 +1711,12 @@
             document.getElementById('doc-form').reset(); renderDocs(); renderHomeWidgets();
         }
 
-        function delDoc(id) { if(confirm("Remove this document from the vault?")) { docsDB = docsDB.filter(d => d.id !== id); renderDocs(); renderHomeWidgets(); } }
+        function delDoc(id) {
+            const idx = docsDB.findIndex(d => d.id === id); if (idx === -1) return;
+            const removed = docsDB[idx]; docsDB.splice(idx, 1);
+            renderDocs(); renderHomeWidgets();
+            showToast('Document removed from the vault.', 'warning', { persist: true, actionLabel: 'Undo', onAction: () => { docsDB.splice(Math.min(idx, docsDB.length), 0, removed); renderDocs(); renderHomeWidgets(); showToast('Document restored.', 'success'); } });
+        }
 
         function renderDocs() {
             const grid = document.getElementById('docs-grid'); const filterText = (document.getElementById('doc-search').value || '').toLowerCase(); const todayStr = todayISO().split('T')[0];
@@ -1675,16 +1779,69 @@
         // RECURRING TRACKER MODULE
         // ==========================================
         let recSortAscending = true;
+        let recSortCol = null, recSortDir = 'asc';
+        let tSortCol = null, tSortDir = 'asc';
+
+        // Shared sorting helpers for the Recurring and Tasks tables.
+        function colValue(item, colId, kind) {
+            if (colId === 'amount') return Number(item.amount) || 0;
+            if (colId === 'date') return new Date(item.date).getTime() || 0;
+            if (colId === 'recurring') return item.recurring ? 1 : 0;
+            if (colId === 'done') return item.done ? 1 : 0;
+            if (colId === 'tags') return (item.tags || []).join(',').toLowerCase();
+            if (colId === 'mode') { const a = accounts.find(x => x.id === item.modeId); return a ? a.name.toLowerCase() : ''; }
+            if (kind === 'rec') {
+                if (colId === 'name') return (item.name || '').toLowerCase();
+                if (colId === 'type') return (item.type || '').toLowerCase();
+                if (colId === 'status') return (item.status || '').toLowerCase();
+                if (item.custom && item.custom[colId] != null) return String(item.custom[colId]).toLowerCase();
+            } else {
+                if (colId === 'name') return (item.name || '').toLowerCase();
+                if (colId === 'client_name') return (item.client_name || '').toLowerCase();
+                if (colId === 'category') return (item.category || '').toLowerCase();
+                if (colId === 'status') return (item.status || '').toLowerCase();
+                if (item.customData && item.customData[colId] != null) return String(item.customData[colId]).toLowerCase();
+            }
+            return '';
+        }
+        function compareRows(a, b, colId, dir, kind) {
+            const va = colValue(a, colId, kind), vb = colValue(b, colId, kind);
+            let c;
+            if (typeof va === 'number' && typeof vb === 'number') c = va - vb;
+            else c = String(va).localeCompare(String(vb));
+            return dir === 'asc' ? c : -c;
+        }
+        // Each click cycles ascending, descending, then back to the default month grouping.
+        function sortRecBy(id) { if (recSortCol !== id) { recSortCol = id; recSortDir = 'asc'; } else if (recSortDir === 'asc') { recSortDir = 'desc'; } else { recSortCol = null; recSortDir = 'asc'; } renderRecTable(); }
+        function sortTaskBy(id) { if (tSortCol !== id) { tSortCol = id; tSortDir = 'asc'; } else if (tSortDir === 'asc') { tSortDir = 'desc'; } else { tSortCol = null; tSortDir = 'asc'; } renderTaskTable(); }
         let recCols = [ { id: 'done', label: '✔', fixed: true, width: '40px' }, { id: 'name', label: 'Aa Bill', width: '220px' }, { id: 'tags', label: '🏷 Tags', width: '130px' }, { id: 'type', label: '🗂 Type', width: '130px' }, { id: 'amount', label: '# Amount', width: '110px' }, { id: 'date', label: '📅 Due date', width: '130px' }, { id: 'status', label: '🔆 Status', width: '130px' }, { id: 'mode', label: '💳 Mode', width: '150px' }, { id: 'recurring', label: '🔄 Recurring', width: '100px' }, { id: 'actions', label: '✕', fixed: true, width: '50px' } ];
         let recDB = [];
 
         function evalRecStatus(dateStr) { const tgt = new Date(dateStr + 'T00:00:00'); const today = new Date(todayISO().split('T')[0]+'T00:00:00'); if (tgt < today) return 'Overdue'; if (tgt.getMonth() === today.getMonth() && tgt.getFullYear() === today.getFullYear()) return 'Due'; return 'Upcoming'; }
 
         function addRecurring(e) { e.preventDefault(); const dateStr = document.getElementById('rec-date').value; const tagsInput = document.getElementById('rec-tags-input').value; recDB.push({ id: Date.now(), name: document.getElementById('rec-name').value, type: document.getElementById('rec-type').value, amount: document.getElementById('rec-amount').value, date: dateStr, modeId: document.getElementById('rec-mode').value, recurring: true, done: false, status: evalRecStatus(dateStr), tags: parseTags(tagsInput), custom: {} }); document.getElementById('rec-form').reset(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
-        function toggleRecPaid(id, isChecked) { const item = recDB.find(r => r.id === id); if(!item) return; if(item.done === isChecked) return; const success = processTransaction(item, !isChecked); if(!success) { renderRecTable(); return; } item.done = isChecked; item.status = isChecked ? 'Paid' : evalRecStatus(item.date); if(isChecked && item.recurring) { let oldD = new Date(item.date); oldD.setMonth(oldD.getMonth() + 1); recDB.push({ ...item, id: Date.now() + Math.floor(Math.random()*100), date: oldD.toISOString().split('T')[0], done: false, status: 'Upcoming', custom: {...item.custom} }); } renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
+        function toggleRecPaid(id, isChecked) { const item = recDB.find(r => r.id === id); if(!item) return; if(item.done === isChecked) return; const success = processTransaction(item, !isChecked); if(!success) { renderRecTable(); return; } item.done = isChecked; item.status = isChecked ? 'Paid' : evalRecStatus(item.date); if(isChecked && item.recurring) { const newId = Date.now() + Math.floor(Math.random()*100); let oldD = new Date(item.date); oldD.setMonth(oldD.getMonth() + 1); recDB.push({ ...item, id: newId, date: oldD.toISOString().split('T')[0], done: false, status: 'Upcoming', custom: {...item.custom}, spawnParent: item.id, spawnChild: undefined }); item.spawnChild = newId; } else if (!isChecked && item.spawnChild) { const ci = recDB.findIndex(r => r.id === item.spawnChild); if (ci !== -1 && !recDB[ci].done) recDB.splice(ci, 1); item.spawnChild = undefined; } renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
         function updateRecField(id, field, val) { const item = recDB.find(r => r.id === id); if(!item) return; if(field === 'status') { if(val === 'Paid' && !item.done) { toggleRecPaid(id, true); return; } else if (val !== 'Paid' && item.done) { toggleRecPaid(id, false); item.status = val; renderRecTable(); renderCashflowAnalytics(); return; } item.status = val; } else { item[field] = val; if(field === 'date' && !item.done) item.status = evalRecStatus(val); } if(field === 'tags' || field === 'status' || field === 'date' || field === 'amount') { renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); } }
-        function delRec(id) { const item = recDB.find(r => r.id === id); if(!item) return; if(item.done) { if (!window.confirm(`WARNING: Deleting will refund ₹${item.amount} to your ledger. Proceed?`)) return; processTransaction(item, true); renderAccounts(); renderCashflowAnalytics(); } recDB = recDB.filter(r => r.id !== id); renderRecTable(); renderHomeWidgets(); }
-        function addRecCustomCol() { const name = prompt("Column Name:"); if(name) { recCols.splice(recCols.length-1, 0, { id: 'c_'+Date.now(), label: '📝 '+name, isCustom: true, width: '130px' }); renderRecTable(); } }
+        function delRec(id) {
+            const idx = recDB.findIndex(r => r.id === id); if (idx === -1) return;
+            const item = recDB[idx];
+            let childItem = null;
+            if (item.spawnChild) { const ci = recDB.findIndex(r => r.id === item.spawnChild); if (ci !== -1 && !recDB[ci].done) childItem = recDB[ci]; }
+            const wasDone = item.done;
+            if (wasDone) { processTransaction(item, true); }
+            const removeIds = [id]; if (childItem) removeIds.push(childItem.id);
+            recDB = recDB.filter(r => !removeIds.includes(r.id));
+            renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets();
+            const msg = wasDone ? `Recurring entry deleted and ₹${formatMoney(item.amount)} refunded.` : 'Recurring entry deleted.';
+            showToast(msg, 'warning', { persist: true, actionLabel: 'Undo', onAction: () => {
+                recDB.splice(Math.min(idx, recDB.length), 0, item);
+                if (childItem) recDB.push(childItem);
+                if (wasDone) processTransaction(item, false);
+                renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets();
+                showToast('Recurring entry restored.', 'success');
+            } });
+        }
+        function addRecCustomCol() { showPrompt('Name the new column', { title: 'New column', placeholder: 'Column name', confirmLabel: 'Add', onSubmit: (name) => { if (name) { recCols.splice(recCols.length-1, 0, { id: 'c_'+Date.now(), label: '📝 '+name, isCustom: true, width: '130px' }); renderRecTable(); scheduleSave(); } } }); }
         function toggleRecSort() { recSortAscending = !recSortAscending; renderRecTable(); }
         function exportRecCSV() {
             const rows = [recCols.map(c => c.label)];
@@ -1708,26 +1865,28 @@
         }
 
         let rRsz=false, rTh=null, rSx=0, rSw=0, rDrag=null;
-        function initRRes(e, th, i) { e.stopPropagation(); rRsz=true; rTh=th; rSx=e.pageX; rSw=th.offsetWidth; rTh.classList.add('resizing'); document.body.style.cursor='col-resize'; document.addEventListener('mousemove', rMM); document.addEventListener('mouseup', rMU); }
-        function rMM(e) { if(!rRsz) return; const w=Math.max(60, rSw+(e.pageX-rSx)); rTh.style.width=`${w}px`; rTh.style.minWidth=`${w}px`; recCols[Array.from(rTh.parentNode.children).indexOf(rTh)].width = `${w}px`; }
-        function rMU() { rRsz=false; if(rTh) rTh.classList.remove('resizing'); rTh=null; document.body.style.cursor='default'; document.removeEventListener('mousemove', rMM); document.removeEventListener('mouseup', rMU); }
+        function initRRes(e, th, i) { e.stopPropagation(); e.preventDefault(); rRsz=true; rTh=th; rSx=(e.touches?e.touches[0].pageX:e.pageX); rSw=th.offsetWidth; rTh.classList.add('resizing'); document.body.style.cursor='col-resize'; document.addEventListener('pointermove', rMM); document.addEventListener('pointerup', rMU); document.addEventListener('pointercancel', rMU); }
+        function rMM(e) { if(!rRsz) return; const px=(e.touches?e.touches[0].pageX:e.pageX); const w=Math.max(50, rSw+(px-rSx)); rTh.style.width=`${w}px`; rTh.style.minWidth=`${w}px`; recCols[Array.from(rTh.parentNode.children).indexOf(rTh)].width = `${w}px`; }
+        function rMU() { if(!rRsz) return; rRsz=false; if(rTh) rTh.classList.remove('resizing'); rTh=null; document.body.style.cursor='default'; document.removeEventListener('pointermove', rMM); document.removeEventListener('pointerup', rMU); document.removeEventListener('pointercancel', rMU); scheduleSave(); }
         function rDStart(e,i){ if(recCols[i].fixed||e.target.classList.contains('resizer')){e.preventDefault();return;} rDrag=i; e.target.classList.add('opacity-50'); e.dataTransfer.effectAllowed='move';}
         function rDDrop(e,i){ e.stopPropagation(); e.target.closest('th').classList.remove('drag-over'); if(rDrag!==null && rDrag!==i && !recCols[i].fixed && !recCols[rDrag].fixed){ recCols.splice(i, 0, recCols.splice(rDrag,1)[0]); renderRecTable(); } return false;}
 
         function renderRecTable() {
             const head = document.getElementById('rec-header'); head.innerHTML='';
-            recCols.forEach((col, i) => { const th = document.createElement('th'); th.className = `p-2 border-r border-corp-700 relative bg-corp-900 ${col.fixed?'text-center':'cursor-grab hover:bg-corp-800'}`; th.style.width=col.width; th.style.minWidth=col.width; if(col.fixed) { th.textContent=col.label; } else { th.draggable=true; th.ondragstart=(e)=>rDStart(e,i); th.ondragover=(e)=>{e.preventDefault(); e.target.closest('th').classList.add('drag-over'); return false;}; th.ondragleave=(e)=>e.target.closest('th').classList.remove('drag-over'); th.ondrop=(e)=>rDDrop(e,i); th.ondragend=(e)=>e.target.classList.remove('opacity-50'); th.innerHTML = `<input type="text" value="${col.label}" onchange="recCols[${i}].label=this.value" class="bg-transparent font-medium text-gray-400 focus:text-white focus:outline-none w-full cursor-pointer focus:cursor-text text-sm">`; const r = document.createElement('div'); r.className='resizer'; r.onmousedown=(e)=>initRRes(e,th,i); th.appendChild(r); } head.appendChild(th); });
+            recCols.forEach((col, i) => { const th = document.createElement('th'); th.className = `p-2 border-r border-corp-700 relative bg-corp-900 ${col.fixed?'text-center':'cursor-grab hover:bg-corp-800'}`; th.style.width=col.width; th.style.minWidth=col.width; if(col.fixed) { th.textContent=col.label; } else { th.draggable=true; th.ondragstart=(e)=>rDStart(e,i); th.ondragover=(e)=>{e.preventDefault(); e.target.closest('th').classList.add('drag-over'); return false;}; th.ondragleave=(e)=>e.target.closest('th').classList.remove('drag-over'); th.ondrop=(e)=>rDDrop(e,i); th.ondragend=(e)=>e.target.classList.remove('opacity-50'); th.innerHTML = `<div class="flex items-center gap-1"><input type="text" value="${col.label}" onchange="recCols[${i}].label=this.value" class="bg-transparent font-medium text-gray-400 focus:text-white focus:outline-none flex-1 min-w-0 cursor-pointer focus:cursor-text text-sm"><button type="button" title="Sort by this column" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation(); sortRecBy('${col.id}')" class="shrink-0 text-xs px-0.5 ${recSortCol===col.id?'text-corp-300':'text-gray-600 hover:text-gray-300'}">${recSortCol===col.id?(recSortDir==='asc'?'▲':'▼'):'⇅'}</button></div>`; const r = document.createElement('div'); r.className='resizer'; r.onpointerdown=(e)=>initRRes(e,th,i); th.appendChild(r); } head.appendChild(th); });
 
             const filterText = (document.getElementById('rec-search-filter').value || '').toLowerCase();
             let dRecs = recDB.filter(r => { let acc=accounts.find(a=>a.id===r.modeId); return r.name.toLowerCase().includes(filterText) || r.type.toLowerCase().includes(filterText) || r.status.toLowerCase().includes(filterText) || (r.tags&&r.tags.join(' ').toLowerCase().includes(filterText)) || (acc&&acc.name.toLowerCase().includes(filterText)); });
-            dRecs.sort((a,b) => recSortAscending ? new Date(a.date)-new Date(b.date) : new Date(b.date)-new Date(a.date));
-            const grouped = {}; dRecs.forEach(r => { if(!r.done) r.status = evalRecStatus(r.date); const my = new Date(r.date).toLocaleString('en-US', {month:'long', year:'numeric'}); if(!grouped[my]) grouped[my]=[]; grouped[my].push(r); });
+            dRecs.forEach(r => { if(!r.done) r.status = evalRecStatus(r.date); });
+            const grouped = {};
+            if (recSortCol) { dRecs.sort((a,b)=>compareRows(a,b,recSortCol,recSortDir,'rec')); grouped['__sorted__'] = dRecs; }
+            else { dRecs.sort((a,b) => recSortAscending ? new Date(a.date)-new Date(b.date) : new Date(b.date)-new Date(a.date)); dRecs.forEach(r => { const my = new Date(r.date).toLocaleString('en-US', {month:'long', year:'numeric'}); if(!grouped[my]) grouped[my]=[]; grouped[my].push(r); }); }
 
             const list = document.getElementById('rec-list'); list.innerHTML='';
             if(Object.keys(grouped).length===0) { list.innerHTML=`<tr><td colspan="${recCols.length}" class="p-4 text-center text-gray-500 italic text-sm">No records.</td></tr>`; return; }
 
             Object.keys(grouped).forEach(m => {
-                list.innerHTML += `<tr class="bg-corp-800 border-b border-corp-700 select-none"><td colspan="${recCols.length}" class="p-3 font-semibold text-corp-400 text-sm tracking-wide">🗓 ${m}</td></tr>`;
+                list.innerHTML += `<tr class="bg-corp-800 border-b border-corp-700 select-none"><td colspan="${recCols.length}" class="p-3 font-semibold text-corp-400 text-sm tracking-wide">${m==='__sorted__' ? ('↕ Sorted by ' + ((recCols.find(c=>c.id===recSortCol)||{}).label||'') + ' ' + (recSortDir==='asc'?'ascending':'descending') + '. Tap the arrow again to clear.') : ('🗓 ' + m)}</td></tr>`;
                 let mProj = 0, mSp = 0;
                 grouped[m].forEach(r => {
                     mProj += Number(r.amount); if(r.done) mSp += Number(r.amount);
@@ -1760,10 +1919,19 @@
         let tDB = [];
 
         function addTask(e) { e.preventDefault(); const tagsIn = document.getElementById('task-tags-input').value; tDB.push({ id: Date.now(), name: document.getElementById('task-name').value, client_name: document.getElementById('task-client-name').value || "-", category: document.getElementById('task-category').value, tags: parseTags(tagsIn), date: document.getElementById('task-date').value, status: document.getElementById('task-status').value, recurring: document.getElementById('task-recurring').checked, done: (document.getElementById('task-status').value === "Done"), customData: {} }); document.getElementById('task-form').reset(); renderTaskTable(); renderHomeWidgets(); }
-        function toggleTaskDone(id) { const t = tDB.find(x => x.id === id); if(!t) return; t.done = !t.done; t.status = t.done ? "Done" : "Not started"; if(t.done && t.recurring) { let old = new Date(t.date); old.setMonth(old.getMonth()+1); tDB.push({...t, id:Date.now(), date:old.toISOString().split('T')[0], done:false, status:"Not started", customData:{...t.customData}}); } renderTaskTable(); renderHomeWidgets(); }
+        function toggleTaskDone(id) { const t = tDB.find(x => x.id === id); if(!t) return; t.done = !t.done; t.status = t.done ? "Done" : "Not started"; if(t.done && t.recurring) { const newId = Date.now() + Math.floor(Math.random()*100); let old = new Date(t.date); old.setMonth(old.getMonth()+1); tDB.push({...t, id:newId, date:old.toISOString().split('T')[0], done:false, status:"Not started", customData:{...t.customData}, spawnParent:t.id, spawnChild:undefined}); t.spawnChild = newId; } else if (!t.done && t.spawnChild) { const ci = tDB.findIndex(x => x.id === t.spawnChild); if (ci !== -1 && !tDB[ci].done) tDB.splice(ci, 1); t.spawnChild = undefined; } renderTaskTable(); renderHomeWidgets(); }
         function updateTaskField(id, f, v) { const t = tDB.find(x => x.id === id); if(t) { t[f] = v; if(f === 'status') t.done = (v === 'Done'); if(f === 'status' || f === 'date' || f === 'tags') { renderTaskTable(); renderHomeWidgets(); } } }
-        function delTask(id) { tDB = tDB.filter(x => x.id !== id); renderTaskTable(); renderHomeWidgets(); }
-        function addTaskCustomCol() { const n = prompt("Column Name:"); if(n) { tCols.splice(tCols.length-1, 0, { id: 'c_'+Date.now(), label: '📝 '+n, isCustom: true, width: '150px' }); renderTaskTable(); } }
+        function delTask(id) {
+            const idx = tDB.findIndex(x => x.id === id); if (idx === -1) return;
+            const item = tDB[idx];
+            let childItem = null;
+            if (item.spawnChild) { const ci = tDB.findIndex(x => x.id === item.spawnChild); if (ci !== -1 && !tDB[ci].done) childItem = tDB[ci]; }
+            const removeIds = [id]; if (childItem) removeIds.push(childItem.id);
+            tDB = tDB.filter(x => !removeIds.includes(x.id));
+            renderTaskTable(); renderHomeWidgets();
+            showToast('Task deleted.', 'warning', { persist: true, actionLabel: 'Undo', onAction: () => { tDB.splice(Math.min(idx, tDB.length), 0, item); if (childItem) tDB.push(childItem); renderTaskTable(); renderHomeWidgets(); showToast('Task restored.', 'success'); } });
+        }
+        function addTaskCustomCol() { showPrompt('Name the new column', { title: 'New column', placeholder: 'Column name', confirmLabel: 'Add', onSubmit: (n) => { if (n) { tCols.splice(tCols.length-1, 0, { id: 'c_'+Date.now(), label: '📝 '+n, isCustom: true, width: '150px' }); renderTaskTable(); scheduleSave(); } } }); }
         function toggleTaskSort() { tSortAsc = !tSortAsc; renderTaskTable(); }
         function exportTaskCSV() {
             const rows = [tCols.map(c => c.label)];
@@ -1786,9 +1954,9 @@
         }
 
         let tRsz=false, tTh=null, tSx=0, tSw=0, tDrag=null;
-        function initTRes(e, th, i) { e.stopPropagation(); tRsz=true; tTh=th; tSx=e.pageX; tSw=th.offsetWidth; tTh.classList.add('resizing'); document.body.style.cursor='col-resize'; document.addEventListener('mousemove', tMM); document.addEventListener('mouseup', tMU); }
-        function tMM(e) { if(!tRsz) return; const w=Math.max(60, tSw+(e.pageX-tSx)); tTh.style.width=`${w}px`; tTh.style.minWidth=`${w}px`; tCols[Array.from(tTh.parentNode.children).indexOf(tTh)].width = `${w}px`; }
-        function tMU() { tRsz=false; if(tTh) tTh.classList.remove('resizing'); tTh=null; document.body.style.cursor='default'; document.removeEventListener('mousemove', tMM); document.removeEventListener('mouseup', tMU); }
+        function initTRes(e, th, i) { e.stopPropagation(); e.preventDefault(); tRsz=true; tTh=th; tSx=(e.touches?e.touches[0].pageX:e.pageX); tSw=th.offsetWidth; tTh.classList.add('resizing'); document.body.style.cursor='col-resize'; document.addEventListener('pointermove', tMM); document.addEventListener('pointerup', tMU); document.addEventListener('pointercancel', tMU); }
+        function tMM(e) { if(!tRsz) return; const px=(e.touches?e.touches[0].pageX:e.pageX); const w=Math.max(50, tSw+(px-tSx)); tTh.style.width=`${w}px`; tTh.style.minWidth=`${w}px`; tCols[Array.from(tTh.parentNode.children).indexOf(tTh)].width = `${w}px`; }
+        function tMU() { if(!tRsz) return; tRsz=false; if(tTh) tTh.classList.remove('resizing'); tTh=null; document.body.style.cursor='default'; document.removeEventListener('pointermove', tMM); document.removeEventListener('pointerup', tMU); document.removeEventListener('pointercancel', tMU); scheduleSave(); }
         function tDStart(e,i){ if(tCols[i].fixed||e.target.classList.contains('resizer')){e.preventDefault();return;} tDrag=i; e.target.classList.add('opacity-50'); e.dataTransfer.effectAllowed='move';}
         function tDDrop(e,i){ e.stopPropagation(); e.target.closest('th').classList.remove('drag-over'); if(tDrag!==null && tDrag!==i && !tCols[i].fixed && !tCols[tDrag].fixed){ tCols.splice(i, 0, tCols.splice(tDrag,1)[0]); renderTaskTable(); } return false;}
 
@@ -1800,21 +1968,21 @@
                 const th = document.createElement('th'); th.className = `p-2 border-r border-corp-700 relative bg-corp-900 ${col.fixed?'text-center':'cursor-grab hover:bg-corp-800'}`; th.style.width=col.width; th.style.minWidth=col.width;
                 if(col.fixed) { th.textContent=col.label; } else {
                     th.draggable=true; th.ondragstart=(e)=>tDStart(e,i); th.ondragover=(e)=>{e.preventDefault(); e.target.closest('th').classList.add('drag-over'); return false;}; th.ondragleave=(e)=>e.target.closest('th').classList.remove('drag-over'); th.ondrop=(e)=>tDDrop(e,i); th.ondragend=(e)=>e.target.classList.remove('opacity-50');
-                    th.innerHTML = `<input type="text" value="${col.label}" onchange="tCols[${i}].label=this.value" class="bg-transparent font-medium text-gray-400 focus:text-white focus:outline-none w-full cursor-pointer focus:cursor-text text-sm">`;
-                    const r = document.createElement('div'); r.className='resizer'; r.onmousedown=(e)=>initTRes(e,th,i); th.appendChild(r);
+                    th.innerHTML = `<div class="flex items-center gap-1"><input type="text" value="${col.label}" onchange="tCols[${i}].label=this.value" class="bg-transparent font-medium text-gray-400 focus:text-white focus:outline-none flex-1 min-w-0 cursor-pointer focus:cursor-text text-sm"><button type="button" title="Sort by this column" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation(); sortTaskBy('${col.id}')" class="shrink-0 text-xs px-0.5 ${tSortCol===col.id?'text-corp-300':'text-gray-600 hover:text-gray-300'}">${tSortCol===col.id?(tSortDir==='asc'?'▲':'▼'):'⇅'}</button></div>`;
+                    const r = document.createElement('div'); r.className='resizer'; r.onpointerdown=(e)=>initTRes(e,th,i); th.appendChild(r);
                 } head.appendChild(th);
             });
 
             const fTxt = (document.getElementById('task-search-filter').value || '').toLowerCase();
             let dTs = tDB.filter(t => t.name.toLowerCase().includes(fTxt) || t.client_name.toLowerCase().includes(fTxt) || t.category.toLowerCase().includes(fTxt) || t.status.toLowerCase().includes(fTxt) || (t.tags&&t.tags.join(' ').toLowerCase().includes(fTxt)));
-            dTs.sort((a,b) => tSortAsc ? new Date(a.date)-new Date(b.date) : new Date(b.date)-new Date(a.date));
-            
-            const gTs = {}; dTs.forEach(t => { const my = new Date(t.date).toLocaleString('en-US', {month:'long', year:'numeric'}); if(!gTs[my]) gTs[my]=[]; gTs[my].push(t); });
+            const gTs = {};
+            if (tSortCol) { dTs.sort((a,b)=>compareRows(a,b,tSortCol,tSortDir,'task')); gTs['__sorted__'] = dTs; }
+            else { dTs.sort((a,b) => tSortAsc ? new Date(a.date)-new Date(b.date) : new Date(b.date)-new Date(a.date)); dTs.forEach(t => { const my = new Date(t.date).toLocaleString('en-US', {month:'long', year:'numeric'}); if(!gTs[my]) gTs[my]=[]; gTs[my].push(t); }); }
             const list = document.getElementById('task-list'); list.innerHTML='';
             if(Object.keys(gTs).length===0) { list.innerHTML=`<tr><td colspan="${tCols.length}" class="p-4 text-center text-gray-500 italic text-sm">No tasks found.</td></tr>`; return; }
 
             Object.keys(gTs).forEach(m => {
-                list.innerHTML += `<tr class="bg-corp-800 border-b border-corp-700 select-none"><td colspan="${tCols.length}" class="p-3 font-semibold text-corp-400 text-sm tracking-wide">🗓 ${m}</td></tr>`;
+                list.innerHTML += `<tr class="bg-corp-800 border-b border-corp-700 select-none"><td colspan="${tCols.length}" class="p-3 font-semibold text-corp-400 text-sm tracking-wide">${m==='__sorted__' ? ('↕ Sorted by ' + ((tCols.find(c=>c.id===tSortCol)||{}).label||'') + ' ' + (tSortDir==='asc'?'ascending':'descending') + '. Tap the arrow again to clear.') : ('🗓 ' + m)}</td></tr>`;
                 gTs[m].forEach(t => {
                     const tr = document.createElement('tr'); tr.className = `hover:bg-corp-800/80 transition border-b border-corp-700 ${t.done?'opacity-50':''}`;
                     tCols.forEach(c => {
@@ -1850,7 +2018,7 @@
             folders.forEach(f => {
                 const fNotes = notesDB.filter(n => n.folderId === f.id);
                 sb.innerHTML += `<div class="folder-dropzone rounded-lg pb-2 transition" ondragover="dragOverFolder(event)" ondragleave="dragLeaveFolder(event)" ondrop="dropNoteOnFolder(event, '${f.id}')">
-                    <div class="flex items-center justify-between mt-3 mb-2 px-2 group"><input type="text" value="${f.name}" onchange="updateFolder('${f.id}', this.value)" class="bg-transparent text-xs font-bold text-gray-400 hover:text-gray-200 focus:text-white uppercase tracking-wider focus:outline-none w-full mr-2 transition"><button onclick="createNote('${f.id}')" title="Add Note to ${f.name}" class="text-gray-500 hover:text-corp-400 opacity-100 lg:opacity-0 group-hover:opacity-100 transition text-lg leading-none">+</button></div>
+                    <div class="flex items-center justify-between mt-3 mb-2 px-2 group"><input type="text" value="${f.name}" onchange="updateFolder('${f.id}', this.value)" class="bg-transparent text-xs font-bold text-gray-400 hover:text-gray-200 focus:text-white uppercase tracking-wider focus:outline-none w-full mr-2 transition"><button onclick="createNote('${f.id}')" title="Add Note to ${f.name}" class="text-gray-500 hover:text-corp-400 opacity-100 lg:opacity-0 group-hover:opacity-100 transition text-lg leading-none">+</button><button onclick="delFolder('${f.id}')" title="Delete folder" class="text-gray-500 hover:text-red-400 opacity-100 lg:opacity-0 group-hover:opacity-100 transition text-base leading-none ml-1">✕</button></div>
                     ${fNotes.length === 0 ? `<div class="text-xs text-gray-600 italic px-4 py-1">Empty</div>` : fNotes.map(n => {
                         const isActive = n.id === activeNoteId;
                         return `<button draggable="true" ondragstart="dragNoteStart(event, '${n.id}')" onclick="openNote('${n.id}')" class="w-full text-left px-4 py-2 text-sm rounded-md truncate transition cursor-grab active:cursor-grabbing ${isActive ? 'bg-corp-600/20 text-corp-400 font-medium' : 'text-gray-300 hover:bg-corp-700'}">📄 ${n.title || 'Untitled Note'}</button>`;
@@ -1859,6 +2027,27 @@
             });
             if(!activeNoteId) { document.getElementById('no-note-screen').classList.remove('hidden'); document.getElementById('editor-container').classList.add('hidden'); } 
             else { document.getElementById('no-note-screen').classList.add('hidden'); document.getElementById('editor-container').classList.remove('hidden'); }
+            const nf = document.getElementById('notes-flex'); if (nf) nf.classList.toggle('editing', !!activeNoteId);
+        }
+
+        // On a phone, step back from an open note to the full screen folder list.
+        function backToFolders() { activeNoteId = null; renderNotesSidebar(); }
+
+        function delFolder(id) {
+            const idx = folders.findIndex(f => f.id === id); if (idx === -1) return;
+            const removedFolder = folders[idx];
+            const removedNotes = notesDB.filter(n => n.folderId === id);
+            folders.splice(idx, 1);
+            notesDB = notesDB.filter(n => n.folderId !== id);
+            if (removedNotes.some(n => n.id === activeNoteId)) activeNoteId = null;
+            renderNotesSidebar(); scheduleSave();
+            const noteWord = removedNotes.length === 1 ? 'note' : 'notes';
+            showToast(`Folder deleted with its ${removedNotes.length} ${noteWord}.`, 'warning', { persist: true, actionLabel: 'Undo', onAction: () => {
+                folders.splice(Math.min(idx, folders.length), 0, removedFolder);
+                removedNotes.forEach(n => notesDB.push(n));
+                renderNotesSidebar(); scheduleSave();
+                showToast('Folder restored.', 'success');
+            } });
         }
 
         function dragNoteStart(e, noteId) { e.dataTransfer.setData("text/plain", noteId); e.dataTransfer.effectAllowed = "move"; }
@@ -1870,12 +2059,17 @@
             if (note && note.folderId !== folderId) { note.folderId = folderId; saveNoteState(); }
         }
 
-        function addFolder() { const newName = prompt("Enter new folder name:"); if(newName && newName.trim() !== "") { folders.push({ id: 'f_' + Date.now(), name: '📁 ' + newName }); renderNotesSidebar(); } }
+        function addFolder() { showPrompt('Name your new folder', { title: 'New folder', placeholder: 'Folder name', confirmLabel: 'Create', onSubmit: (newName) => { if (newName) { folders.push({ id: 'f_' + Date.now(), name: '📁 ' + newName }); renderNotesSidebar(); scheduleSave(); } } }); }
         function updateFolder(id, newName) { const f = folders.find(x => x.id === id); if(f) { f.name = newName; renderNotesSidebar(); renderHomeWidgets(); } }
         function createNote(folderId) { const newId = 'n_' + Date.now(); notesDB.push({ id: newId, folderId: folderId, title: '', content: '' }); openNote(newId); }
         function openNote(id) { activeNoteId = id; const note = notesDB.find(n => n.id === id); if(!note) return; document.getElementById('note-title').value = note.title; const folder = folders.find(f => f.id === note.folderId); document.getElementById('note-folder-badge').innerText = folder ? folder.name : 'Unsorted'; document.getElementById('note-editor').innerHTML = note.content; renderNotesSidebar(); }
         function saveNoteState() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(note) { note.title = document.getElementById('note-title').value; note.content = document.getElementById('note-editor').innerHTML; renderNotesSidebar(); const status = document.getElementById('save-status'); status.innerHTML = `<span class="text-corp-400">Saving...</span>`; setTimeout(() => { status.innerHTML = `<i>✔</i> Auto-saved locally`; }, 400); } }
-        function deleteCurrentNote() { if(!activeNoteId) return; if(!confirm("Are you sure you want to delete this note?")) return; notesDB = notesDB.filter(n => n.id !== activeNoteId); activeNoteId = null; renderNotesSidebar(); }
+        function deleteCurrentNote() {
+            if(!activeNoteId) return;
+            const idx = notesDB.findIndex(n => n.id === activeNoteId); if (idx === -1) return;
+            const removed = notesDB[idx]; notesDB.splice(idx, 1); activeNoteId = null; renderNotesSidebar();
+            showToast('Note deleted.', 'warning', { persist: true, actionLabel: 'Undo', onAction: () => { notesDB.splice(Math.min(idx, notesDB.length), 0, removed); renderNotesSidebar(); showToast('Note restored.', 'success'); } });
+        }
         function handleEditorShortcuts(e) { if(e.code === 'Space') { const sel = window.getSelection(); if (!sel.rangeCount) return; const node = sel.anchorNode; if(node.nodeType === 3 && node.textContent.endsWith('[ ]')) { e.preventDefault(); node.textContent = node.textContent.slice(0, -3); const range = sel.getRangeAt(0); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)'); const span = document.createElement('span'); span.className = 'task-text'; span.innerHTML = '&#8203;'; range.insertNode(span); range.insertNode(cb); range.setStart(span, 1); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); saveNoteState(); } } }
         function toggleNoteTask(cb) { if(cb.nextSibling && cb.nextSibling.classList.contains('task-text')) { if(cb.checked) { cb.nextSibling.style.textDecoration = 'line-through'; cb.nextSibling.style.opacity = '0.5'; } else { cb.nextSibling.style.textDecoration = 'none'; cb.nextSibling.style.opacity = '1'; } } const taskId = cb.getAttribute('data-task-id'); if(taskId) { const t = tDB.find(x => x.id == taskId); if(t) { t.done = cb.checked; t.status = t.done ? 'Done' : 'Not started'; renderTaskTable(); renderHomeWidgets(); } } saveNoteState(); }
         function syncTasksToApp() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(!note) return; const editor = document.getElementById('note-editor'); const checkboxes = editor.querySelectorAll('.note-cb'); let count = 0; checkboxes.forEach(cb => { if(!cb.hasAttribute('data-task-id')) { const textNode = cb.nextSibling; const taskName = textNode ? textNode.textContent.replace(/\u200B/g, '').trim() : ''; if(taskName) { const newTaskId = Date.now() + count; cb.setAttribute('data-task-id', newTaskId); tDB.push({ id: newTaskId, name: taskName, client_name: note.title || "Note Sync", category: "Work", date: todayISO().split('T')[0], status: cb.checked ? "Done" : "Not started", recurring: false, done: cb.checked, tags: [], customData: {} }); count++; } } }); saveNoteState(); if(count > 0) { showToast(`Synced ${count} new action item${count > 1 ? 's' : ''} to your Task Tracker.`, 'success'); renderTaskTable(); renderHomeWidgets(); } else { showToast('No new unsynced to-dos found. Type "[ ] " and a space to create a task.', 'info'); } }
@@ -1929,6 +2123,7 @@
             return {
                 accounts, transactionsDB, recDB, recCols, tDB, tCols,
                 notesDB, folders, docsDB, userBudget, security, profile,
+                isPrivate, scratchDraft,
                 savedAt: new Date().toISOString()
             };
         }
@@ -1951,6 +2146,10 @@
             if (d.profile && typeof d.profile === 'object') {
                 profile = Object.assign({ name: '', photo: '', useCustomName: false, useCustomPhoto: false, googleName: '', googleEmail: '', googlePhoto: '' }, d.profile);
             }
+            if (typeof d.isPrivate === 'boolean') isPrivate = d.isPrivate;
+            if (typeof d.scratchDraft === 'string') scratchDraft = d.scratchDraft;
+            applyPrivacyUI();
+            applyScratchDraft();
             populateModeDropdown();
             renderAccounts(); renderRecTable(); renderTaskTable(); renderDocs();
             renderNotesSidebar(); renderCashflowAnalytics(); renderHomeWidgets();
@@ -1995,8 +2194,28 @@
         }
 
         // ----- Google Drive engine (adapted from the supplied study.html) -----
+        // Remember where the backup lives so future sign ins skip the folder search.
+        function rememberDrive() {
+            try { if (driveFileId) localStorage.setItem('rishab_drive', JSON.stringify({ folderId: driveFolderId, fileId: driveFileId })); } catch (e) {}
+        }
+
         async function initializeCloudSync() {
             const headers = { Authorization: `Bearer ${googleToken}` };
+
+            // Fast path: if we remember the backup file, download it straight away.
+            try {
+                const cached = JSON.parse(localStorage.getItem('rishab_drive') || 'null');
+                if (cached && cached.fileId) {
+                    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${cached.fileId}?alt=media`, { headers });
+                    if (res.ok) {
+                        const data = await res.json();
+                        driveFolderId = cached.folderId || null;
+                        driveFileId = cached.fileId;
+                        if (data && typeof data === 'object') { applyState(data); persistLocal(); lastSyncedJSON = JSON.stringify(collectState()); }
+                        return;
+                    }
+                }
+            } catch (e) { /* fall through to the full search */ }
 
             // Find or create the Rishab OS folder.
             const fQ = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent("name='" + DRIVE_FOLDER + "' and mimeType='application/vnd.google-apps.folder' and trashed=false")}&fields=files(id)`, { headers });
@@ -2016,6 +2235,7 @@
             const bData = await bQ.json();
             if (bData.files && bData.files.length > 0) {
                 driveFileId = bData.files[0].id;
+                rememberDrive();
                 const cloudRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, { headers });
                 const cloudData = await cloudRes.json();
                 if (cloudData && typeof cloudData === 'object') {
@@ -2081,6 +2301,7 @@
                     driveFileId = data.id;
                     lastSyncedJSON = payload;
                     cloudPaused = false;
+                    rememberDrive();
                     setSyncStatus('Saved ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
                 }
             } catch (e) {
@@ -2120,7 +2341,7 @@
                     cloudPaused = false;
                     localStorage.setItem('rishab_cloud', 'true');
                     const firstStart = !appStarted;
-                    if (authMode === 'interactive' && firstStart) revealApp();
+                    if (authMode === 'interactive' && firstStart) showAuthLoading();
                     fetchGoogleProfile();   // fills in name, email and photo when the profile scope is granted
                     await finalizeCloud(firstStart);
                 }
@@ -2187,24 +2408,36 @@
                 }
                 if (typeof renderSettings === 'function') renderSettings();
                 if (typeof renderProfile === 'function') renderProfile();
-                // The lock only appears on the very first interactive sign in, never on a refresh or a reconnect.
+                // First interactive sign in: reveal only once data is ready, and place the lock
+                // in front first so the dashboard never appears unlocked. Refresh and reconnect are untouched.
                 if (pendingAfterAuth) { const f = pendingAfterAuth; pendingAfterAuth = null; try { f(); } catch (e) {} }
-                else if (firstStart && authMode === 'interactive' && security.pinEnabled) showLock();
+                else if (firstStart && authMode === 'interactive') {
+                    if (security.pinEnabled) { showLock(); revealApp(); }
+                    else { revealApp(); }
+                }
                 lastActivity = Date.now();
                 runPendingAction();
             }
         }
 
+        // While the first sign in loads your data from Drive, hold a calm loading note
+        // on the sign in screen rather than revealing the dashboard.
+        function showAuthLoading() {
+            const btn = document.getElementById('signin-btn'); if (btn) btn.classList.add('hidden');
+            const note = document.getElementById('signin-note'); if (note) note.classList.add('hidden');
+            const load = document.getElementById('auth-loading'); if (load) { load.classList.remove('hidden'); load.classList.add('flex'); }
+        }
+
         function logout() {
-            if (!confirm('Log out and lock this workspace on this device? Your data stays safe in your Google Drive and returns when you sign in again.')) return;
-            try { if (googleToken && window.google && google.accounts && google.accounts.oauth2) google.accounts.oauth2.revoke(googleToken, () => {}); } catch (e) {}
-            locked = false;
-            // Wipe the local cache so a shared computer keeps nothing. Drive remains the trusted source.
-            localStorage.removeItem(LOCAL_KEY);
-            localStorage.removeItem('rishab_cloud');
-            localStorage.removeItem('rishab_budget');
-            googleToken = null;
-            location.reload();
+            showConfirm('Log out and lock this workspace on this device? Your data stays safe in your Google Drive and returns when you sign in again.', { title: 'Log out', confirmLabel: 'Log out', danger: true, onConfirm: () => {
+                try { if (googleToken && window.google && google.accounts && google.accounts.oauth2) google.accounts.oauth2.revoke(googleToken, () => {}); } catch (e) {}
+                locked = false;
+                localStorage.removeItem(LOCAL_KEY);
+                localStorage.removeItem('rishab_cloud');
+                localStorage.removeItem('rishab_budget');
+                googleToken = null;
+                location.reload();
+            } });
         }
 
         // ----- Theme control -----
@@ -2287,7 +2520,8 @@
             return app && !app.classList.contains('hidden') && auth && auth.classList.contains('hidden');
         }
 
-        function showLock() {
+        function showLock(opts) {
+            opts = opts || {};
             if (!security.pinEnabled || locked) return;
             locked = true;
             const ls = document.getElementById('lock-screen');
@@ -2297,14 +2531,15 @@
             if (inp) { inp.disabled = false; inp.value = ''; updateLockDots(0); }
             const msg = document.getElementById('lock-msg');
             if (msg) { msg.textContent = 'Enter your six digit PIN'; msg.classList.remove('text-red-400'); }
-            // Offer fingerprint first when this device has it registered. The PIN stays available beneath.
+            const reg = fingerprintRegistered();
             const fpWrap = document.getElementById('lock-fp-wrap');
-            if (fpWrap) fpWrap.classList.toggle('hidden', !fingerprintRegistered());
-            if (fingerprintRegistered()) {
-                if (msg) msg.textContent = 'Use your fingerprint, or enter your PIN';
-                setTimeout(() => { tryFingerprintUnlock(true); }, 200);
+            if (fpWrap) fpWrap.classList.toggle('hidden', !reg);
+            if (reg && msg) msg.textContent = 'Use your fingerprint, or enter your PIN';
+            // Only raise the fingerprint sheet automatically when a tap brought us here.
+            if (reg && opts.gesture) {
+                setTimeout(() => { tryFingerprintUnlock(true); }, 150);
             } else {
-                setTimeout(() => { if (inp) inp.focus(); }, 50);
+                setTimeout(() => { if (inp) inp.focus(); }, 60);
             }
         }
 
@@ -2381,14 +2616,15 @@
         }
 
         function forgotPin() {
-            if (!confirm('Reset your PIN by confirming your Google sign in? You can set a new PIN afterwards in Settings.')) return;
-            const finishReset = () => { disablePin(); hideLock(); switchTab('settings'); showToast('PIN reset. Please set a new PIN in Settings, under Security.', 'info'); };
-            authMode = 'interactive';
-            whenGoogleReady(() => {
-                initTokenClientOnce();
-                pendingAfterAuth = finishReset;
-                tokenClient.requestAccessToken();
-            });
+            showConfirm('Reset your PIN by confirming your Google sign in? You can set a new PIN afterwards in Settings.', { title: 'Reset PIN', confirmLabel: 'Continue', onConfirm: () => {
+                const finishReset = () => { disablePin(); hideLock(); switchTab('settings'); showToast('PIN reset. Please set a new PIN in Settings, under Security.', 'info'); };
+                authMode = 'interactive';
+                whenGoogleReady(() => {
+                    initTokenClientOnce();
+                    pendingAfterAuth = finishReset;
+                    tokenClient.requestAccessToken();
+                });
+            } });
         }
 
         // The lock now appears only on the first interactive sign in, on idle timeout, or on the Lock button.
@@ -2478,12 +2714,11 @@
             showToast('Your PIN is set. It will be asked at sign in, after the idle time you chose, and on Lock.', 'success');
         }
         function turnOffPin() {
-            if (!confirm('Turn off the PIN lock? Anyone with access to your signed in device will be able to open the workspace.')) return;
-            disablePin();
+            showConfirm('Turn off the PIN lock? Anyone with access to your signed in device will be able to open the workspace.', { title: 'Turn off PIN', confirmLabel: 'Turn off', danger: true, onConfirm: () => disablePin() });
         }
         function lockNow() {
             if (!security.pinEnabled) { showToast('Set a PIN first in Settings, under Security, then you can lock the workspace.', 'info'); switchTab('settings'); return; }
-            showLock();
+            showLock({ gesture: true });
         }
 
         // ==========================================================
