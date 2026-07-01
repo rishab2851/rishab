@@ -430,6 +430,7 @@
                         <div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1">Account Name</label><input type="text" id="acc-name" required class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
                         <div class="w-full sm:w-48"><label class="block text-xs text-gray-400 mb-1">Type</label><select id="acc-type" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"><option value="asset">Asset (Bank/Investment)</option><option value="liability">Liability (Credit Card/Loan)</option></select></div>
                         <div class="w-full sm:w-48"><label class="block text-xs text-gray-400 mb-1">Balance (₹)</label><input type="number" id="acc-balance" required class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
+                        <div class="w-full sm:w-44"><label class="block text-xs text-gray-400 mb-1">Group (optional)</label><input type="text" id="acc-group" placeholder="e.g. Mutual Funds" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
                         <button type="submit" class="w-full sm:w-auto bg-corp-600 hover:bg-corp-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition h-[38px] shadow">Add</button>
                     </form>
                 </div>
@@ -489,7 +490,6 @@
                     </div>
                 </div>
 
-                <div id="month-review" class="bg-corp-800 border border-corp-700 rounded-2xl p-5 md:p-6 mb-6"></div>
 
                 <div class="flex gap-6 flex-col lg:flex-row">
                     
@@ -546,10 +546,11 @@
                 <div class="bg-corp-800 rounded-xl p-5 border border-corp-700 mb-6 shadow-lg">
                     <form id="rec-form" class="flex flex-col md:flex-row flex-wrap gap-4 items-end" onsubmit="addRecurring(event)">
                         <div class="flex-1 w-full min-w-[150px]"><label class="block text-xs text-gray-400 mb-1">Bill / Subscription</label><input type="text" id="rec-name" required class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
-                        <div class="w-full md:w-32"><label class="block text-xs text-gray-400 mb-1">Type</label><select id="rec-type" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"><option>Rent</option><option>Utility</option><option>Subscription</option><option>Investments</option><option>Credit card</option></select></div>
+                        <div class="w-full md:w-32"><label class="block text-xs text-gray-400 mb-1">Type</label><select id="rec-type" onchange="toggleRecDest()" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"><option>Rent</option><option>Utility</option><option>Subscription</option><option>Investments</option><option>Credit card</option></select></div>
                         <div class="w-full md:w-28"><label class="block text-xs text-gray-400 mb-1">Amount (₹)</label><input type="number" id="rec-amount" required class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
                         <div class="w-full md:w-36"><label class="block text-xs text-gray-400 mb-1">Due Date</label><input type="date" id="rec-date" required class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
                         <div class="w-full md:w-36"><label class="block text-xs text-gray-400 mb-1">Mode</label><select id="rec-mode" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div>
+                        <div id="rec-dest-wrap" class="w-full md:w-40 hidden"><label class="block text-xs text-gray-400 mb-1">Invest into</label><select id="rec-dest" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div>
                         <div class="w-full md:w-36"><label class="block text-xs text-gray-400 mb-1">Tags</label><input type="text" id="rec-tags-input" placeholder="e.g. Housing" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
                         <button type="submit" class="w-full md:w-auto bg-corp-600 hover:bg-corp-500 text-white px-5 py-2 rounded-lg text-sm font-medium h-[38px] shadow transition">Add</button>
                     </form>
@@ -750,6 +751,39 @@
             class="fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full bg-corp-600 hover:bg-corp-500 active:scale-95 text-white shadow-2xl flex items-center justify-center transition">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         </button>
+    </div>
+
+    <div id="kebab-menu" class="hidden fixed z-[175] bg-corp-800 border border-corp-700 rounded-xl shadow-2xl py-1 min-w-[190px]"></div>
+
+    <div id="group-panel" class="hidden fixed inset-0 z-[130] flex justify-end">
+        <div class="absolute inset-0 bg-corp-900/70 backdrop-blur-sm" onclick="closeGroupPanel()"></div>
+        <div class="relative w-full max-w-md h-full bg-corp-800 border-l border-corp-700 shadow-2xl flex flex-col">
+            <div class="p-5 border-b border-corp-700 flex items-center justify-between">
+                <div><h3 id="group-panel-title" class="text-lg font-bold text-white">Group</h3><p id="group-panel-sub" class="text-xs text-gray-400"></p></div>
+                <button onclick="closeGroupPanel()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <div id="group-panel-list" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+            <div class="p-4 border-t border-corp-700">
+                <div class="flex items-center justify-between mb-3"><span class="text-sm text-gray-400">Total</span><span id="group-panel-total" class="text-lg font-bold text-white">₹ 0</span></div>
+                <button onclick="addHoldingToGroup()" class="w-full bg-corp-600 hover:bg-corp-500 text-white py-2 rounded-lg text-sm font-medium transition">+ Add holding to this group</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="acct-tx-panel" class="hidden fixed inset-0 z-[130] flex justify-end">
+        <div class="absolute inset-0 bg-corp-900/70 backdrop-blur-sm" onclick="closeAccountTx()"></div>
+        <div class="relative w-full max-w-md h-full bg-corp-800 border-l border-corp-700 shadow-2xl flex flex-col">
+            <div class="p-5 border-b border-corp-700 flex items-center justify-between">
+                <div><h3 id="acct-tx-title" class="text-lg font-bold text-white">Account</h3><p id="acct-tx-sub" class="text-xs text-gray-400"></p></div>
+                <button onclick="closeAccountTx()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <div class="px-5 py-3 border-b border-corp-700 flex gap-3">
+                <div class="flex-1 bg-corp-900 rounded-lg border border-corp-700 p-2 text-center"><div class="text-[10px] text-gray-400 uppercase tracking-wide">In</div><div id="acct-tx-in" class="text-sm font-bold text-green-400">₹ 0</div></div>
+                <div class="flex-1 bg-corp-900 rounded-lg border border-corp-700 p-2 text-center"><div class="text-[10px] text-gray-400 uppercase tracking-wide">Out</div><div id="acct-tx-out" class="text-sm font-bold text-red-400">₹ 0</div></div>
+                <button onclick="exportAccountTxCSV()" class="shrink-0 self-center text-xs bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-2 rounded-lg transition" title="Export this account">📥 CSV</button>
+            </div>
+            <div id="acct-tx-list" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+        </div>
     </div>
 
     <div id="app-dialog" class="hidden fixed inset-0 z-[170] flex items-center justify-center p-4 bg-corp-900/80 backdrop-blur-sm">
@@ -1032,7 +1066,7 @@
         function togglePrivacy() {
             isPrivate = !isPrivate;
             applyPrivacyUI();
-            renderAccounts(); renderRecTable(); renderCashflowAnalytics(false); renderHomeWidgets();
+            renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets();
             scheduleSave();
         }
         // Keep the eye indicator in step with the privacy state, on toggle and after a refresh.
@@ -1059,7 +1093,7 @@
         // ==========================================
         let accounts = [];
 
-        function addAccount(e) { e.preventDefault(); accounts.push({ id: 'acc_' + Date.now(), name: document.getElementById('acc-name').value, type: document.getElementById('acc-type').value, balance: Number(document.getElementById('acc-balance').value) }); document.getElementById('finance-form').reset(); renderAccounts(); populateModeDropdown(); }
+        function addAccount(e) { e.preventDefault(); const grp = (document.getElementById('acc-group').value || '').trim(); accounts.push({ id: 'acc_' + Date.now(), name: document.getElementById('acc-name').value, type: document.getElementById('acc-type').value, balance: Number(document.getElementById('acc-balance').value), group: grp }); document.getElementById('finance-form').reset(); renderAccounts(); populateModeDropdown(); scheduleSave(); }
         function updateAccount(id, field, value) { const acc = accounts.find(a => a.id === id); if(acc) acc[field] = field === 'balance' ? Number(value) : value; renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
         function delAccount(id) {
             const idx = accounts.findIndex(a => a.id === id); if (idx === -1) return;
@@ -1077,17 +1111,35 @@
             });
         }
         
+        function accountRowHTML(a) {
+            const color = a.type === 'asset' ? 'green' : 'red';
+            return `<td class="p-2 border-r border-corp-700"><div class="px-1 text-sm font-medium text-gray-200 truncate">${esc(a.name)}</div></td>`
+                + `<td class="p-2 w-32"><div class="text-${color}-400 px-1 text-sm font-bold">₹ ${formatMoney(a.balance)}</div></td>`
+                + `<td class="p-2 w-8 text-center"><button onclick="accountKebab(event,'${a.id}')" class="text-gray-500 hover:text-white transition leading-none px-1 text-lg" title="Options">⋮</button></td>`;
+        }
+        function renderAccountList(listEl, accs, type) {
+            const groups = {}; const singles = [];
+            accs.forEach(a => { if (a.group && a.group.trim()) { const k = a.group.trim(); (groups[k] = groups[k] || []).push(a); } else singles.push(a); });
+            singles.forEach(a => { const tr = document.createElement('tr'); tr.innerHTML = accountRowHTML(a); listEl.appendChild(tr); });
+            const color = type === 'asset' ? 'green' : 'red';
+            Object.keys(groups).forEach(g => {
+                const total = groups[g].reduce((s, x) => s + Number(x.balance), 0);
+                const tr = document.createElement('tr'); tr.className = 'cursor-pointer hover:bg-corp-800/70 transition';
+                tr.onclick = () => openGroupPanel(g, type);
+                tr.innerHTML = `<td class="p-2 border-r border-corp-700"><div class="px-1 text-sm font-semibold text-gray-100 flex items-center gap-2">📊 ${esc(g)} <span class="text-[10px] text-gray-500 font-normal">${groups[g].length} holding${groups[g].length > 1 ? 's' : ''}</span></div></td><td class="p-2 w-32"><div class="text-${color}-400 px-1 text-sm font-bold">₹ ${formatMoney(total)}</div></td><td class="p-2 w-8 text-center"><span class="text-corp-400 text-lg leading-none">›</span></td>`;
+                listEl.appendChild(tr);
+            });
+        }
         function renderAccounts() {
             let ast = 0, liab = 0; const alist = document.getElementById('asset-list'); const llist = document.getElementById('liability-list'); alist.innerHTML = ''; llist.innerHTML = '';
-            accounts.forEach(a => {
-                if(a.type === 'asset') ast += a.balance; else liab += a.balance;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="p-2 border-r border-corp-700"><input type="text" value="${a.name}" onchange="updateAccount('${a.id}', 'name', this.value)" class="bg-transparent text-gray-200 focus:text-white border-none focus:outline-none w-full px-1 text-sm font-medium"></td><td class="p-2 w-32"><div class="flex items-center text-${a.type==='asset'?'green':'red'}-400">₹ <input type="${isPrivate?'password':'number'}" value="${a.balance}" onchange="updateAccount('${a.id}', 'balance', this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm font-bold text-inherit" ${isPrivate?'disabled':''}></div></td><td class="p-2 w-8 text-center"><button onclick="delAccount('${a.id}')" class="text-gray-600 hover:text-red-400 transition leading-none" title="Delete this account">✕</button></td>`;
-                if(a.type === 'asset') alist.appendChild(tr); else llist.appendChild(tr);
-            });
+            accounts.forEach(a => { if (a.type === 'asset') ast += a.balance; else liab += a.balance; });
+            renderAccountList(alist, accounts.filter(a => a.type === 'asset'), 'asset');
+            renderAccountList(llist, accounts.filter(a => a.type === 'liability'), 'liability');
             if (!alist.children.length) alist.innerHTML = `<tr><td class="p-4 text-sm text-gray-500 italic">No accounts yet. Add your first bank or wallet using the form above.</td></tr>`;
             if (!llist.children.length) llist.innerHTML = `<tr><td class="p-4 text-sm text-gray-500 italic">No liabilities yet. Add a credit card or a loan above to track it here.</td></tr>`;
             document.getElementById('calc-assets').innerText = `₹ ${formatMoney(ast)}`; document.getElementById('calc-liabilities').innerText = `₹ ${formatMoney(liab)}`; document.getElementById('calc-networth').innerText = `₹ ${formatMoney(ast - liab)}`;
+            if (openGroupKey) refreshGroupPanel();
+            if (acctTxId) renderAccountTx();
         }
 
         function processTransaction(item, isReversal) {
@@ -1096,7 +1148,7 @@
             if(!isReversal && acc.type === 'asset' && acc.balance < amt) { showToast(`Insufficient funds in ${acc.name}. Requires ₹${formatMoney(amt)}, available ₹${formatMoney(acc.balance)}.`, 'warning'); return false; }
             
             if(acc.type === 'asset') acc.balance -= amt; else acc.balance += amt; 
-            if(item.type === 'Investments') { let mf = accounts.find(a => a.name.toLowerCase().includes('mutual')); if(mf) mf.balance += amt; } else if (item.type === 'Credit card') { let cc = accounts.find(a => a.name === item.name); if(cc) cc.balance -= amt; }
+            if(item.type === 'Investments') { let dest = item.destId ? accounts.find(a => a.id === item.destId) : accounts.find(a => a.name.toLowerCase().includes('mutual')); if(dest) dest.balance += amt; } else if (item.type === 'Credit card') { let cc = accounts.find(a => a.name === item.name); if(cc) cc.balance -= amt; }
             return true;
         }
 
@@ -1142,6 +1194,157 @@
             inp.onkeydown = (e) => { if (e.key === 'Enter') submit(); };
             dlg.classList.remove('hidden');
             setTimeout(() => inp.focus(), 50);
+        }
+
+        // ----- Small HTML escaper for values shown as plain text -----
+        function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+        // ----- Three dots menu (one shared popover) -----
+        function openKebab(ev, actions) {
+            ev.stopPropagation();
+            const menu = document.getElementById('kebab-menu');
+            menu.innerHTML = '';
+            actions.forEach(a => {
+                if (a.divider) { const d = document.createElement('div'); d.className = 'my-1 border-t border-corp-700'; menu.appendChild(d); return; }
+                const b = document.createElement('button');
+                b.className = `w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition ${a.danger ? 'text-red-400 hover:bg-red-900/20' : 'text-gray-200 hover:bg-corp-700'}`;
+                b.innerHTML = `<span class="w-4 text-center shrink-0">${a.icon || ''}</span><span>${a.label}</span>`;
+                b.onclick = (e) => { e.stopPropagation(); closeKebab(); if (a.onClick) a.onClick(); };
+                menu.appendChild(b);
+            });
+            const trigger = ev.currentTarget || ev.target;
+            const rect = trigger.getBoundingClientRect();
+            menu.classList.remove('hidden');
+            const mw = menu.offsetWidth, mh = menu.offsetHeight;
+            let left = rect.right - mw; if (left < 8) left = 8;
+            let top = rect.bottom + 4;
+            if (top + mh > window.innerHeight - 8) top = Math.max(8, rect.top - mh - 4);
+            menu.style.left = left + 'px'; menu.style.top = top + 'px';
+        }
+        function closeKebab() { const m = document.getElementById('kebab-menu'); if (m) m.classList.add('hidden'); }
+        document.addEventListener('click', () => closeKebab());
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeKebab(); } });
+
+        function accountKebab(ev, id) {
+            const acc = accounts.find(a => a.id === id); if (!acc) return;
+            openKebab(ev, [
+                { label: 'Rename', icon: '✏️', onClick: () => showPrompt('Rename this account', { title: 'Rename account', value: acc.name, confirmLabel: 'Save', onSubmit: v => { if (v) { updateAccount(id, 'name', v); scheduleSave(); } } }) },
+                { label: 'Edit balance', icon: '₹', onClick: () => showPrompt('Update the balance', { title: 'Edit balance', value: String(acc.balance), confirmLabel: 'Save', onSubmit: v => { if (v !== '') { updateAccount(id, 'balance', v); scheduleSave(); } } }) },
+                { label: 'Set group', icon: '🗂️', onClick: () => showPrompt('Group label, for example Mutual Funds or Shares. Leave blank for none.', { title: 'Account group', value: acc.group || '', placeholder: 'Group label', confirmLabel: 'Save', onSubmit: v => { acc.group = (v || '').trim(); renderAccounts(); scheduleSave(); } }) },
+                { label: 'View transactions', icon: '📄', onClick: () => openAccountTransactions(id) },
+                { divider: true },
+                { label: 'Delete', icon: '🗑️', danger: true, onClick: () => delAccount(id) }
+            ]);
+        }
+
+        function recHeaderKebab(ev, i) {
+            const col = recCols[i]; if (!col) return;
+            const actions = [
+                { label: 'Rename', icon: '✏️', onClick: () => showPrompt('Rename this column', { title: 'Rename column', value: col.label, confirmLabel: 'Save', onSubmit: v => { if (v) { recCols[i].label = v; renderRecTable(); scheduleSave(); } } }) },
+                { label: 'Sort ascending', icon: '▲', onClick: () => { recSortCol = col.id; recSortDir = 'asc'; renderRecTable(); } },
+                { label: 'Sort descending', icon: '▼', onClick: () => { recSortCol = col.id; recSortDir = 'desc'; renderRecTable(); } },
+                { label: 'Clear sort', icon: '↕', onClick: () => { recSortCol = null; renderRecTable(); } }
+            ];
+            if (col.isCustom) { actions.push({ divider: true }); actions.push({ label: 'Delete column', icon: '🗑️', danger: true, onClick: () => { recCols.splice(i, 1); renderRecTable(); scheduleSave(); } }); }
+            openKebab(ev, actions);
+        }
+
+        function taskHeaderKebab(ev, i) {
+            const col = tCols[i]; if (!col) return;
+            const actions = [
+                { label: 'Rename', icon: '✏️', onClick: () => showPrompt('Rename this column', { title: 'Rename column', value: col.label, confirmLabel: 'Save', onSubmit: v => { if (v) { tCols[i].label = v; renderTaskTable(); scheduleSave(); } } }) },
+                { label: 'Sort ascending', icon: '▲', onClick: () => { tSortCol = col.id; tSortDir = 'asc'; renderTaskTable(); } },
+                { label: 'Sort descending', icon: '▼', onClick: () => { tSortCol = col.id; tSortDir = 'desc'; renderTaskTable(); } },
+                { label: 'Clear sort', icon: '↕', onClick: () => { tSortCol = null; renderTaskTable(); } }
+            ];
+            if (col.isCustom) { actions.push({ divider: true }); actions.push({ label: 'Delete column', icon: '🗑️', danger: true, onClick: () => { tCols.splice(i, 1); renderTaskTable(); scheduleSave(); } }); }
+            openKebab(ev, actions);
+        }
+
+        function folderKebab(ev, id) {
+            const f = folders.find(x => x.id === id); if (!f) return;
+            openKebab(ev, [
+                { label: 'Rename', icon: '✏️', onClick: () => showPrompt('Rename this folder', { title: 'Rename folder', value: f.name.replace(/^📁\s*/, ''), confirmLabel: 'Save', onSubmit: v => { if (v) { updateFolder(id, '📁 ' + v); scheduleSave(); } } }) },
+                { label: 'New note', icon: '➕', onClick: () => createNote(id) },
+                { divider: true },
+                { label: 'Delete', icon: '🗑️', danger: true, onClick: () => delFolder(id) }
+            ]);
+        }
+
+        // ----- Grouped investment holdings: summary row opens a detail panel -----
+        let openGroupKey = null;
+        function openGroupPanel(g, type) { openGroupKey = { g, type }; document.getElementById('group-panel').classList.remove('hidden'); refreshGroupPanel(); }
+        function closeGroupPanel() { openGroupKey = null; const p = document.getElementById('group-panel'); if (p) p.classList.add('hidden'); }
+        function refreshGroupPanel() {
+            if (!openGroupKey) return;
+            const { g, type } = openGroupKey;
+            const holds = accounts.filter(a => a.type === type && (a.group || '').trim() === g);
+            if (!holds.length) { closeGroupPanel(); return; }
+            const total = holds.reduce((s, x) => s + Number(x.balance), 0);
+            const color = type === 'asset' ? 'green' : 'red';
+            document.getElementById('group-panel-title').textContent = g;
+            document.getElementById('group-panel-sub').textContent = `${holds.length} holding${holds.length > 1 ? 's' : ''}`;
+            const list = document.getElementById('group-panel-list'); list.innerHTML = '';
+            holds.forEach(a => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between bg-corp-900 border border-corp-700 rounded-lg p-3';
+                row.innerHTML = `<div class="min-w-0"><div class="text-sm font-medium text-gray-200 truncate">${esc(a.name)}</div></div><div class="flex items-center gap-2 shrink-0"><span class="text-${color}-400 text-sm font-bold">₹ ${formatMoney(a.balance)}</span><button onclick="accountKebab(event,'${a.id}')" class="text-gray-500 hover:text-white px-1 leading-none" title="Options">⋮</button></div>`;
+                list.appendChild(row);
+            });
+            document.getElementById('group-panel-total').textContent = `₹ ${formatMoney(total)}`;
+        }
+        function addHoldingToGroup() {
+            if (!openGroupKey) return;
+            const { g, type } = openGroupKey;
+            showPrompt(`Add a holding to ${g}`, { title: 'New holding', placeholder: 'Holding name, e.g. HDFC Flexicap', confirmLabel: 'Next', onSubmit: name => {
+                if (!name) return;
+                showPrompt(`Current value of ${name}`, { title: 'Holding value', placeholder: 'Amount in ₹', confirmLabel: 'Add', onSubmit: val => {
+                    accounts.push({ id: 'acc_' + Date.now(), name: name, type: type, balance: Number(val) || 0, group: g });
+                    renderAccounts(); populateModeDropdown(); renderCashflowAnalytics(); renderHomeWidgets(); scheduleSave();
+                } });
+            } });
+        }
+
+        // ----- All transactions for a single account -----
+        let acctTxId = null;
+        function effectOnAccount(tx, acc) {
+            if (tx.type === 'income') return acc.type === 'asset' ? Number(tx.amount) : -Number(tx.amount);
+            return acc.type === 'asset' ? -Number(tx.amount) : Number(tx.amount);
+        }
+        function openAccountTransactions(id) { const acc = accounts.find(a => a.id === id); if (!acc) return; acctTxId = id; document.getElementById('acct-tx-panel').classList.remove('hidden'); renderAccountTx(); }
+        function closeAccountTx() { acctTxId = null; const p = document.getElementById('acct-tx-panel'); if (p) p.classList.add('hidden'); }
+        function renderAccountTx() {
+            if (!acctTxId) return;
+            const acc = accounts.find(a => a.id === acctTxId); if (!acc) { closeAccountTx(); return; }
+            const txs = transactionsDB.filter(t => t.modeId === acctTxId);
+            const asc = txs.slice().sort((a, b) => new Date(a.date) - new Date(b.date) || a.id - b.id);
+            const totalEffect = asc.reduce((s, t) => s + effectOnAccount(t, acc), 0);
+            let running = acc.balance - totalEffect;
+            const withRun = asc.map(t => { running += effectOnAccount(t, acc); return { t, run: running }; }).reverse();
+            let totalIn = 0, totalOut = 0;
+            txs.forEach(t => { const e = effectOnAccount(t, acc); if (e >= 0) totalIn += e; else totalOut += (-e); });
+            document.getElementById('acct-tx-title').textContent = acc.name;
+            document.getElementById('acct-tx-sub').textContent = `Current balance ₹ ${formatMoney(acc.balance)}`;
+            document.getElementById('acct-tx-in').textContent = `₹ ${formatMoney(totalIn)}`;
+            document.getElementById('acct-tx-out').textContent = `₹ ${formatMoney(totalOut)}`;
+            const list = document.getElementById('acct-tx-list'); list.innerHTML = '';
+            if (!withRun.length) { list.innerHTML = `<div class="text-center text-sm text-gray-500 italic py-10">No transactions recorded against this account yet.</div>`; return; }
+            withRun.forEach(({ t, run }) => {
+                const e = effectOnAccount(t, acc); const pos = e >= 0;
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between bg-corp-900 border border-corp-700 rounded-lg p-3';
+                row.innerHTML = `<div class="min-w-0"><div class="text-sm font-medium text-gray-200 truncate">${t.emoji || ''} ${esc(t.desc || t.category)}</div><div class="text-[11px] text-gray-500">${t.date}${t.category ? (' · ' + esc(t.category)) : ''}</div></div><div class="text-right shrink-0 ml-2"><div class="${pos ? 'text-green-400' : 'text-red-400'} text-sm font-bold">${pos ? '+' : '-'} ₹${formatMoney(Math.abs(e))}</div><div class="text-[11px] text-gray-500">bal ₹${formatMoney(run)}</div></div>`;
+                list.appendChild(row);
+            });
+        }
+        function exportAccountTxCSV() {
+            if (!acctTxId) return; const acc = accounts.find(a => a.id === acctTxId); if (!acc) return;
+            const txs = transactionsDB.filter(t => t.modeId === acctTxId).sort((a, b) => new Date(a.date) - new Date(b.date));
+            if (!txs.length) { showToast('No transactions to export.', 'info'); return; }
+            const rows = [['Date', 'Type', 'Category', 'Description', 'Amount (INR)', 'Tags']];
+            txs.forEach(t => rows.push([t.date, t.type, t.category, t.desc || '', t.amount, (t.tags || []).join(', ')]));
+            downloadCSV(`Transactions_${acc.name.replace(/[^a-z0-9]+/gi, '_')}.csv`, rows);
+            showToast('Account transactions exported.', 'success');
         }
 
         // ----- Toast notifications (replace the browser alert boxes) -----
@@ -1440,7 +1643,7 @@
 
                     if(passesFilter) {
                         if(!dayGroups[r.date]) dayGroups[r.date] = { net: 0, items: [] }; 
-                        dayGroups[r.date].items.push({...r, isRec: true, type: 'expense', emoji: '🔄'}); 
+                        dayGroups[r.date].items.push({...r, isRec: true, emoji: '🔄'}); 
                         dayGroups[r.date].net -= Number(r.amount);
                     }
                 }
@@ -1455,8 +1658,8 @@
                 
                 const maxBar = Math.max(tTotalExp, lmTotalExp, 1);
                 const lmPct = (lmTotalExp / maxBar) * 100; const tmPct = (tTotalExp / maxBar) * 100;
-                document.getElementById('bar-last-month').style.height = `${lmPct}%`; document.getElementById('bar-last-month').innerText = `₹${(lmTotalExp/1000).toFixed(1)}k`;
-                document.getElementById('bar-curr-month').style.height = `${tmPct}%`; document.getElementById('bar-curr-month').innerText = `₹${(tTotalExp/1000).toFixed(1)}k`;
+                document.getElementById('bar-last-month').style.height = `${lmPct}%`; document.getElementById('bar-last-month').innerText = isPrivate ? '•••' : `₹${(lmTotalExp/1000).toFixed(1)}k`;
+                document.getElementById('bar-curr-month').style.height = `${tmPct}%`; document.getElementById('bar-curr-month').innerText = isPrivate ? '•••' : `₹${(tTotalExp/1000).toFixed(1)}k`;
 
                 const budgetList = document.getElementById('ana-budget-list');
                 budgetList.innerHTML = '';
@@ -1490,7 +1693,6 @@
                 }
 
                 renderBreakdownList();
-                renderMonthReview();
             }
 
             const timeline = document.getElementById('analytics-timeline'); timeline.innerHTML = '';
@@ -1505,7 +1707,7 @@
                 const dayData = dayGroups[dateStr]; const displayDate = new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
                 let dayHtml = `<div class="mb-4"><h3 class="text-gray-400 font-bold mb-3 border-b border-corp-700 pb-1 text-sm tracking-wide uppercase">📅 ${displayDate}</h3><div class="space-y-2">`;
                 dayData.items.forEach(item => {
-                    const acc = accounts.find(a => a.id === item.modeId); const isInc = item.type === 'income'; const amountStr = `${isInc ? '+' : '-'} ₹${formatMoney(item.amount)}`; const colorClass = isInc ? 'text-green-400' : 'text-red-400'; const title = item.isRec ? `${item.name} (${item.type})` : (item.desc || item.category);
+                    const acc = accounts.find(a => a.id === item.modeId); const isInc = item.type === 'income'; const isInv = item.isRec && (item.type === 'Investments' || (item.tags && item.tags.includes('Investments'))); const amountStr = `${isInc ? '+' : '-'} ₹${formatMoney(item.amount)}`; const colorClass = isInc ? 'text-green-400' : (isInv ? 'text-corp-300' : 'text-red-400'); const title = item.isRec ? `${item.name} (${item.type})` : (item.desc || item.category);
                     dayHtml += `<div class="flex flex-col sm:flex-row sm:items-center justify-between bg-corp-900/50 p-3 rounded-lg border border-corp-700/50 hover:bg-corp-800 transition group gap-2"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-corp-800 flex items-center justify-center text-lg border border-corp-700 shrink-0 shadow-sm">${item.emoji}</div><div><div class="font-medium text-gray-200 text-sm">${title}</div><div class="text-xs text-gray-500 flex gap-2 mt-0.5"><span>💳 ${acc?acc.name:'Unknown'}</span> ${item.isRec ? '<span class="text-corp-400">🔄 Recurring</span>' : ''}</div>${(item.tags && item.tags.length > 0) ? `<div class="mt-1 flex flex-wrap gap-1">${renderTagBadges(item.tags)}</div>` : ''}</div></div><div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 w-full sm:w-auto"><span class="${colorClass} font-bold text-sm tracking-wide">${amountStr}</span>${!item.isRec ? `<div class="flex items-center gap-3 opacity-100 sm:opacity-0 group-hover:opacity-100 transition"><button onclick="openRecordForEdit(${item.id})" class="text-gray-500 hover:text-corp-300 text-xs font-medium">Edit</button><button onclick="delTransaction(${item.id})" class="text-gray-500 hover:text-red-400 text-xs font-medium">Refund & Delete</button></div>` : ''}</div></div>`;
                 });
                 const netColor = dayData.net >= 0 ? 'text-green-400' : 'text-red-400'; const netSign = dayData.net >= 0 ? '+' : '';
@@ -1533,72 +1735,7 @@
             document.getElementById('btn-view-ven').classList.toggle('bg-corp-700', anaBreakdownView === 'vendor'); document.getElementById('btn-view-ven').classList.toggle('text-white', anaBreakdownView === 'vendor'); document.getElementById('btn-view-ven').classList.toggle('text-gray-400', anaBreakdownView !== 'vendor');
         }
 
-        // ----- Month in Review: a quiet summary of where the money went -----
-        function renderMonthReview() {
-            const box = document.getElementById('month-review');
-            if (!box) return;
-            const s = window.currentAnaStats; if (!s) return;
-            const monthName = (() => { try { const [y, m] = s.selMonth.split('-'); return new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }); } catch (e) { return s.selMonth; } })();
-
-            if ((s.totalInc + s.totalExp + s.totalInv) === 0) {
-                box.innerHTML = `<h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">📊 ${monthName} in Review</h3><p class="text-sm text-gray-400">Nothing recorded for this month yet. Use the plus button to log your first transaction and this summary will come to life.</p>`;
-                return;
-            }
-
-            const net = s.totalInc - s.totalExp - s.totalInv;
-            const netColor = net >= 0 ? 'text-green-400' : 'text-red-400';
-            const netWord = net >= 0 ? 'set aside' : 'overspent by';
-
-            // Top three spending categories.
-            const cats = Object.keys(s.catTotals).map(k => ({ name: k, amount: s.catTotals[k].amount, emoji: s.catTotals[k].emoji })).sort((a, b) => b.amount - a.amount).slice(0, 3);
-            const topHtml = cats.length ? cats.map(c => `<span class="inline-flex items-center gap-1 bg-corp-900 border border-corp-700 rounded-full px-3 py-1 text-xs text-gray-200">${c.emoji} ${c.name} <span class="text-gray-400">₹${formatMoney(c.amount)}</span></span>`).join(' ') : '<span class="text-xs text-gray-500">No expenses logged.</span>';
-
-            // Budgets that slipped this month.
-            const slipped = [];
-            Object.keys(userBudget.categories || {}).forEach(cat => {
-                const limit = userBudget.categories[cat];
-                const spent = s.catTotals[cat] ? s.catTotals[cat].amount : 0;
-                if (limit > 0 && spent > limit) slipped.push({ cat, spent, limit, over: spent - limit });
-            });
-            const overallLimit = Number(userBudget.global) || 0;
-            const overallOver = overallLimit > 0 && s.totalExp > overallLimit;
-            let budgetHtml;
-            if (!overallLimit && slipped.length === 0 && !Object.keys(userBudget.categories || {}).some(c => userBudget.categories[c] > 0)) {
-                budgetHtml = '<span class="text-xs text-gray-500">No budgets set yet. You can set them under Manage.</span>';
-            } else if (slipped.length === 0 && !overallOver) {
-                budgetHtml = '<span class="text-xs text-green-400">Every budget held this month. Nicely done.</span>';
-            } else {
-                let parts = slipped.sort((a, b) => b.over - a.over).slice(0, 4).map(b => `<span class="inline-flex items-center gap-1 bg-red-900/30 border border-red-800 rounded-full px-3 py-1 text-xs text-red-300">${b.cat} over by ₹${formatMoney(b.over)}</span>`);
-                if (overallOver) parts.unshift(`<span class="inline-flex items-center gap-1 bg-red-900/30 border border-red-800 rounded-full px-3 py-1 text-xs text-red-300">Overall over by ₹${formatMoney(s.totalExp - overallLimit)}</span>`);
-                budgetHtml = parts.join(' ');
-            }
-
-            // Trend against last month.
-            let trendHtml;
-            if (s.lmExp > 0) {
-                const diff = s.totalExp - s.lmExp;
-                const pct = Math.abs(diff / s.lmExp * 100);
-                if (Math.abs(diff) < 1) trendHtml = 'Your spending is about the same as last month.';
-                else trendHtml = `Your spending is ${diff > 0 ? 'up' : 'down'} ${pct.toFixed(0)} percent versus last month, a ${diff > 0 ? 'rise' : 'fall'} of ₹${formatMoney(Math.abs(diff))}.`;
-            } else {
-                trendHtml = 'No prior month to compare against yet.';
-            }
-
-            box.innerHTML = `
-                <h3 class="text-base font-bold text-white mb-3 flex items-center gap-2">📊 ${monthName} in Review</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div class="bg-corp-900 rounded-xl border border-corp-700 p-3 text-center"><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1">Came in</div><div class="text-lg font-bold text-green-400 ${isIncomeRevealed ? '' : 'income-blur'}">₹ ${formatMoney(s.totalInc)}</div></div>
-                    <div class="bg-corp-900 rounded-xl border border-corp-700 p-3 text-center"><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1">Went out</div><div class="text-lg font-bold text-red-400">₹ ${formatMoney(s.totalExp + s.totalInv)}</div></div>
-                    <div class="bg-corp-900 rounded-xl border border-corp-700 p-3 text-center"><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1">${net >= 0 ? 'Net set aside' : 'Net overspend'}</div><div class="text-lg font-bold ${netColor}">₹ ${formatMoney(Math.abs(net))}</div></div>
-                </div>
-                <div class="space-y-3">
-                    <div><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1.5">Top spending</div><div class="flex flex-wrap gap-2">${topHtml}</div></div>
-                    <div><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1.5">Budgets</div><div class="flex flex-wrap gap-2">${budgetHtml}</div></div>
-                    <div><div class="text-[11px] text-gray-400 uppercase tracking-wide mb-1.5">Trend</div><p class="text-sm text-gray-300">${trendHtml}</p></div>
-                </div>
-            `;
-        }
-
+        
         // Export the selected month's day to day transactions as a clean CSV.
         function exportTxCSV() {
             const selMonth = document.getElementById('analytics-month').value;
@@ -1819,7 +1956,7 @@
 
         function evalRecStatus(dateStr) { const tgt = new Date(dateStr + 'T00:00:00'); const today = new Date(todayISO().split('T')[0]+'T00:00:00'); if (tgt < today) return 'Overdue'; if (tgt.getMonth() === today.getMonth() && tgt.getFullYear() === today.getFullYear()) return 'Due'; return 'Upcoming'; }
 
-        function addRecurring(e) { e.preventDefault(); const dateStr = document.getElementById('rec-date').value; const tagsInput = document.getElementById('rec-tags-input').value; recDB.push({ id: Date.now(), name: document.getElementById('rec-name').value, type: document.getElementById('rec-type').value, amount: document.getElementById('rec-amount').value, date: dateStr, modeId: document.getElementById('rec-mode').value, recurring: true, done: false, status: evalRecStatus(dateStr), tags: parseTags(tagsInput), custom: {} }); document.getElementById('rec-form').reset(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
+        function addRecurring(e) { e.preventDefault(); const dateStr = document.getElementById('rec-date').value; const tagsInput = document.getElementById('rec-tags-input').value; recDB.push({ id: Date.now(), name: document.getElementById('rec-name').value, type: document.getElementById('rec-type').value, amount: document.getElementById('rec-amount').value, date: dateStr, modeId: document.getElementById('rec-mode').value, destId: document.getElementById('rec-dest').value || '', recurring: true, done: false, status: evalRecStatus(dateStr), tags: parseTags(tagsInput), custom: {} }); document.getElementById('rec-form').reset(); toggleRecDest(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); scheduleSave(); }
         function toggleRecPaid(id, isChecked) { const item = recDB.find(r => r.id === id); if(!item) return; if(item.done === isChecked) return; const success = processTransaction(item, !isChecked); if(!success) { renderRecTable(); return; } item.done = isChecked; item.status = isChecked ? 'Paid' : evalRecStatus(item.date); if(isChecked && item.recurring) { const newId = Date.now() + Math.floor(Math.random()*100); let oldD = new Date(item.date); oldD.setMonth(oldD.getMonth() + 1); recDB.push({ ...item, id: newId, date: oldD.toISOString().split('T')[0], done: false, status: 'Upcoming', custom: {...item.custom}, spawnParent: item.id, spawnChild: undefined }); item.spawnChild = newId; } else if (!isChecked && item.spawnChild) { const ci = recDB.findIndex(r => r.id === item.spawnChild); if (ci !== -1 && !recDB[ci].done) recDB.splice(ci, 1); item.spawnChild = undefined; } renderAccounts(); renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); }
         function updateRecField(id, field, val) { const item = recDB.find(r => r.id === id); if(!item) return; if(field === 'status') { if(val === 'Paid' && !item.done) { toggleRecPaid(id, true); return; } else if (val !== 'Paid' && item.done) { toggleRecPaid(id, false); item.status = val; renderRecTable(); renderCashflowAnalytics(); return; } item.status = val; } else { item[field] = val; if(field === 'date' && !item.done) item.status = evalRecStatus(val); } if(field === 'tags' || field === 'status' || field === 'date' || field === 'amount') { renderRecTable(); renderCashflowAnalytics(); renderHomeWidgets(); } }
         function delRec(id) {
@@ -1873,7 +2010,7 @@
 
         function renderRecTable() {
             const head = document.getElementById('rec-header'); head.innerHTML='';
-            recCols.forEach((col, i) => { const th = document.createElement('th'); th.className = `p-2 border-r border-corp-700 relative bg-corp-900 ${col.fixed?'text-center':'cursor-grab hover:bg-corp-800'}`; th.style.width=col.width; th.style.minWidth=col.width; if(col.fixed) { th.textContent=col.label; } else { th.draggable=true; th.ondragstart=(e)=>rDStart(e,i); th.ondragover=(e)=>{e.preventDefault(); e.target.closest('th').classList.add('drag-over'); return false;}; th.ondragleave=(e)=>e.target.closest('th').classList.remove('drag-over'); th.ondrop=(e)=>rDDrop(e,i); th.ondragend=(e)=>e.target.classList.remove('opacity-50'); th.innerHTML = `<div class="flex items-center gap-1"><input type="text" value="${col.label}" onchange="recCols[${i}].label=this.value" class="bg-transparent font-medium text-gray-400 focus:text-white focus:outline-none flex-1 min-w-0 cursor-pointer focus:cursor-text text-sm"><button type="button" title="Sort by this column" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation(); sortRecBy('${col.id}')" class="shrink-0 text-xs px-0.5 ${recSortCol===col.id?'text-corp-300':'text-gray-600 hover:text-gray-300'}">${recSortCol===col.id?(recSortDir==='asc'?'▲':'▼'):'⇅'}</button></div>`; const r = document.createElement('div'); r.className='resizer'; r.onpointerdown=(e)=>initRRes(e,th,i); th.appendChild(r); } head.appendChild(th); });
+            recCols.forEach((col, i) => { const th = document.createElement('th'); th.className = `p-2 border-r border-corp-700 relative bg-corp-900 ${col.fixed?'text-center':'cursor-grab hover:bg-corp-800'}`; th.style.width=col.width; th.style.minWidth=col.width; if(col.fixed) { th.textContent=col.label; } else { th.draggable=true; th.ondragstart=(e)=>rDStart(e,i); th.ondragover=(e)=>{e.preventDefault(); e.target.closest('th').classList.add('drag-over'); return false;}; th.ondragleave=(e)=>e.target.closest('th').classList.remove('drag-over'); th.ondrop=(e)=>rDDrop(e,i); th.ondragend=(e)=>e.target.classList.remove('opacity-50'); th.innerHTML = `<div class="flex items-center gap-1"><span class="font-medium text-gray-400 flex-1 min-w-0 truncate text-sm pointer-events-none">${esc(col.label)}</span>${recSortCol===col.id?`<span class="shrink-0 text-xs text-corp-300 pointer-events-none">${recSortDir==='asc'?'▲':'▼'}</span>`:''}<button type="button" title="Options" onpointerdown="event.stopPropagation()" onclick="recHeaderKebab(event, ${i})" class="shrink-0 text-gray-500 hover:text-white text-base leading-none px-0.5">⋮</button></div>`; const r = document.createElement('div'); r.className='resizer'; r.onpointerdown=(e)=>initRRes(e,th,i); th.appendChild(r); } head.appendChild(th); });
 
             const filterText = (document.getElementById('rec-search-filter').value || '').toLowerCase();
             let dRecs = recDB.filter(r => { let acc=accounts.find(a=>a.id===r.modeId); return r.name.toLowerCase().includes(filterText) || r.type.toLowerCase().includes(filterText) || r.status.toLowerCase().includes(filterText) || (r.tags&&r.tags.join(' ').toLowerCase().includes(filterText)) || (acc&&acc.name.toLowerCase().includes(filterText)); });
@@ -1968,7 +2105,7 @@
                 const th = document.createElement('th'); th.className = `p-2 border-r border-corp-700 relative bg-corp-900 ${col.fixed?'text-center':'cursor-grab hover:bg-corp-800'}`; th.style.width=col.width; th.style.minWidth=col.width;
                 if(col.fixed) { th.textContent=col.label; } else {
                     th.draggable=true; th.ondragstart=(e)=>tDStart(e,i); th.ondragover=(e)=>{e.preventDefault(); e.target.closest('th').classList.add('drag-over'); return false;}; th.ondragleave=(e)=>e.target.closest('th').classList.remove('drag-over'); th.ondrop=(e)=>tDDrop(e,i); th.ondragend=(e)=>e.target.classList.remove('opacity-50');
-                    th.innerHTML = `<div class="flex items-center gap-1"><input type="text" value="${col.label}" onchange="tCols[${i}].label=this.value" class="bg-transparent font-medium text-gray-400 focus:text-white focus:outline-none flex-1 min-w-0 cursor-pointer focus:cursor-text text-sm"><button type="button" title="Sort by this column" onpointerdown="event.stopPropagation()" onclick="event.stopPropagation(); sortTaskBy('${col.id}')" class="shrink-0 text-xs px-0.5 ${tSortCol===col.id?'text-corp-300':'text-gray-600 hover:text-gray-300'}">${tSortCol===col.id?(tSortDir==='asc'?'▲':'▼'):'⇅'}</button></div>`;
+                    th.innerHTML = `<div class="flex items-center gap-1"><span class="font-medium text-gray-400 flex-1 min-w-0 truncate text-sm pointer-events-none">${esc(col.label)}</span>${tSortCol===col.id?`<span class="shrink-0 text-xs text-corp-300 pointer-events-none">${tSortDir==='asc'?'▲':'▼'}</span>`:''}<button type="button" title="Options" onpointerdown="event.stopPropagation()" onclick="taskHeaderKebab(event, ${i})" class="shrink-0 text-gray-500 hover:text-white text-base leading-none px-0.5">⋮</button></div>`;
                     const r = document.createElement('div'); r.className='resizer'; r.onpointerdown=(e)=>initTRes(e,th,i); th.appendChild(r);
                 } head.appendChild(th);
             });
@@ -2018,7 +2155,7 @@
             folders.forEach(f => {
                 const fNotes = notesDB.filter(n => n.folderId === f.id);
                 sb.innerHTML += `<div class="folder-dropzone rounded-lg pb-2 transition" ondragover="dragOverFolder(event)" ondragleave="dragLeaveFolder(event)" ondrop="dropNoteOnFolder(event, '${f.id}')">
-                    <div class="flex items-center justify-between mt-3 mb-2 px-2 group"><input type="text" value="${f.name}" onchange="updateFolder('${f.id}', this.value)" class="bg-transparent text-xs font-bold text-gray-400 hover:text-gray-200 focus:text-white uppercase tracking-wider focus:outline-none w-full mr-2 transition"><button onclick="createNote('${f.id}')" title="Add Note to ${f.name}" class="text-gray-500 hover:text-corp-400 opacity-100 lg:opacity-0 group-hover:opacity-100 transition text-lg leading-none">+</button><button onclick="delFolder('${f.id}')" title="Delete folder" class="text-gray-500 hover:text-red-400 opacity-100 lg:opacity-0 group-hover:opacity-100 transition text-base leading-none ml-1">✕</button></div>
+                    <div class="flex items-center justify-between mt-3 mb-2 px-2 group"><span class="text-xs font-bold text-gray-400 uppercase tracking-wider truncate mr-2">${f.name}</span><button onclick="folderKebab(event,'${f.id}')" class="text-gray-500 hover:text-white opacity-100 lg:opacity-0 group-hover:opacity-100 transition text-base leading-none shrink-0" title="Options">⋮</button></div>
                     ${fNotes.length === 0 ? `<div class="text-xs text-gray-600 italic px-4 py-1">Empty</div>` : fNotes.map(n => {
                         const isActive = n.id === activeNoteId;
                         return `<button draggable="true" ondragstart="dragNoteStart(event, '${n.id}')" onclick="openNote('${n.id}')" class="w-full text-left px-4 py-2 text-sm rounded-md truncate transition cursor-grab active:cursor-grabbing ${isActive ? 'bg-corp-600/20 text-corp-400 font-medium' : 'text-gray-300 hover:bg-corp-700'}">📄 ${n.title || 'Untitled Note'}</button>`;
@@ -2079,10 +2216,12 @@
         // Fills the Record and Recurring forms with the user's accounts.
         // ==========================================================
         function populateModeDropdown() {
-            const opts = accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+            const opts = accounts.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
             const tx = document.getElementById('tx-mode'); if (tx) tx.innerHTML = opts;
             const rec = document.getElementById('rec-mode'); if (rec) rec.innerHTML = opts;
+            const dest = document.getElementById('rec-dest'); if (dest) dest.innerHTML = '<option value="">Choose holding...</option>' + accounts.filter(a => a.type === 'asset').map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
         }
+        function toggleRecDest() { const t = document.getElementById('rec-type').value; const wrap = document.getElementById('rec-dest-wrap'); if (wrap) wrap.classList.toggle('hidden', t !== 'Investments'); }
 
         // ==========================================================
         // UNIFIED STATE (LOCAL + GOOGLE DRIVE)
