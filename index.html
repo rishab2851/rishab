@@ -651,7 +651,7 @@
                         <div class="w-full md:w-36"><label class="block text-xs text-gray-400 mb-1">Expiry (Optional)</label><input type="date" id="doc-exp" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></div>
                         <div class="flex-1 w-full min-w-[250px]"><label class="block text-xs text-gray-400 mb-1">Drive / Cloud Link</label><input type="url" id="doc-link" required class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" placeholder="https://drive.google.com/..."></div>
                         <div class="w-full md:w-40"><label class="block text-xs text-gray-400 mb-1">Tags</label><input type="text" id="doc-tags" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" placeholder="e.g. Personal"></div>
-                        <button type="submit" class="w-full md:w-auto bg-corp-600 hover:bg-corp-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition h-[38px] shadow">Store</button>
+                        <button type="submit" id="doc-submit-btn" class="w-full md:w-auto bg-corp-600 hover:bg-corp-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition h-[38px] shadow">Store</button>
                     </form>
                 </div>
 
@@ -777,10 +777,11 @@
                 <div><h3 id="acct-tx-title" class="text-lg font-bold text-white">Account</h3><p id="acct-tx-sub" class="text-xs text-gray-400"></p></div>
                 <button onclick="closeAccountTx()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
             </div>
+            <div class="px-5 pt-3 pb-1 border-b border-corp-700"><select id="acct-tx-month" onchange="setAcctTxMonth(this.value)" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition cursor-pointer"></select></div>
             <div class="px-5 py-3 border-b border-corp-700 flex gap-3">
                 <div class="flex-1 bg-corp-900 rounded-lg border border-corp-700 p-2 text-center"><div class="text-[10px] text-gray-400 uppercase tracking-wide">In</div><div id="acct-tx-in" class="text-sm font-bold text-green-400">₹ 0</div></div>
                 <div class="flex-1 bg-corp-900 rounded-lg border border-corp-700 p-2 text-center"><div class="text-[10px] text-gray-400 uppercase tracking-wide">Out</div><div id="acct-tx-out" class="text-sm font-bold text-red-400">₹ 0</div></div>
-                <button onclick="exportAccountTxCSV()" class="shrink-0 self-center text-xs bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-2 rounded-lg transition" title="Export this account">📥 CSV</button>
+                <button onclick="exportAccountTxCSV()" class="shrink-0 self-center text-xs bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-2 rounded-lg transition" title="Export what is shown">📥 CSV</button>
             </div>
             <div id="acct-tx-list" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
         </div>
@@ -1182,7 +1183,7 @@
         function accountRowHTML(a) {
             const color = a.type === 'asset' ? 'green' : 'red';
             return `<td class="p-2 border-r border-corp-700"><div class="px-1 text-sm font-medium text-gray-200 truncate">${esc(a.name)}</div></td>`
-                + `<td class="p-2 w-32"><div class="text-${color}-400 px-1 text-sm font-bold">₹ ${formatMoney(a.balance)}</div></td>`
+                + `<td class="p-2 w-32"><div class="text-${color}-400 px-1 text-sm font-bold text-right">₹ ${formatMoney(a.balance)}</div></td>`
                 + `<td class="p-2 w-8 text-center"><button onclick="accountKebab(event,'${a.id}')" class="text-gray-500 hover:text-white transition leading-none px-1 text-lg" title="Options">⋮</button></td>`;
         }
         function renderAccountList(listEl, accs, type) {
@@ -1194,7 +1195,7 @@
                 const total = groups[g].reduce((s, x) => s + Number(x.balance), 0);
                 const tr = document.createElement('tr'); tr.className = 'cursor-pointer hover:bg-corp-800/70 transition';
                 tr.onclick = () => openGroupPanel(g, type);
-                tr.innerHTML = `<td class="p-2 border-r border-corp-700"><div class="px-1 text-sm font-semibold text-gray-100 flex items-center gap-2">📊 ${esc(g)} <span class="text-[10px] text-gray-500 font-normal">${groups[g].length} holding${groups[g].length > 1 ? 's' : ''}</span></div></td><td class="p-2 w-32"><div class="text-${color}-400 px-1 text-sm font-bold">₹ ${formatMoney(total)}</div></td><td class="p-2 w-8 text-center"><span class="text-corp-400 text-lg leading-none">›</span></td>`;
+                tr.innerHTML = `<td class="p-2 border-r border-corp-700"><div class="px-1 text-sm font-semibold text-gray-100 flex items-center gap-2">📊 ${esc(g)} <span class="text-[10px] text-gray-500 font-normal">${groups[g].length} holding${groups[g].length > 1 ? 's' : ''}</span></div></td><td class="p-2 w-32"><div class="text-${color}-400 px-1 text-sm font-bold text-right">₹ ${formatMoney(total)}</div></td><td class="p-2 w-8 text-center"><span class="text-corp-400 text-lg leading-none">›</span></td>`;
                 listEl.appendChild(tr);
             });
         }
@@ -1411,29 +1412,46 @@
 
         // ----- All transactions for a single account -----
         let acctTxId = null;
+        let acctTxMonth = 'all';
         function effectOnAccount(tx, acc) {
             if (tx.type === 'income') return acc.type === 'asset' ? Number(tx.amount) : -Number(tx.amount);
             return acc.type === 'asset' ? -Number(tx.amount) : Number(tx.amount);
         }
-        function openAccountTransactions(id) { const acc = accounts.find(a => a.id === id); if (!acc) return; acctTxId = id; document.getElementById('acct-tx-panel').classList.remove('hidden'); renderAccountTx(); }
+        function openAccountTransactions(id) { const acc = accounts.find(a => a.id === id); if (!acc) return; acctTxId = id; acctTxMonth = todayISO().slice(0, 7); document.getElementById('acct-tx-panel').classList.remove('hidden'); renderAccountTx(); }
         function closeAccountTx() { acctTxId = null; const p = document.getElementById('acct-tx-panel'); if (p) p.classList.add('hidden'); }
+        function setAcctTxMonth(v) { acctTxMonth = v; renderAccountTx(); }
         function renderAccountTx() {
             if (!acctTxId) return;
             const acc = accounts.find(a => a.id === acctTxId); if (!acc) { closeAccountTx(); return; }
-            const txs = transactionsDB.filter(t => t.modeId === acctTxId);
-            const asc = txs.slice().sort((a, b) => new Date(a.date) - new Date(b.date) || a.id - b.id);
+            const allTxs = transactionsDB.filter(t => t.modeId === acctTxId);
+            // Running balance is computed across all time so each line shows the true balance after it.
+            const asc = allTxs.slice().sort((a, b) => new Date(a.date) - new Date(b.date) || a.id - b.id);
             const totalEffect = asc.reduce((s, t) => s + effectOnAccount(t, acc), 0);
             let running = acc.balance - totalEffect;
-            const withRun = asc.map(t => { running += effectOnAccount(t, acc); return { t, run: running }; }).reverse();
+            const withRun = asc.map(t => { running += effectOnAccount(t, acc); return { t, run: running }; });
+            // Month dropdown: All months plus every month with activity, and always the current month.
+            const cur = todayISO().slice(0, 7);
+            const monthSet = new Set(allTxs.map(t => String(t.date).slice(0, 7)).filter(Boolean));
+            monthSet.add(cur);
+            const months = [...monthSet].sort().reverse();
+            if (acctTxMonth !== 'all' && !months.includes(acctTxMonth)) acctTxMonth = cur;
+            const monthSel = document.getElementById('acct-tx-month');
+            if (monthSel) { monthSel.innerHTML = '<option value="all">All months</option>' + months.map(m => `<option value="${m}">${monthLabelFromStr(m)}</option>`).join(''); monthSel.value = acctTxMonth; }
+            // Apply the month filter for display and for the In and Out totals.
+            let shown = (acctTxMonth === 'all') ? withRun : withRun.filter(x => String(x.t.date).startsWith(acctTxMonth));
+            shown = shown.slice().reverse();
             let totalIn = 0, totalOut = 0;
-            txs.forEach(t => { const e = effectOnAccount(t, acc); if (e >= 0) totalIn += e; else totalOut += (-e); });
+            shown.forEach(({ t }) => { const e = effectOnAccount(t, acc); if (e >= 0) totalIn += e; else totalOut += (-e); });
             document.getElementById('acct-tx-title').textContent = acc.name;
             document.getElementById('acct-tx-sub').textContent = `Current balance ₹ ${formatMoney(acc.balance)}`;
             document.getElementById('acct-tx-in').textContent = `₹ ${formatMoney(totalIn)}`;
             document.getElementById('acct-tx-out').textContent = `₹ ${formatMoney(totalOut)}`;
             const list = document.getElementById('acct-tx-list'); list.innerHTML = '';
-            if (!withRun.length) { list.innerHTML = `<div class="text-center text-sm text-gray-500 italic py-10">No transactions recorded against this account yet.</div>`; return; }
-            withRun.forEach(({ t, run }) => {
+            if (!shown.length) {
+                const msg = (acctTxMonth === 'all') ? 'No transactions recorded against this account yet.' : `No transactions for this account in ${monthLabelFromStr(acctTxMonth)}.`;
+                list.innerHTML = `<div class="text-center text-sm text-gray-500 italic py-10">${msg}</div>`; return;
+            }
+            shown.forEach(({ t, run }) => {
                 const e = effectOnAccount(t, acc); const pos = e >= 0;
                 const row = document.createElement('div');
                 row.className = 'flex items-center justify-between bg-corp-900 border border-corp-700 rounded-lg p-3';
@@ -1443,12 +1461,15 @@
         }
         function exportAccountTxCSV() {
             if (!acctTxId) return; const acc = accounts.find(a => a.id === acctTxId); if (!acc) return;
-            const txs = transactionsDB.filter(t => t.modeId === acctTxId).sort((a, b) => new Date(a.date) - new Date(b.date));
-            if (!txs.length) { showToast('No transactions to export.', 'info'); return; }
+            let txs = transactionsDB.filter(t => t.modeId === acctTxId);
+            if (acctTxMonth !== 'all') txs = txs.filter(t => String(t.date).startsWith(acctTxMonth));
+            txs = txs.sort((a, b) => new Date(a.date) - new Date(b.date));
+            if (!txs.length) { showToast('No transactions to export for this view.', 'info'); return; }
             const rows = [['Date', 'Type', 'Category', 'Description', 'Amount (INR)', 'Tags']];
             txs.forEach(t => rows.push([t.date, t.type, t.category, t.desc || '', t.amount, (t.tags || []).join(', ')]));
-            downloadCSV(`Transactions_${acc.name.replace(/[^a-z0-9]+/gi, '_')}.csv`, rows);
-            showToast('Account transactions exported.', 'success');
+            const suffix = acctTxMonth === 'all' ? 'all' : acctTxMonth;
+            downloadCSV(`Transactions_${acc.name.replace(/[^a-z0-9]+/gi, '_')}_${suffix}.csv`, rows);
+            showToast('Transactions exported.', 'success');
         }
 
         // ----- Toast notifications (replace the browser alert boxes) -----
@@ -1983,10 +2004,43 @@
         // ==========================================
         let docsDB = [];
 
+        let editingDocId = null;
         function addDocument(e) {
             e.preventDefault(); const tagsInput = document.getElementById('doc-tags').value;
-            docsDB.push({ id: 'd_' + Date.now(), name: document.getElementById('doc-name').value, category: document.getElementById('doc-cat').value, expiry: document.getElementById('doc-exp').value, link: document.getElementById('doc-link').value, tags: parseTags(tagsInput) });
-            document.getElementById('doc-form').reset(); renderDocs(); renderHomeWidgets();
+            const fields = { name: document.getElementById('doc-name').value, category: document.getElementById('doc-cat').value, expiry: document.getElementById('doc-exp').value, link: document.getElementById('doc-link').value, tags: parseTags(tagsInput) };
+            if (editingDocId != null) {
+                const doc = docsDB.find(d => d.id === editingDocId);
+                if (doc) Object.assign(doc, fields);
+                editingDocId = null;
+                const b = document.getElementById('doc-submit-btn'); if (b) b.innerText = 'Store';
+                document.getElementById('doc-form').reset(); renderDocs(); renderHomeWidgets(); scheduleSave();
+                showToast('Document updated.', 'success');
+                return;
+            }
+            docsDB.push({ id: 'd_' + Date.now(), ...fields });
+            document.getElementById('doc-form').reset(); renderDocs(); renderHomeWidgets(); scheduleSave();
+        }
+        // Open the Add Document form pre filled to correct an existing entry.
+        function openDocForEdit(id) {
+            const doc = docsDB.find(d => d.id === id); if (!doc) return;
+            editingDocId = id;
+            document.getElementById('doc-name').value = doc.name || '';
+            document.getElementById('doc-cat').value = doc.category || 'Other';
+            document.getElementById('doc-exp').value = doc.expiry || '';
+            document.getElementById('doc-link').value = doc.link || '';
+            document.getElementById('doc-tags').value = (doc.tags || []).join(', ');
+            const b = document.getElementById('doc-submit-btn'); if (b) b.innerText = 'Update';
+            const form = document.getElementById('doc-form'); if (form) form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => { const n = document.getElementById('doc-name'); if (n) n.focus(); }, 200);
+            showToast('Editing document. Change any field and press Update.', 'info');
+        }
+        function docKebab(ev, id) {
+            const doc = docsDB.find(d => d.id === id); if (!doc) return;
+            openKebab(ev, [
+                { label: 'Edit properties', icon: '✏️', onClick: () => openDocForEdit(id) },
+                { divider: true },
+                { label: 'Delete', icon: '🗑️', danger: true, onClick: () => delDoc(id) }
+            ]);
         }
 
         function delDoc(id) {
@@ -2020,7 +2074,7 @@
                     <div class="bg-corp-800 border border-corp-700 rounded-xl p-5 shadow-lg flex flex-col hover:border-corp-500 transition group">
                         <div class="flex justify-between items-start mb-3">
                             <div class="flex items-center gap-3"><div class="text-3xl">${icons[d.category] || '📄'}</div><div><h3 class="text-white font-bold text-sm line-clamp-1" title="${d.name}">${d.name}</h3><span class="text-xs text-corp-400 bg-corp-900/50 px-2 py-0.5 rounded border border-corp-700">${d.category}</span></div></div>
-                            <button onclick="delDoc('${d.id}')" class="text-gray-500 hover:text-red-400 opacity-100 lg:opacity-0 group-hover:opacity-100 transition">✕</button>
+                            <button onclick="docKebab(event,'${d.id}')" class="text-gray-500 hover:text-white opacity-100 lg:opacity-0 group-hover:opacity-100 transition text-lg leading-none px-1" title="Options">⋮</button>
                         </div>
                         <div class="mt-2 mb-4 flex-1">${expHtml}<div class="mt-2 flex flex-wrap gap-1">${renderTagBadges(d.tags)}</div></div>
                         <a href="${d.link}" target="_blank" class="block w-full text-center bg-corp-900 hover:bg-corp-700 text-gray-300 border border-corp-600 rounded-lg py-2 text-sm font-bold transition">Open File ↗</a>
