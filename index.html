@@ -469,7 +469,8 @@
                             <div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1" id="tx-desc-label">What was this for? (e.g. Swiggy)</label><input type="text" id="tx-desc" placeholder="..." class="w-full bg-corp-900 border border-corp-700 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div>
                         </div>
                         <div class="mb-6" id="tx-category-section"><label class="block text-xs text-gray-400 mb-2 uppercase tracking-wide font-semibold">Select Category</label><div id="tx-chips-container" class="flex flex-wrap gap-2"></div><input type="hidden" id="tx-category" value="Food"><input type="hidden" id="tx-emoji" value="🍔"><div id="custom-cat-wrapper" class="hidden mt-3 max-w-sm"><input type="text" id="custom-cat-input" placeholder="Enter custom category name..." class="w-full bg-corp-900 border border-corp-700 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div></div>
-                        <div class="flex flex-col sm:flex-row items-end gap-4 border-t border-corp-700 pt-6"><div class="w-full sm:w-1/3" id="tx-mode-wrap"><label class="block text-xs text-gray-400 mb-1" id="tx-mode-label">Mode of Payment</label><select id="tx-mode" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div><div class="hidden w-full sm:w-2/3 gap-3 flex" id="tx-transfer-wrap"><div class="flex-1"><label class="block text-xs text-gray-400 mb-1">From</label><select id="tx-from" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div><div class="flex-1"><label class="block text-xs text-gray-400 mb-1">To</label><select id="tx-to" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div></div><div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1">Pivot Tags (Optional, comma split)</label><input type="text" id="tx-tags" placeholder="e.g. GIES-Closure, Audit" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div><button type="submit" id="btn-tx-submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]">Log Expense</button></div>
+                        <div class="mb-6 hidden" id="tx-transfer-section"><label class="block text-xs text-gray-400 mb-2 uppercase tracking-wide font-semibold">Move Money Between Accounts</label><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="block text-xs text-gray-400 mb-1">From</label><select id="tx-from" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-corp-500 transition"></select></div><div><label class="block text-xs text-gray-400 mb-1">To</label><select id="tx-to" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-corp-500 transition"></select></div></div><p class="text-[11px] text-gray-500 mt-2">A transfer moves money between your own accounts. It is never counted as income or expense. Sending to a credit card settles that outstanding.</p></div>
+                        <div class="flex flex-col sm:flex-row items-end gap-4 border-t border-corp-700 pt-6"><div class="w-full sm:w-1/3" id="tx-mode-wrap"><label class="block text-xs text-gray-400 mb-1" id="tx-mode-label">Mode of Payment</label><select id="tx-mode" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div><div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1">Pivot Tags (Optional, comma split)</label><input type="text" id="tx-tags" placeholder="e.g. GIES-Closure, Audit" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div><button type="submit" id="btn-tx-submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]">Log Expense</button></div>
                     </form>
                 </div>
               </div>
@@ -634,14 +635,14 @@
                         <div id="editor-container" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col relative">
                             <input type="text" id="note-title" class="text-3xl md:text-4xl font-bold bg-transparent border-none text-white focus:outline-none mb-6 w-full placeholder-gray-600 tracking-tight" placeholder="Untitled Note" oninput="saveNoteState()">
                             <div class="flex flex-wrap items-center gap-2 mb-3 select-none">
-                                <button type="button" onclick="insertNoteCheckbox()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">☑ Checkbox</button>
-                                <button type="button" onclick="insertNoteBullet()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">• Bullet</button>
-                                <button type="button" onclick="triggerNoteImage()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">📷 Image</button>
-                                <button type="button" onclick="insertNoteLink()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">🔗 Link</button>
+                                <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteCheckbox()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">☑ Checkbox</button>
+                                <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteBullet()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">• Bullet</button>
+                                <button type="button" onmousedown="event.preventDefault()" onclick="triggerNoteImage()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">📷 Image</button>
+                                <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteLink()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">🔗 Link</button>
                                 <input type="file" id="note-image-input" accept="image/*" class="hidden" onchange="onNoteImageChosen(event)">
                                 <span class="text-[11px] text-gray-500 hidden sm:inline">Tip, type #Tag to link databases</span>
                             </div>
-                            <div id="note-editor" class="flex-1 text-gray-300 text-base md:text-lg leading-relaxed focus:outline-none" contenteditable="true" placeholder="Start typing here..." oninput="saveNoteState()" onkeydown="handleEditorShortcuts(event)"></div>
+                            <div id="note-editor" class="rich-editor flex-1 text-gray-300 text-base md:text-lg leading-relaxed focus:outline-none" contenteditable="true" placeholder="Start typing here..." onfocus="setActiveEditor('note-editor')" oninput="saveNoteState()" onkeydown="handleEditorShortcuts(event)" onclick="noteEditorClick(event)" onblur="linkifyEditor(this)"></div>
                         </div>
                         <div id="no-note-screen" class="absolute inset-0 bg-corp-800 z-10 flex flex-col items-center justify-center text-center hidden p-4">
                             <span class="text-6xl mb-4">📓</span><h3 class="text-xl font-bold text-white mb-2">Knowledge Base</h3><p class="text-gray-400 max-w-sm mb-6">Select a note from the sidebar or click '+' next to a folder to start writing.</p>
@@ -801,6 +802,24 @@
                 <button onclick="exportAccountTxCSV()" class="shrink-0 self-center text-xs bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-2 rounded-lg transition" title="Export what is shown">📥 CSV</button>
             </div>
             <div id="acct-tx-list" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+        </div>
+    </div>
+
+    <div id="task-page" class="hidden fixed inset-0 z-[140] bg-corp-900 overflow-y-auto">
+        <div class="max-w-3xl mx-auto p-4 md:p-8">
+            <div class="flex items-start justify-between mb-6 gap-4">
+                <h2 id="task-page-title" class="text-2xl md:text-3xl font-bold text-white tracking-tight break-words min-w-0">Task</h2>
+                <button onclick="closeTaskPage()" class="text-gray-400 hover:text-white text-3xl leading-none shrink-0" title="Close">&times;</button>
+            </div>
+            <div id="task-page-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"></div>
+            <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wide mb-3">Other Notes</h3>
+            <div class="flex flex-wrap items-center gap-2 mb-3 select-none">
+                <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteCheckbox()" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">☑ Checkbox</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteBullet()" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">• Bullet</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="triggerNoteImage()" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">📷 Image</button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteLink()" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">🔗 Link</button>
+            </div>
+            <div id="task-notes-editor" class="rich-editor min-h-[240px] bg-corp-800 border border-corp-700 rounded-xl p-4 text-gray-300 text-base leading-relaxed focus:outline-none mb-10" contenteditable="true" placeholder="Write detailed notes, numbered points, checklists..." onfocus="setActiveEditor('task-notes-editor')" oninput="saveTaskNotes()" onkeydown="handleEditorShortcuts(event)" onclick="noteEditorClick(event)" onblur="linkifyEditor(this)"></div>
         </div>
     </div>
 
@@ -1661,26 +1680,26 @@
         function setTxType(type) {
             currTxType = type;
             const btnExp = document.getElementById('btn-tx-exp'); const btnInc = document.getElementById('btn-tx-inc'); const btnTra = document.getElementById('btn-tx-tra'); const submitBtn = document.getElementById('btn-tx-submit'); const descLabel = document.getElementById('tx-desc-label');
-            const catSec = document.getElementById('tx-category-section'); const modeWrap = document.getElementById('tx-mode-wrap'); const transWrap = document.getElementById('tx-transfer-wrap'); const modeLabel = document.getElementById('tx-mode-label');
+            const catSec = document.getElementById('tx-category-section'); const modeWrap = document.getElementById('tx-mode-wrap'); const transSec = document.getElementById('tx-transfer-section'); const modeLabel = document.getElementById('tx-mode-label');
             const inactive = "flex-1 bg-transparent text-gray-400 border border-transparent hover:text-gray-200 rounded-lg py-2 font-bold transition";
             btnExp.className = inactive; btnInc.className = inactive; if (btnTra) btnTra.className = inactive;
             if (type === 'expense') {
                 btnExp.className = "flex-1 bg-red-500/20 text-red-400 border border-red-500/50 rounded-lg py-2 font-bold transition shadow-sm";
                 submitBtn.className = "w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Expense";
                 descLabel.innerText = "What was this for? (e.g. Swiggy)";
-                catSec.classList.remove('hidden'); modeWrap.classList.remove('hidden'); transWrap.classList.add('hidden'); transWrap.classList.remove('flex');
+                catSec.classList.remove('hidden'); modeWrap.classList.remove('hidden'); transSec.classList.add('hidden');
                 modeLabel.innerText = "Mode of Payment"; renderTxChips();
             } else if (type === 'income') {
                 btnInc.className = "flex-1 bg-green-500/20 text-green-400 border border-green-500/50 rounded-lg py-2 font-bold transition shadow-sm";
                 submitBtn.className = "w-full sm:w-auto bg-green-600 hover:bg-green-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Income";
                 descLabel.innerText = "Source of income? (e.g. Acme Corp)";
-                catSec.classList.remove('hidden'); modeWrap.classList.remove('hidden'); transWrap.classList.add('hidden'); transWrap.classList.remove('flex');
+                catSec.classList.remove('hidden'); modeWrap.classList.remove('hidden'); transSec.classList.add('hidden');
                 modeLabel.innerText = "Mode of Receipt"; renderTxChips();
             } else {
                 btnTra.className = "flex-1 bg-corp-500/20 text-corp-300 border border-corp-500/50 rounded-lg py-2 font-bold transition shadow-sm";
                 submitBtn.className = "w-full sm:w-auto bg-corp-600 hover:bg-corp-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Transfer";
                 descLabel.innerText = "Note (optional, e.g. Card bill)";
-                catSec.classList.add('hidden'); modeWrap.classList.add('hidden'); transWrap.classList.remove('hidden'); transWrap.classList.add('flex');
+                catSec.classList.add('hidden'); modeWrap.classList.add('hidden'); transSec.classList.remove('hidden');
                 populateTransferDropdowns();
             }
             document.getElementById('custom-cat-wrapper').classList.add('hidden');
@@ -2104,10 +2123,8 @@
                 }).join('');
             } else { docAlertsContainer.classList.add('hidden'); }
 
-            let monthExp = 0;
-            transactionsDB.forEach(tx => { if(tx.date.startsWith(currMonth) && tx.type === 'expense') monthExp += tx.amount; });
-            recDB.forEach(r => { if(r.done && r.date.startsWith(currMonth) && !r.tags.includes('Investments') && r.type !== 'Investments') monthExp += Number(r.amount); });
-            
+            const monthExp = budgetSpend(currMonth).total;
+
             document.getElementById('home-bud-spent').innerText = `₹${formatMoney(monthExp)}`;
             document.getElementById('home-bud-limit').innerText = `₹${formatMoney(userBudget.global)}`;
             
@@ -2404,7 +2421,7 @@
         // TASKS MODULE
         // ==========================================
         let tSortAsc = true;
-        let tCols = [ { id: 'done', label: '✔', fixed: true, width: '40px' }, { id: 'name', label: 'Aa Task Name', width: '220px' }, { id: 'client_name', label: '🏢 Client Name', width: '160px' }, { id: 'tags', label: '🏷 Tags', width: '130px' }, { id: 'category', label: '🗂 Category', width: '110px' }, { id: 'status', label: '🔆 Status', width: '180px' }, { id: 'date', label: '📅 Due Date', width: '130px' }, { id: 'recurring', label: '🔄 Recurring', width: '100px' }, { id: 'actions', label: '✕', fixed: true, width: '50px' } ];
+        let tCols = [ { id: 'done', label: '✔', fixed: true, width: '40px' }, { id: 'name', label: 'Aa Task Name', width: '220px' }, { id: 'client_name', label: '🏢 Client Name', width: '160px' }, { id: 'tags', label: '🏷 Tags', width: '130px' }, { id: 'category', label: '🗂 Category', width: '110px' }, { id: 'status', label: '🔆 Status', width: '180px' }, { id: 'date', label: '📅 Due Date', width: '130px' }, { id: 'recurring', label: '🔄 Recurring', width: '100px' }, { id: 'actions', label: '⚙', fixed: true, width: '68px' } ];
         let tDB = [];
 
         function addTask(e) { e.preventDefault(); const tagsIn = document.getElementById('task-tags-input').value; tDB.push({ id: Date.now(), name: document.getElementById('task-name').value, client_name: document.getElementById('task-client-name').value || "-", category: document.getElementById('task-category').value, tags: parseTags(tagsIn), date: document.getElementById('task-date').value, status: document.getElementById('task-status').value, recurring: document.getElementById('task-recurring').checked, done: (document.getElementById('task-status').value === "Done"), customData: {} }); document.getElementById('task-form').reset(); renderTaskTable(); renderHomeWidgets(); }
@@ -2484,7 +2501,7 @@
                         else if(c.id==='date') td.innerHTML = `<input type="date" value="${t.date}" onchange="updateTaskField(${t.id},'date',this.value)" class="bg-transparent text-gray-200 border-none focus:outline-none w-full px-1 text-sm">`;
                         else if(c.id==='status') td.innerHTML = `<select onchange="updateTaskField(${t.id},'status',this.value)" class="bg-transparent border-none focus:outline-none w-full px-1 text-sm ${getTColClass(t.status)} cursor-pointer font-medium"><option class="bg-corp-900 text-gray-400" ${t.status==='Not started'?'selected':''}>Not started</option><option class="bg-corp-900 text-corp-400" ${t.status==='Preparation'?'selected':''}>Preparation</option><option class="bg-corp-900 text-yellow-400" ${t.status==='Awaiting information'?'selected':''}>Awaiting information</option><option class="bg-corp-900 text-orange-400" ${t.status==='Open points'?'selected':''}>Open points</option><option class="bg-corp-900 text-purple-400" ${t.status==='Partner review'?'selected':''}>Partner review</option><option class="bg-corp-900 text-pink-400" ${t.status==='Client approval'?'selected':''}>Client approval</option><option class="bg-corp-900 text-green-400" ${t.status==='Done'?'selected':''}>Done</option></select>`;
                         else if(c.id==='recurring') td.innerHTML = `<div class="text-center"><input type="checkbox" ${t.recurring?'checked':''} onchange="updateTaskField(${t.id},'recurring',this.checked)" class="w-4 h-4 accent-corp-500 rounded bg-corp-900 border-corp-700 cursor-pointer"></div>`;
-                        else if(c.id==='actions') td.innerHTML = `<div class="text-center"><button onclick="delTask(${t.id})" class="text-gray-500 hover:text-red-400">✕</button></div>`;
+                        else if(c.id==='actions') td.innerHTML = `<div class="flex items-center justify-center gap-2"><button onclick="openTaskPage(${t.id})" class="text-gray-500 hover:text-corp-300" title="Open as page">⤢</button><button onclick="delTask(${t.id})" class="text-gray-500 hover:text-red-400" title="Delete">✕</button></div>`;
                         else if(c.isCustom) td.innerHTML = `<input type="text" value="${t.customData[c.id]||''}" onchange="tDB.find(x=>x.id==${t.id}).customData['${c.id}']=this.value" class="bg-transparent border-none text-gray-200 focus:text-white focus:outline-none w-full px-2 text-sm">`;
                         tr.appendChild(td);
                     }); list.appendChild(tr);
@@ -2551,7 +2568,7 @@
         function addFolder() { showPrompt('Name your new folder', { title: 'New folder', placeholder: 'Folder name', confirmLabel: 'Create', onSubmit: (newName) => { if (newName) { folders.push({ id: 'f_' + Date.now(), name: '📁 ' + newName }); renderNotesSidebar(); scheduleSave(); } } }); }
         function updateFolder(id, newName) { const f = folders.find(x => x.id === id); if(f) { f.name = newName; renderNotesSidebar(); renderHomeWidgets(); } }
         function createNote(folderId) { const newId = 'n_' + Date.now(); notesDB.push({ id: newId, folderId: folderId, title: '', content: '' }); openNote(newId); }
-        function openNote(id) { activeNoteId = id; const note = notesDB.find(n => n.id === id); if(!note) return; document.getElementById('note-title').value = note.title; const folder = folders.find(f => f.id === note.folderId); document.getElementById('note-folder-badge').innerText = folder ? folder.name : 'Unsorted'; document.getElementById('note-editor').innerHTML = note.content; renderNotesSidebar(); }
+        function openNote(id) { activeNoteId = id; setActiveEditor('note-editor'); const note = notesDB.find(n => n.id === id); if(!note) return; document.getElementById('note-title').value = note.title; const folder = folders.find(f => f.id === note.folderId); document.getElementById('note-folder-badge').innerText = folder ? folder.name : 'Unsorted'; document.getElementById('note-editor').innerHTML = note.content; renderNotesSidebar(); }
         function saveNoteState() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(note) { note.title = document.getElementById('note-title').value; note.content = document.getElementById('note-editor').innerHTML; renderNotesSidebar(); const status = document.getElementById('save-status'); status.innerHTML = `<span class="text-corp-400">Saving...</span>`; setTimeout(() => { status.innerHTML = `<i>✔</i> Auto-saved locally`; }, 400); } }
         function deleteCurrentNote() {
             if(!activeNoteId) return;
@@ -2559,27 +2576,51 @@
             const removed = notesDB[idx]; notesDB.splice(idx, 1); activeNoteId = null; renderNotesSidebar();
             showToast('Note deleted.', 'warning', { persist: true, actionLabel: 'Undo', onAction: () => { notesDB.splice(Math.min(idx, notesDB.length), 0, removed); renderNotesSidebar(); showToast('Note restored.', 'success'); } });
         }
-        function handleEditorShortcuts(e) { if(e.code === 'Space') { const sel = window.getSelection(); if (!sel.rangeCount) return; const node = sel.anchorNode; if(node.nodeType === 3 && node.textContent.endsWith('[ ]')) { e.preventDefault(); node.textContent = node.textContent.slice(0, -3); const range = sel.getRangeAt(0); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)'); const span = document.createElement('span'); span.className = 'task-text'; span.innerHTML = '&#8203;'; range.insertNode(span); range.insertNode(cb); range.setStart(span, 1); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); saveNoteState(); } } }
-        function toggleNoteTask(cb) { if(cb.nextSibling && cb.nextSibling.classList.contains('task-text')) { if(cb.checked) { cb.nextSibling.style.textDecoration = 'line-through'; cb.nextSibling.style.opacity = '0.5'; } else { cb.nextSibling.style.textDecoration = 'none'; cb.nextSibling.style.opacity = '1'; } } const taskId = cb.getAttribute('data-task-id'); if(taskId) { const t = tDB.find(x => x.id == taskId); if(t) { t.done = cb.checked; t.status = t.done ? 'Done' : 'Not started'; renderTaskTable(); renderHomeWidgets(); } } saveNoteState(); }
+        function handleEditorShortcuts(e) { if (e.key === 'Enter') { if (noteEditorEnter(e)) return; } if(e.code === 'Space') { const sel = window.getSelection(); if (!sel.rangeCount) return; const node = sel.anchorNode; if(node.nodeType === 3 && node.textContent.endsWith('[ ]')) { e.preventDefault(); node.textContent = node.textContent.slice(0, -3); const range = sel.getRangeAt(0); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)'); const span = document.createElement('span'); span.className = 'task-text'; span.innerHTML = '&#8203;'; range.insertNode(span); range.insertNode(cb); range.setStart(span, 1); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); saveNoteState(); } } }
+        function toggleNoteTask(cb) { if (cb.checked) cb.setAttribute('checked', 'checked'); else cb.removeAttribute('checked'); if(cb.nextSibling && cb.nextSibling.classList.contains('task-text')) { if(cb.checked) { cb.nextSibling.style.textDecoration = 'line-through'; cb.nextSibling.style.opacity = '0.5'; } else { cb.nextSibling.style.textDecoration = 'none'; cb.nextSibling.style.opacity = '1'; } } const taskId = cb.getAttribute('data-task-id'); if(taskId) { const t = tDB.find(x => x.id == taskId); if(t) { t.done = cb.checked; t.status = t.done ? 'Done' : 'Not started'; renderTaskTable(); renderHomeWidgets(); } } saveNoteState(); }
 
-        // ----- Notes toolbar: reliable buttons for phone use, replacing the bracket trick -----
+        // ----- Notes toolbar: reliable buttons for phone and laptop -----
+        let lastEditorRange = null;
+        document.addEventListener('selectionchange', () => {
+            const sel = window.getSelection(); if (!sel || !sel.rangeCount) return;
+            let el = sel.anchorNode; el = el && el.nodeType === 3 ? el.parentNode : el;
+            if (el && el.closest && el.closest('.rich-editor')) lastEditorRange = sel.getRangeAt(0).cloneRange();
+        });
+        let activeRichEditorId = 'note-editor';
+        function setActiveEditor(id) { activeRichEditorId = id; }
+        function getActiveEditor() { return document.getElementById(activeRichEditorId); }
+        function saveActiveEditor() { if (activeRichEditorId === 'task-notes-editor') saveTaskNotes(); else saveNoteState(); }
+        function restoreEditorSelection() {
+            const editor = getActiveEditor(); if (!editor) return editor;
+            editor.focus();
+            try { if (lastEditorRange && editor.contains(lastEditorRange.startContainer)) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(lastEditorRange); } } catch (e) {}
+            return editor;
+        }
         function insertBlockAtCursor(editor, node) {
             const sel = window.getSelection();
-            if (sel && sel.rangeCount && editor.contains(sel.anchorNode)) { const range = sel.getRangeAt(0); range.collapse(false); range.insertNode(node); }
+            if (sel && sel.rangeCount && editor.contains(sel.anchorNode)) { const range = sel.getRangeAt(0); range.collapse(false); range.insertNode(node); range.setStartAfter(node); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); }
             else { editor.appendChild(node); }
         }
-        function insertNoteCheckbox() {
-            const editor = document.getElementById('note-editor'); if (!editor) return; editor.focus();
-            const line = document.createElement('div');
-            const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)');
+        function makeCheckboxLine(checked) {
+            const line = document.createElement('div'); line.className = 'note-task-line';
+            const cb = document.createElement('input'); cb.type = 'checkbox'; if (checked) cb.checked = true; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)');
             const span = document.createElement('span'); span.className = 'task-text'; span.innerHTML = '&#8203;';
             line.appendChild(cb); line.appendChild(span);
-            insertBlockAtCursor(editor, line);
-            try { const sel = window.getSelection(); const range = document.createRange(); range.setStart(span, span.childNodes.length); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); } catch (e) {}
-            saveNoteState();
+            return line;
         }
-        function insertNoteBullet() { const editor = document.getElementById('note-editor'); if (!editor) return; editor.focus(); try { document.execCommand('insertUnorderedList'); } catch (e) {} saveNoteState(); }
-        function triggerNoteImage() { const inp = document.getElementById('note-image-input'); if (inp) inp.click(); }
+        function caretIntoSpan(span) {
+            if (!span) return;
+            try { const sel = window.getSelection(); const range = document.createRange(); const t = span.firstChild; range.setStart(t || span, t ? (t.length || 0) : 0); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); } catch (e) {}
+        }
+        function insertNoteCheckbox() {
+            const editor = restoreEditorSelection();
+            const line = makeCheckboxLine(false);
+            insertBlockAtCursor(editor, line);
+            caretIntoSpan(line.querySelector('.task-text'));
+            saveActiveEditor();
+        }
+        function insertNoteBullet() { restoreEditorSelection(); try { document.execCommand('insertUnorderedList', false, null); } catch (e) {} saveActiveEditor(); }
+        function triggerNoteImage() { restoreEditorSelection(); const inp = document.getElementById('note-image-input'); if (inp) inp.click(); }
         function onNoteImageChosen(e) {
             const file = e.target.files && e.target.files[0]; if (!file) return;
             const reader = new FileReader();
@@ -2591,11 +2632,11 @@
                     const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                     let dataUrl; try { dataUrl = canvas.toDataURL('image/jpeg', 0.8); } catch (err) { showToast('Could not read that image.', 'warning'); return; }
-                    const editor = document.getElementById('note-editor'); if (!editor) return; editor.focus();
+                    const editor = restoreEditorSelection();
                     const image = document.createElement('img'); image.src = dataUrl; image.className = 'note-img max-w-full rounded-lg my-2 border border-corp-700';
                     const wrap = document.createElement('div'); wrap.appendChild(image); wrap.appendChild(document.createElement('br'));
                     insertBlockAtCursor(editor, wrap);
-                    saveNoteState();
+                    saveActiveEditor();
                 };
                 img.src = ev.target.result;
             };
@@ -2606,13 +2647,101 @@
             showPrompt('Paste a link, for example a Drive file URL', { title: 'Add link or attachment', placeholder: 'https://...', confirmLabel: 'Next', onSubmit: (url) => {
                 if (!url) return;
                 showPrompt('Text to show for the link', { title: 'Link label', value: url, confirmLabel: 'Add', onSubmit: (label) => {
-                    const editor = document.getElementById('note-editor'); if (!editor) return; editor.focus();
+                    const editor = restoreEditorSelection();
                     const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.className = 'text-corp-300 underline'; a.textContent = label || url;
                     const wrap = document.createElement('div'); wrap.appendChild(document.createTextNode('📎 ')); wrap.appendChild(a);
                     insertBlockAtCursor(editor, wrap);
-                    saveNoteState();
+                    saveActiveEditor();
                 } });
             } });
+        }
+        // Enter inside a checklist item creates the next item; an empty item exits the checklist.
+        function noteEditorEnter(e) {
+            const editor = getActiveEditor(); if (!editor) return false;
+            const sel = window.getSelection(); if (!sel.rangeCount) return false;
+            let node = sel.anchorNode; if (!node || !editor.contains(node)) return false;
+            let line = node.nodeType === 3 ? node.parentNode : node;
+            while (line && line.parentNode !== editor && line !== editor) line = line.parentNode;
+            if (!line || line === editor || !(line.querySelector && line.querySelector('.note-cb'))) return false;
+            const span = line.querySelector('.task-text');
+            const text = span ? span.textContent.replace(/\u200B/g, '').trim() : '';
+            e.preventDefault();
+            if (text === '') { const p = document.createElement('div'); p.innerHTML = '<br>'; line.replaceWith(p); try { const r = document.createRange(); r.setStart(p, 0); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); } catch (er) {} }
+            else { const nl = makeCheckboxLine(false); line.after(nl); caretIntoSpan(nl.querySelector('.task-text')); }
+            saveActiveEditor();
+            return true;
+        }
+        // Make links open on a tap, on both phone and laptop, rather than dropping into edit mode.
+        function noteEditorClick(e) { const a = e.target && e.target.closest ? e.target.closest('a') : null; if (a && a.href) { e.preventDefault(); window.open(a.href, '_blank', 'noopener'); } }
+        // When you finish editing, turn any pasted plain URL into a real, tappable link.
+        function linkifyEditor(editor) {
+            if (!editor) return;
+            const urlRe = /(https?:\/\/[^\s<]+)/g;
+            const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
+            const targets = []; let n;
+            while ((n = walker.nextNode())) { if (n.parentNode && n.parentNode.closest && n.parentNode.closest('a')) continue; urlRe.lastIndex = 0; if (urlRe.test(n.textContent)) targets.push(n); }
+            let changed = false;
+            targets.forEach(node => {
+                const text = node.textContent; const frag = document.createDocumentFragment(); let last = 0, m; urlRe.lastIndex = 0;
+                while ((m = urlRe.exec(text)) !== null) {
+                    if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+                    const a = document.createElement('a'); a.href = m[0]; a.target = '_blank'; a.rel = 'noopener'; a.className = 'text-corp-300 underline'; a.textContent = m[0];
+                    frag.appendChild(a); last = m.index + m[0].length; changed = true;
+                }
+                if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+                if (changed) node.parentNode.replaceChild(frag, node);
+            });
+            if (changed) { if (editor.id === 'task-notes-editor') saveTaskNotes(); else saveNoteState(); }
+        }
+
+        // ----- Full screen task detail page (Notion style) -----
+        let currentTaskPageId = null;
+        function saveTaskNotes() { if (currentTaskPageId == null) return; const t = tDB.find(x => x.id === currentTaskPageId); const ed = document.getElementById('task-notes-editor'); if (t && ed) { t.otherNotes = ed.innerHTML; scheduleSave(false); } }
+        function openTaskPage(id) {
+            const t = tDB.find(x => x.id === id); if (!t) return;
+            currentTaskPageId = id;
+            setActiveEditor('task-notes-editor');
+            document.getElementById('task-page-title').textContent = t.name || 'Untitled Task';
+            renderTaskPageFields(t);
+            const ed = document.getElementById('task-notes-editor'); if (ed) ed.innerHTML = t.otherNotes || '';
+            document.getElementById('task-page').classList.remove('hidden');
+        }
+        function closeTaskPage() { currentTaskPageId = null; setActiveEditor('note-editor'); const p = document.getElementById('task-page'); if (p) p.classList.add('hidden'); }
+        function renderTaskPageFields(t) {
+            const box = document.getElementById('task-page-fields'); if (!box) return; box.innerHTML = '';
+            const inp = 'w-full bg-corp-800 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition';
+            tCols.forEach(c => {
+                if (c.id === 'actions') return;
+                const wrap = document.createElement('div');
+                if (c.id === 'name' || c.id === 'client_name') wrap.className = 'sm:col-span-2';
+                const label = `<label class="block text-xs text-gray-400 mb-1 uppercase tracking-wide">${esc(c.label)}</label>`;
+                let field = '';
+                if (c.id === 'done') field = `<label class="flex items-center gap-2 text-sm text-gray-200"><input type="checkbox" ${t.done ? 'checked' : ''} onchange="taskPageField('done', this.checked)" class="w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700"> Completed</label>`;
+                else if (c.id === 'recurring') field = `<label class="flex items-center gap-2 text-sm text-gray-200"><input type="checkbox" ${t.recurring ? 'checked' : ''} onchange="taskPageField('recurring', this.checked)" class="w-4 h-4 accent-corp-500 rounded bg-corp-900 border-corp-700"> Recurring</label>`;
+                else if (c.id === 'date') field = `<input type="date" value="${t.date || ''}" onchange="taskPageField('date', this.value)" class="${inp}">`;
+                else if (c.id === 'category') field = `<select onchange="taskPageField('category', this.value)" class="${inp} cursor-pointer">${['Work', 'Personal', 'Office'].map(o => `<option ${t.category === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`;
+                else if (c.id === 'status') { const opts = ['Not started', 'Preparation', 'Awaiting information', 'Open points', 'Partner review', 'Client approval', 'Done']; field = `<select onchange="taskPageField('status', this.value)" class="${inp} cursor-pointer">${opts.map(o => `<option ${t.status === o ? 'selected' : ''}>${o}</option>`).join('')}</select>`; }
+                else if (c.id === 'tags') field = `<input type="text" value="${esc((t.tags || []).join(', '))}" onchange="taskPageField('tags', this.value)" placeholder="comma separated" class="${inp}">`;
+                else if (c.id === 'name') field = `<input type="text" value="${esc(t.name || '')}" onchange="taskPageField('name', this.value)" class="${inp}">`;
+                else if (c.id === 'client_name') field = `<input type="text" value="${esc(t.client_name || '')}" onchange="taskPageField('client_name', this.value)" class="${inp}">`;
+                else if (c.isCustom) field = `<input type="text" value="${esc((t.customData && t.customData[c.id]) || '')}" onchange="taskPageField('${c.id}', this.value)" class="${inp}">`;
+                else field = `<input type="text" value="${esc(t[c.id] || '')}" onchange="taskPageField('${c.id}', this.value)" class="${inp}">`;
+                wrap.innerHTML = label + field;
+                box.appendChild(wrap);
+            });
+        }
+        function taskPageField(colId, value) {
+            if (currentTaskPageId == null) return;
+            const t = tDB.find(x => x.id === currentTaskPageId); if (!t) return;
+            const col = tCols.find(c => c.id === colId);
+            if (colId === 'done') { if (t.done !== value) toggleTaskDone(t.id); }
+            else if (colId === 'recurring') { updateTaskField(t.id, 'recurring', value); }
+            else if (colId === 'tags') { updateTaskField(t.id, 'tags', parseTags(value)); }
+            else if (col && col.isCustom) { if (!t.customData) t.customData = {}; t.customData[colId] = value; }
+            else { updateTaskField(t.id, colId, value); }
+            if (colId === 'name') document.getElementById('task-page-title').textContent = value || 'Untitled Task';
+            if (colId === 'status' || colId === 'done') renderTaskPageFields(t);
+            renderTaskTable(); renderHomeWidgets(); scheduleSave();
         }
         function syncTasksToApp() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(!note) return; const editor = document.getElementById('note-editor'); const checkboxes = editor.querySelectorAll('.note-cb'); let count = 0; checkboxes.forEach(cb => { if(!cb.hasAttribute('data-task-id')) { const textNode = cb.nextSibling; const taskName = textNode ? textNode.textContent.replace(/\u200B/g, '').trim() : ''; if(taskName) { const newTaskId = Date.now() + count; cb.setAttribute('data-task-id', newTaskId); tDB.push({ id: newTaskId, name: taskName, client_name: note.title || "Note Sync", category: "Work", date: todayISO().split('T')[0], status: cb.checked ? "Done" : "Not started", recurring: false, done: cb.checked, tags: [], customData: {} }); count++; } } }); saveNoteState(); if(count > 0) { showToast(`Synced ${count} new action item${count > 1 ? 's' : ''} to your Task Tracker.`, 'success'); renderTaskTable(); renderHomeWidgets(); } else { showToast('No new unsynced to-dos found. Type "[ ] " and a space to create a task.', 'info'); } }
 
