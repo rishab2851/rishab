@@ -360,6 +360,15 @@
                             <p id="scratch-status" class="text-xs text-green-400 mt-2 hidden">✔ Note successfully saved to workspace</p>
                         </div>
 
+                        <div class="bg-corp-800 rounded-xl p-5 md:p-6 border border-corp-700 shadow-lg">
+                            <h3 class="text-white font-bold mb-4 flex items-center gap-2"><span class="text-green-400">✅</span> Quick To-dos</h3>
+                            <div id="home-todo-list" class="space-y-2 mb-3"></div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-gray-600 text-lg leading-none">＋</span>
+                                <input type="text" id="home-todo-add" onkeydown="handleTodoAddKey(event)" placeholder="Add a to do and press Enter" class="flex-1 bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off">
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="col-span-1 flex flex-col gap-6">
@@ -448,9 +457,10 @@
                     <button type="button" onclick="closeRecord()" class="text-gray-400 hover:text-white text-3xl font-bold leading-none">&times;</button>
                 </div>
                 <div class="bg-corp-800 rounded-2xl p-6 md:p-8 border border-corp-700 shadow-2xl">
-                    <div class="flex gap-4 mb-8 bg-corp-900 p-1.5 rounded-xl border border-corp-700">
-                        <button type="button" id="btn-tx-exp" onclick="setTxType('expense')" class="flex-1 bg-red-500/20 text-red-400 border border-red-500/50 rounded-lg py-2 font-bold transition shadow-sm">📉 Log Expense</button>
-                        <button type="button" id="btn-tx-inc" onclick="setTxType('income')" class="flex-1 bg-transparent text-gray-400 border border-transparent hover:text-gray-200 rounded-lg py-2 font-bold transition">📈 Log Income</button>
+                    <div class="flex gap-3 mb-8 bg-corp-900 p-1.5 rounded-xl border border-corp-700">
+                        <button type="button" id="btn-tx-exp" onclick="setTxType('expense')" class="flex-1 bg-red-500/20 text-red-400 border border-red-500/50 rounded-lg py-2 font-bold transition shadow-sm">📉 Expense</button>
+                        <button type="button" id="btn-tx-inc" onclick="setTxType('income')" class="flex-1 bg-transparent text-gray-400 border border-transparent hover:text-gray-200 rounded-lg py-2 font-bold transition">📈 Income</button>
+                        <button type="button" id="btn-tx-tra" onclick="setTxType('transfer')" class="flex-1 bg-transparent text-gray-400 border border-transparent hover:text-gray-200 rounded-lg py-2 font-bold transition">🔄 Transfer</button>
                     </div>
                     <form id="tx-form" onsubmit="addTransaction(event)">
                         <div class="flex flex-col sm:flex-row gap-4 mb-6 items-end">
@@ -458,8 +468,8 @@
                             <div class="w-full sm:w-40 shrink-0"><label class="block text-xs text-gray-400 mb-1">Date</label><input type="date" id="tx-date" required class="w-full bg-corp-900 border border-corp-700 rounded-xl px-3 py-3.5 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div>
                             <div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1" id="tx-desc-label">What was this for? (e.g. Swiggy)</label><input type="text" id="tx-desc" placeholder="..." class="w-full bg-corp-900 border border-corp-700 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div>
                         </div>
-                        <div class="mb-6"><label class="block text-xs text-gray-400 mb-2 uppercase tracking-wide font-semibold">Select Category</label><div id="tx-chips-container" class="flex flex-wrap gap-2"></div><input type="hidden" id="tx-category" value="Food"><input type="hidden" id="tx-emoji" value="🍔"><div id="custom-cat-wrapper" class="hidden mt-3 max-w-sm"><input type="text" id="custom-cat-input" placeholder="Enter custom category name..." class="w-full bg-corp-900 border border-corp-700 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div></div>
-                        <div class="flex flex-col sm:flex-row items-end gap-4 border-t border-corp-700 pt-6"><div class="w-full sm:w-1/3"><label class="block text-xs text-gray-400 mb-1">Mode of Payment</label><select id="tx-mode" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div><div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1">Pivot Tags (Optional, comma split)</label><input type="text" id="tx-tags" placeholder="e.g. GIES-Closure, Audit" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div><button type="submit" id="btn-tx-submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]">Log Expense</button></div>
+                        <div class="mb-6" id="tx-category-section"><label class="block text-xs text-gray-400 mb-2 uppercase tracking-wide font-semibold">Select Category</label><div id="tx-chips-container" class="flex flex-wrap gap-2"></div><input type="hidden" id="tx-category" value="Food"><input type="hidden" id="tx-emoji" value="🍔"><div id="custom-cat-wrapper" class="hidden mt-3 max-w-sm"><input type="text" id="custom-cat-input" placeholder="Enter custom category name..." class="w-full bg-corp-900 border border-corp-700 rounded-lg px-4 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div></div>
+                        <div class="flex flex-col sm:flex-row items-end gap-4 border-t border-corp-700 pt-6"><div class="w-full sm:w-1/3" id="tx-mode-wrap"><label class="block text-xs text-gray-400 mb-1" id="tx-mode-label">Mode of Payment</label><select id="tx-mode" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div><div class="hidden w-full sm:w-2/3 gap-3 flex" id="tx-transfer-wrap"><div class="flex-1"><label class="block text-xs text-gray-400 mb-1">From</label><select id="tx-from" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div><div class="flex-1"><label class="block text-xs text-gray-400 mb-1">To</label><select id="tx-to" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition"></select></div></div><div class="flex-1 w-full"><label class="block text-xs text-gray-400 mb-1">Pivot Tags (Optional, comma split)</label><input type="text" id="tx-tags" placeholder="e.g. GIES-Closure, Audit" class="w-full bg-corp-900 border border-corp-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition" autocomplete="off"></div><button type="submit" id="btn-tx-submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]">Log Expense</button></div>
                     </form>
                 </div>
               </div>
@@ -623,7 +633,14 @@
                         </div>
                         <div id="editor-container" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col relative">
                             <input type="text" id="note-title" class="text-3xl md:text-4xl font-bold bg-transparent border-none text-white focus:outline-none mb-6 w-full placeholder-gray-600 tracking-tight" placeholder="Untitled Note" oninput="saveNoteState()">
-                            <p class="text-xs text-gray-500 mb-4 select-none">💡 Tip: Type <code class="bg-corp-900 border border-corp-700 px-1 rounded">[ ] </code> and hit Space to create a checkbox. Type <code class="text-corp-400">#Tag</code> to link databases.</p>
+                            <div class="flex flex-wrap items-center gap-2 mb-3 select-none">
+                                <button type="button" onclick="insertNoteCheckbox()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">☑ Checkbox</button>
+                                <button type="button" onclick="insertNoteBullet()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">• Bullet</button>
+                                <button type="button" onclick="triggerNoteImage()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">📷 Image</button>
+                                <button type="button" onclick="insertNoteLink()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">🔗 Link</button>
+                                <input type="file" id="note-image-input" accept="image/*" class="hidden" onchange="onNoteImageChosen(event)">
+                                <span class="text-[11px] text-gray-500 hidden sm:inline">Tip, type #Tag to link databases</span>
+                            </div>
                             <div id="note-editor" class="flex-1 text-gray-300 text-base md:text-lg leading-relaxed focus:outline-none" contenteditable="true" placeholder="Start typing here..." oninput="saveNoteState()" onkeydown="handleEditorShortcuts(event)"></div>
                         </div>
                         <div id="no-note-screen" class="absolute inset-0 bg-corp-800 z-10 flex flex-col items-center justify-center text-center hidden p-4">
@@ -1040,6 +1057,7 @@
         }
         let isPrivate = false;
         let scratchDraft = '';
+        let homeTodos = [];
 
         function updateGreeting() {
             const hour = TODAY.getHours();
@@ -1135,6 +1153,40 @@
             scratchDraft = el ? el.value : '';
             persistLocal();
             scheduleSave(false);
+        }
+
+        // ----- Quick To-dos on the home screen, a standalone list with real checkboxes -----
+        function renderHomeTodos() {
+            const list = document.getElementById('home-todo-list'); if (!list) return;
+            list.innerHTML = '';
+            if (!homeTodos.length) { list.innerHTML = '<p class="text-xs text-gray-500 italic">No to dos yet. Add one below.</p>'; return; }
+            homeTodos.forEach(t => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-2 group';
+                row.innerHTML = `<input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleHomeTodo('${t.id}')" class="w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 cursor-pointer shrink-0"><input type="text" value="${esc(t.text)}" oninput="updateHomeTodo('${t.id}', this.value)" onkeydown="handleTodoItemKey(event, '${t.id}')" class="flex-1 bg-transparent border-none outline-none text-sm ${t.done ? 'line-through text-gray-500' : 'text-gray-200'}"><button onclick="delHomeTodo('${t.id}')" class="text-gray-600 hover:text-red-400 opacity-100 lg:opacity-0 group-hover:opacity-100 transition text-sm shrink-0" title="Remove">✕</button>`;
+                list.appendChild(row);
+            });
+        }
+        function addHomeTodo(text, afterId) {
+            const item = { id: 'td_' + Date.now() + '_' + Math.floor(Math.random() * 1000), text: text || '', done: false };
+            if (afterId) { const i = homeTodos.findIndex(t => t.id === afterId); if (i !== -1) homeTodos.splice(i + 1, 0, item); else homeTodos.push(item); }
+            else homeTodos.push(item);
+            persistLocal(); scheduleSave(); renderHomeTodos();
+            return item.id;
+        }
+        function toggleHomeTodo(id) { const t = homeTodos.find(x => x.id === id); if (!t) return; t.done = !t.done; persistLocal(); scheduleSave(); renderHomeTodos(); }
+        function updateHomeTodo(id, text) { const t = homeTodos.find(x => x.id === id); if (!t) return; t.text = text; persistLocal(); scheduleSave(false); }
+        function delHomeTodo(id) { const idx = homeTodos.findIndex(x => x.id === id); if (idx === -1) return; homeTodos.splice(idx, 1); persistLocal(); scheduleSave(); renderHomeTodos(); }
+        function handleTodoAddKey(e) {
+            if (e.key === 'Enter') { e.preventDefault(); const input = e.target; const v = input.value.trim(); if (v) { addHomeTodo(v); input.value = ''; setTimeout(() => input.focus(), 20); } }
+        }
+        // Pressing Enter inside a to do creates the next one and moves the cursor to it.
+        function handleTodoItemKey(e, id) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const newId = addHomeTodo('', id);
+                setTimeout(() => { const list = document.getElementById('home-todo-list'); if (!list) return; const rows = list.querySelectorAll('input[type="text"]'); for (const r of rows) { if (r.getAttribute('onkeydown') && r.getAttribute('onkeydown').includes("'" + newId + "'")) { r.focus(); break; } } }, 30);
+            }
         }
 
         function formatMoney(num) { return isPrivate ? '***,***' : Number(num).toLocaleString('en-IN'); }
@@ -1414,6 +1466,11 @@
         let acctTxId = null;
         let acctTxMonth = 'all';
         function effectOnAccount(tx, acc) {
+            if (tx.type === 'transfer') {
+                if (tx.fromId === acc.id) return acc.type === 'asset' ? -Number(tx.amount) : Number(tx.amount);
+                if (tx.toId === acc.id) return acc.type === 'asset' ? Number(tx.amount) : -Number(tx.amount);
+                return 0;
+            }
             if (tx.type === 'income') return acc.type === 'asset' ? Number(tx.amount) : -Number(tx.amount);
             return acc.type === 'asset' ? -Number(tx.amount) : Number(tx.amount);
         }
@@ -1423,7 +1480,7 @@
         function renderAccountTx() {
             if (!acctTxId) return;
             const acc = accounts.find(a => a.id === acctTxId); if (!acc) { closeAccountTx(); return; }
-            const allTxs = transactionsDB.filter(t => t.modeId === acctTxId);
+            const allTxs = transactionsDB.filter(t => t.modeId === acctTxId || (t.type === 'transfer' && t.toId === acctTxId));
             // Running balance is computed across all time so each line shows the true balance after it.
             const asc = allTxs.slice().sort((a, b) => new Date(a.date) - new Date(b.date) || a.id - b.id);
             const totalEffect = asc.reduce((s, t) => s + effectOnAccount(t, acc), 0);
@@ -1453,9 +1510,18 @@
             }
             shown.forEach(({ t, run }) => {
                 const e = effectOnAccount(t, acc); const pos = e >= 0;
+                let label, sub;
+                if (t.type === 'transfer') {
+                    const other = accounts.find(a => a.id === (t.fromId === acctTxId ? t.toId : t.fromId));
+                    label = `🔄 ${t.fromId === acctTxId ? 'To ' : 'From '}${other ? esc(other.name) : '?'}`;
+                    sub = `${t.date} · Transfer`;
+                } else {
+                    label = `${t.emoji || ''} ${esc(t.desc || t.category)}`;
+                    sub = `${t.date}${t.category ? (' · ' + esc(t.category)) : ''}`;
+                }
                 const row = document.createElement('div');
                 row.className = 'flex items-center justify-between bg-corp-900 border border-corp-700 rounded-lg p-3';
-                row.innerHTML = `<div class="min-w-0"><div class="text-sm font-medium text-gray-200 truncate">${t.emoji || ''} ${esc(t.desc || t.category)}</div><div class="text-[11px] text-gray-500">${t.date}${t.category ? (' · ' + esc(t.category)) : ''}</div></div><div class="text-right shrink-0 ml-2"><div class="${pos ? 'text-green-400' : 'text-red-400'} text-sm font-bold">${pos ? '+' : '-'} ₹${formatMoney(Math.abs(e))}</div><div class="text-[11px] text-gray-500">bal ₹${formatMoney(run)}</div></div>`;
+                row.innerHTML = `<div class="min-w-0"><div class="text-sm font-medium text-gray-200 truncate">${label}</div><div class="text-[11px] text-gray-500">${sub}</div></div><div class="text-right shrink-0 ml-2"><div class="${pos ? 'text-green-400' : 'text-red-400'} text-sm font-bold">${pos ? '+' : '-'} ₹${formatMoney(Math.abs(e))}</div><div class="text-[11px] text-gray-500">bal ₹${formatMoney(run)}</div></div>`;
                 list.appendChild(row);
             });
         }
@@ -1594,10 +1660,36 @@
 
         function setTxType(type) {
             currTxType = type;
-            const btnExp = document.getElementById('btn-tx-exp'); const btnInc = document.getElementById('btn-tx-inc'); const submitBtn = document.getElementById('btn-tx-submit'); const descLabel = document.getElementById('tx-desc-label');
-            if (type === 'expense') { btnExp.className = "flex-1 bg-red-500/20 text-red-400 border border-red-500/50 rounded-lg py-2 font-bold transition shadow-sm"; btnInc.className = "flex-1 bg-transparent text-gray-400 border border-transparent hover:text-gray-200 rounded-lg py-2 font-bold transition"; submitBtn.className = "w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Expense"; descLabel.innerText = "What was this for? (e.g. Swiggy)"; } 
-            else { btnInc.className = "flex-1 bg-green-500/20 text-green-400 border border-green-500/50 rounded-lg py-2 font-bold transition shadow-sm"; btnExp.className = "flex-1 bg-transparent text-gray-400 border border-transparent hover:text-gray-200 rounded-lg py-2 font-bold transition"; submitBtn.className = "w-full sm:w-auto bg-green-600 hover:bg-green-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Income"; descLabel.innerText = "Source of income? (e.g. Acme Corp)"; }
-            renderTxChips(); document.getElementById('custom-cat-wrapper').classList.add('hidden');
+            const btnExp = document.getElementById('btn-tx-exp'); const btnInc = document.getElementById('btn-tx-inc'); const btnTra = document.getElementById('btn-tx-tra'); const submitBtn = document.getElementById('btn-tx-submit'); const descLabel = document.getElementById('tx-desc-label');
+            const catSec = document.getElementById('tx-category-section'); const modeWrap = document.getElementById('tx-mode-wrap'); const transWrap = document.getElementById('tx-transfer-wrap'); const modeLabel = document.getElementById('tx-mode-label');
+            const inactive = "flex-1 bg-transparent text-gray-400 border border-transparent hover:text-gray-200 rounded-lg py-2 font-bold transition";
+            btnExp.className = inactive; btnInc.className = inactive; if (btnTra) btnTra.className = inactive;
+            if (type === 'expense') {
+                btnExp.className = "flex-1 bg-red-500/20 text-red-400 border border-red-500/50 rounded-lg py-2 font-bold transition shadow-sm";
+                submitBtn.className = "w-full sm:w-auto bg-red-600 hover:bg-red-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Expense";
+                descLabel.innerText = "What was this for? (e.g. Swiggy)";
+                catSec.classList.remove('hidden'); modeWrap.classList.remove('hidden'); transWrap.classList.add('hidden'); transWrap.classList.remove('flex');
+                modeLabel.innerText = "Mode of Payment"; renderTxChips();
+            } else if (type === 'income') {
+                btnInc.className = "flex-1 bg-green-500/20 text-green-400 border border-green-500/50 rounded-lg py-2 font-bold transition shadow-sm";
+                submitBtn.className = "w-full sm:w-auto bg-green-600 hover:bg-green-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Income";
+                descLabel.innerText = "Source of income? (e.g. Acme Corp)";
+                catSec.classList.remove('hidden'); modeWrap.classList.remove('hidden'); transWrap.classList.add('hidden'); transWrap.classList.remove('flex');
+                modeLabel.innerText = "Mode of Receipt"; renderTxChips();
+            } else {
+                btnTra.className = "flex-1 bg-corp-500/20 text-corp-300 border border-corp-500/50 rounded-lg py-2 font-bold transition shadow-sm";
+                submitBtn.className = "w-full sm:w-auto bg-corp-600 hover:bg-corp-500 text-white px-10 py-2 rounded-lg font-medium transition shadow h-[38px]"; submitBtn.innerText = "Log Transfer";
+                descLabel.innerText = "Note (optional, e.g. Card bill)";
+                catSec.classList.add('hidden'); modeWrap.classList.add('hidden'); transWrap.classList.remove('hidden'); transWrap.classList.add('flex');
+                populateTransferDropdowns();
+            }
+            document.getElementById('custom-cat-wrapper').classList.add('hidden');
+        }
+        function populateTransferDropdowns() {
+            const opts = accounts.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
+            const from = document.getElementById('tx-from'); const to = document.getElementById('tx-to');
+            if (from) from.innerHTML = opts;
+            if (to) to.innerHTML = opts;
         }
 
         function renderTxChips() {
@@ -1614,8 +1706,29 @@
             if(cat === 'Other') { document.getElementById('custom-cat-wrapper').classList.remove('hidden'); document.getElementById('custom-cat-input').focus(); } else { document.getElementById('custom-cat-wrapper').classList.add('hidden'); }
         }
 
+        // A transfer moves money between your own accounts. Net worth does not change and it is
+        // never counted as income or expense. Sending to a credit card settles that outstanding.
+        function handleTransfer(amt) {
+            const fromId = document.getElementById('tx-from').value; const toId = document.getElementById('tx-to').value;
+            const from = accounts.find(a => a.id === fromId); const to = accounts.find(a => a.id === toId);
+            if (!from || !to) { showToast('Choose both a From and a To account.', 'warning'); return; }
+            if (fromId === toId) { showToast('From and To must be different accounts.', 'warning'); return; }
+            if (!(amt > 0)) { showToast('Enter an amount greater than zero.', 'warning'); return; }
+            if (from.type === 'asset' && from.balance < amt) { showToast(`Insufficient funds in ${from.name}. Requires ₹${formatMoney(amt)}, available ₹${formatMoney(from.balance)}.`, 'warning'); return; }
+            if (from.type === 'asset') from.balance -= amt; else from.balance += amt;
+            if (to.type === 'asset') to.balance += amt; else to.balance -= amt;
+            const item = { id: Date.now(), type: 'transfer', amount: amt, fromId: fromId, toId: toId, modeId: fromId, desc: document.getElementById('tx-desc').value, date: document.getElementById('tx-date').value, tags: parseTags(document.getElementById('tx-tags').value) };
+            transactionsDB.push(item);
+            document.getElementById('tx-amount').value = ''; document.getElementById('tx-desc').value = ''; document.getElementById('tx-tags').value = '';
+            editingTxId = null;
+            renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+            closeRecord();
+            showToast(`Transferred ₹${formatMoney(amt)} from ${from.name} to ${to.name}.`, 'success');
+        }
         function addTransaction(e) {
-            e.preventDefault(); const amt = Number(document.getElementById('tx-amount').value); const modeId = document.getElementById('tx-mode').value; const acc = accounts.find(a => a.id === modeId);
+            e.preventDefault(); const amt = Number(document.getElementById('tx-amount').value);
+            if (currTxType === 'transfer') { handleTransfer(amt); return; }
+            const modeId = document.getElementById('tx-mode').value; const acc = accounts.find(a => a.id === modeId);
             if (!acc) { showToast('Add an account first, then you can record against it. Opening Finance now.', 'warning'); closeRecord(); switchTab('finance'); return; }
 
             // Editing an existing entry: first reverse its old effect so the checks and balances are correct.
@@ -1684,6 +1797,22 @@
         function delTransaction(id) {
             const idx = transactionsDB.findIndex(e => e.id === id); if (idx === -1) return;
             const tx = transactionsDB[idx];
+            if (tx.type === 'transfer') {
+                const from = accounts.find(a => a.id === tx.fromId); const to = accounts.find(a => a.id === tx.toId);
+                if (from) { if (from.type === 'asset') from.balance += tx.amount; else from.balance -= tx.amount; }
+                if (to) { if (to.type === 'asset') to.balance -= tx.amount; else to.balance += tx.amount; }
+                const removedT = transactionsDB.splice(idx, 1)[0]; const removedTIndex = idx;
+                renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+                showToast('Transfer deleted. The balances have been reversed.', 'warning', { persist: true, actionLabel: 'Undo', onAction: () => {
+                    const f2 = accounts.find(a => a.id === removedT.fromId); const t2 = accounts.find(a => a.id === removedT.toId);
+                    if (f2) { if (f2.type === 'asset') f2.balance -= removedT.amount; else f2.balance += removedT.amount; }
+                    if (t2) { if (t2.type === 'asset') t2.balance += removedT.amount; else t2.balance -= removedT.amount; }
+                    transactionsDB.splice(Math.min(removedTIndex, transactionsDB.length), 0, removedT);
+                    renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+                    showToast('Transfer restored.', 'success');
+                } });
+                return;
+            }
             const acc = accounts.find(a => a.id === tx.modeId);
             // Reverse the balance effect, exactly as before.
             if (acc) { if (tx.type === 'income') { if (acc.type === 'asset') acc.balance -= tx.amount; else acc.balance += tx.amount; } else { if (acc.type === 'asset') acc.balance += tx.amount; else acc.balance -= tx.amount; } }
@@ -1744,7 +1873,8 @@
 
             transactionsDB.forEach(tx => {
                 if(tx.date.startsWith(selMonth)) {
-                    if(tx.type === 'income') { if(recalcStats) tTotalInc += tx.amount; } 
+                    if(tx.type === 'income') { if(recalcStats) tTotalInc += tx.amount; }
+                    else if(tx.type === 'transfer') { /* a transfer is neither income nor expense */ }
                     else {
                         if(recalcStats) {
                             tTotalExp += tx.amount;
@@ -1754,15 +1884,18 @@
                     }
                     
                     let passesFilter = true;
-                    if(anaTimelineFilter && tx.type !== 'income') {
-                        if(anaTimelineFilter.type === 'category' && tx.category !== anaTimelineFilter.value) passesFilter = false;
-                        if(anaTimelineFilter.type === 'vendor' && (tx.desc ? tx.desc.trim() : tx.category) !== anaTimelineFilter.value) passesFilter = false;
-                    } else if (anaTimelineFilter && tx.type === 'income') { passesFilter = false; }
+                    if(anaTimelineFilter) {
+                        if(tx.type === 'income' || tx.type === 'transfer') passesFilter = false;
+                        else {
+                            if(anaTimelineFilter.type === 'category' && tx.category !== anaTimelineFilter.value) passesFilter = false;
+                            if(anaTimelineFilter.type === 'vendor' && (tx.desc ? tx.desc.trim() : tx.category) !== anaTimelineFilter.value) passesFilter = false;
+                        }
+                    }
 
                     if(passesFilter) {
                         if(!dayGroups[tx.date]) dayGroups[tx.date] = { net: 0, items: [] }; 
                         dayGroups[tx.date].items.push({...tx, isRec: false}); 
-                        dayGroups[tx.date].net += (tx.type === 'income' ? tx.amount : -tx.amount);
+                        dayGroups[tx.date].net += (tx.type === 'income' ? tx.amount : (tx.type === 'transfer' ? 0 : -tx.amount));
                     }
                 }
                 if(recalcStats && tx.type === 'expense' && tx.date.startsWith(lastMonthStr)) { lmTotalExp += tx.amount; }
@@ -1771,7 +1904,9 @@
             recDB.forEach(r => {
                 if(r.done && r.date.startsWith(selMonth)) {
                     let isInv = r.tags.includes('Investments') || r.type === 'Investments';
+                    let isCard = r.type === 'Credit card';
                     if(isInv) { if(recalcStats) tTotalInv += Number(r.amount); } 
+                    else if(isCard) { /* a card bill payment settles a liability, it is not a fresh expense */ }
                     else {
                         if(recalcStats) {
                             tTotalExp += Number(r.amount);
@@ -1781,18 +1916,18 @@
                     }
 
                     let passesFilter = true;
-                    if(anaTimelineFilter && !isInv) {
+                    if(anaTimelineFilter && !isInv && !isCard) {
                         if(anaTimelineFilter.type === 'category' && r.type !== anaTimelineFilter.value) passesFilter = false;
                         if(anaTimelineFilter.type === 'vendor' && r.name.trim() !== anaTimelineFilter.value) passesFilter = false;
-                    } else if (anaTimelineFilter && isInv) { passesFilter = false; }
+                    } else if (anaTimelineFilter && (isInv || isCard)) { passesFilter = false; }
 
                     if(passesFilter) {
                         if(!dayGroups[r.date]) dayGroups[r.date] = { net: 0, items: [] }; 
                         dayGroups[r.date].items.push({...r, isRec: true, emoji: '🔄'}); 
-                        dayGroups[r.date].net -= Number(r.amount);
+                        dayGroups[r.date].net -= (isCard ? 0 : Number(r.amount));
                     }
                 }
-                if(recalcStats && r.done && r.date.startsWith(lastMonthStr) && !r.tags.includes('Investments') && r.type !== 'Investments') { lmTotalExp += Number(r.amount); }
+                if(recalcStats && r.done && r.date.startsWith(lastMonthStr) && !r.tags.includes('Investments') && r.type !== 'Investments' && r.type !== 'Credit card') { lmTotalExp += Number(r.amount); }
             });
 
             if(recalcStats) {
@@ -1869,8 +2004,8 @@
                 const dayData = dayGroups[dateStr]; const displayDate = new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
                 let dayHtml = `<div class="mb-4"><h3 class="text-gray-400 font-bold mb-3 border-b border-corp-700 pb-1 text-sm tracking-wide uppercase">📅 ${displayDate}</h3><div class="space-y-2">`;
                 dayData.items.forEach(item => {
-                    const acc = accounts.find(a => a.id === item.modeId); const isInc = item.type === 'income'; const isInv = item.isRec && (item.type === 'Investments' || (item.tags && item.tags.includes('Investments'))); const amountStr = `${isInc ? '+' : '-'} ₹${formatMoney(item.amount)}`; const colorClass = isInc ? 'text-green-400' : (isInv ? 'text-corp-300' : 'text-red-400'); const title = item.isRec ? `${item.name} (${item.type})` : (item.desc || item.category);
-                    dayHtml += `<div class="flex flex-col sm:flex-row sm:items-center justify-between bg-corp-900/50 p-3 rounded-lg border border-corp-700/50 hover:bg-corp-800 transition group gap-2"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-corp-800 flex items-center justify-center text-lg border border-corp-700 shrink-0 shadow-sm">${item.emoji}</div><div><div class="font-medium text-gray-200 text-sm">${title}</div><div class="text-xs text-gray-500 flex gap-2 mt-0.5"><span>💳 ${acc?acc.name:'Unknown'}</span> ${item.isRec ? '<span class="text-corp-400">🔄 Recurring</span>' : ''}</div>${(item.tags && item.tags.length > 0) ? `<div class="mt-1 flex flex-wrap gap-1">${renderTagBadges(item.tags)}</div>` : ''}</div></div><div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 w-full sm:w-auto"><span class="${colorClass} font-bold text-sm tracking-wide">${amountStr}</span>${!item.isRec ? `<div class="flex items-center gap-3 opacity-100 sm:opacity-0 group-hover:opacity-100 transition"><button onclick="openRecordForEdit(${item.id})" class="text-gray-500 hover:text-corp-300 text-xs font-medium">Edit</button><button onclick="delTransaction(${item.id})" class="text-gray-500 hover:text-red-400 text-xs font-medium">Refund & Delete</button></div>` : ''}</div></div>`;
+                    const acc = accounts.find(a => a.id === item.modeId); const isInc = item.type === 'income'; const isTransfer = item.type === 'transfer'; const isInv = item.isRec && (item.type === 'Investments' || (item.tags && item.tags.includes('Investments'))); const isCard = item.isRec && item.type === 'Credit card'; const neutral = isTransfer || isInv || isCard; const amountStr = isTransfer ? `⇄ ₹${formatMoney(item.amount)}` : `${isInc ? '+' : '-'} ₹${formatMoney(item.amount)}`; const colorClass = isInc ? 'text-green-400' : (neutral ? 'text-corp-300' : 'text-red-400'); let title; if (isTransfer) { const _f = accounts.find(a => a.id === item.fromId); const _t = accounts.find(a => a.id === item.toId); title = `Transfer: ${_f ? esc(_f.name) : '?'} → ${_t ? esc(_t.name) : '?'}`; } else { title = item.isRec ? `${item.name} (${item.type})` : (item.desc || item.category); }
+                    dayHtml += `<div class="flex flex-col sm:flex-row sm:items-center justify-between bg-corp-900/50 p-3 rounded-lg border border-corp-700/50 hover:bg-corp-800 transition group gap-2"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-corp-800 flex items-center justify-center text-lg border border-corp-700 shrink-0 shadow-sm">${isTransfer ? '🔄' : item.emoji}</div><div><div class="font-medium text-gray-200 text-sm">${title}</div><div class="text-xs text-gray-500 flex gap-2 mt-0.5"><span>💳 ${acc?acc.name:'Unknown'}</span> ${item.isRec ? '<span class="text-corp-400">🔄 Recurring</span>' : ''}</div>${(item.tags && item.tags.length > 0) ? `<div class="mt-1 flex flex-wrap gap-1">${renderTagBadges(item.tags)}</div>` : ''}</div></div><div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 w-full sm:w-auto"><span class="${colorClass} font-bold text-sm tracking-wide">${amountStr}</span>${!item.isRec ? `<div class="flex items-center gap-3 opacity-100 sm:opacity-0 group-hover:opacity-100 transition">${!isTransfer ? `<button onclick="openRecordForEdit(${item.id})" class="text-gray-500 hover:text-corp-300 text-xs font-medium">Edit</button>` : ''}<button onclick="delTransaction(${item.id})" class="text-gray-500 hover:text-red-400 text-xs font-medium">${isTransfer ? 'Delete' : 'Refund & Delete'}</button></div>` : ''}</div></div>`;
                 });
                 const netColor = dayData.net >= 0 ? 'text-green-400' : 'text-red-400'; const netSign = dayData.net >= 0 ? '+' : '';
                 dayHtml += `</div><div class="text-right mt-2 mr-2"><span class="text-xs text-gray-500 font-semibold uppercase tracking-wider mr-2">Daily Net:</span><span class="${netColor} font-bold text-sm bg-corp-900 px-2 py-1 rounded border border-corp-700 shadow-inner">${netSign}₹${formatMoney(dayData.net)}</span></div></div>`;
@@ -2426,6 +2561,59 @@
         }
         function handleEditorShortcuts(e) { if(e.code === 'Space') { const sel = window.getSelection(); if (!sel.rangeCount) return; const node = sel.anchorNode; if(node.nodeType === 3 && node.textContent.endsWith('[ ]')) { e.preventDefault(); node.textContent = node.textContent.slice(0, -3); const range = sel.getRangeAt(0); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)'); const span = document.createElement('span'); span.className = 'task-text'; span.innerHTML = '&#8203;'; range.insertNode(span); range.insertNode(cb); range.setStart(span, 1); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); saveNoteState(); } } }
         function toggleNoteTask(cb) { if(cb.nextSibling && cb.nextSibling.classList.contains('task-text')) { if(cb.checked) { cb.nextSibling.style.textDecoration = 'line-through'; cb.nextSibling.style.opacity = '0.5'; } else { cb.nextSibling.style.textDecoration = 'none'; cb.nextSibling.style.opacity = '1'; } } const taskId = cb.getAttribute('data-task-id'); if(taskId) { const t = tDB.find(x => x.id == taskId); if(t) { t.done = cb.checked; t.status = t.done ? 'Done' : 'Not started'; renderTaskTable(); renderHomeWidgets(); } } saveNoteState(); }
+
+        // ----- Notes toolbar: reliable buttons for phone use, replacing the bracket trick -----
+        function insertBlockAtCursor(editor, node) {
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount && editor.contains(sel.anchorNode)) { const range = sel.getRangeAt(0); range.collapse(false); range.insertNode(node); }
+            else { editor.appendChild(node); }
+        }
+        function insertNoteCheckbox() {
+            const editor = document.getElementById('note-editor'); if (!editor) return; editor.focus();
+            const line = document.createElement('div');
+            const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)');
+            const span = document.createElement('span'); span.className = 'task-text'; span.innerHTML = '&#8203;';
+            line.appendChild(cb); line.appendChild(span);
+            insertBlockAtCursor(editor, line);
+            try { const sel = window.getSelection(); const range = document.createRange(); range.setStart(span, span.childNodes.length); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); } catch (e) {}
+            saveNoteState();
+        }
+        function insertNoteBullet() { const editor = document.getElementById('note-editor'); if (!editor) return; editor.focus(); try { document.execCommand('insertUnorderedList'); } catch (e) {} saveNoteState(); }
+        function triggerNoteImage() { const inp = document.getElementById('note-image-input'); if (inp) inp.click(); }
+        function onNoteImageChosen(e) {
+            const file = e.target.files && e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const max = 1200; let w = img.width, h = img.height;
+                    if (w > max || h > max) { if (w >= h) { h = Math.round(h * max / w); w = max; } else { w = Math.round(w * max / h); h = max; } }
+                    const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    let dataUrl; try { dataUrl = canvas.toDataURL('image/jpeg', 0.8); } catch (err) { showToast('Could not read that image.', 'warning'); return; }
+                    const editor = document.getElementById('note-editor'); if (!editor) return; editor.focus();
+                    const image = document.createElement('img'); image.src = dataUrl; image.className = 'note-img max-w-full rounded-lg my-2 border border-corp-700';
+                    const wrap = document.createElement('div'); wrap.appendChild(image); wrap.appendChild(document.createElement('br'));
+                    insertBlockAtCursor(editor, wrap);
+                    saveNoteState();
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        }
+        function insertNoteLink() {
+            showPrompt('Paste a link, for example a Drive file URL', { title: 'Add link or attachment', placeholder: 'https://...', confirmLabel: 'Next', onSubmit: (url) => {
+                if (!url) return;
+                showPrompt('Text to show for the link', { title: 'Link label', value: url, confirmLabel: 'Add', onSubmit: (label) => {
+                    const editor = document.getElementById('note-editor'); if (!editor) return; editor.focus();
+                    const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.className = 'text-corp-300 underline'; a.textContent = label || url;
+                    const wrap = document.createElement('div'); wrap.appendChild(document.createTextNode('📎 ')); wrap.appendChild(a);
+                    insertBlockAtCursor(editor, wrap);
+                    saveNoteState();
+                } });
+            } });
+        }
         function syncTasksToApp() { if(!activeNoteId) return; const note = notesDB.find(n => n.id === activeNoteId); if(!note) return; const editor = document.getElementById('note-editor'); const checkboxes = editor.querySelectorAll('.note-cb'); let count = 0; checkboxes.forEach(cb => { if(!cb.hasAttribute('data-task-id')) { const textNode = cb.nextSibling; const taskName = textNode ? textNode.textContent.replace(/\u200B/g, '').trim() : ''; if(taskName) { const newTaskId = Date.now() + count; cb.setAttribute('data-task-id', newTaskId); tDB.push({ id: newTaskId, name: taskName, client_name: note.title || "Note Sync", category: "Work", date: todayISO().split('T')[0], status: cb.checked ? "Done" : "Not started", recurring: false, done: cb.checked, tags: [], customData: {} }); count++; } } }); saveNoteState(); if(count > 0) { showToast(`Synced ${count} new action item${count > 1 ? 's' : ''} to your Task Tracker.`, 'success'); renderTaskTable(); renderHomeWidgets(); } else { showToast('No new unsynced to-dos found. Type "[ ] " and a space to create a task.', 'info'); } }
 
         // ==========================================================
@@ -2439,6 +2627,7 @@
             const tx = document.getElementById('tx-mode'); if (tx) tx.innerHTML = opts;
             const rec = document.getElementById('rec-mode'); if (rec) rec.innerHTML = opts;
             const dest = document.getElementById('rec-dest'); if (dest) dest.innerHTML = '<option value="">Choose holding...</option>' + accounts.filter(a => a.subtype === 'investment').map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join('');
+            populateTransferDropdowns();
         }
         function toggleRecDest() { const t = document.getElementById('rec-type').value; const wrap = document.getElementById('rec-dest-wrap'); if (wrap) wrap.classList.toggle('hidden', t !== 'Investments'); }
 
@@ -2481,7 +2670,7 @@
             return {
                 accounts, transactionsDB, recDB, recCols, tDB, tCols,
                 notesDB, folders, docsDB, userBudget, security, profile,
-                isPrivate, scratchDraft,
+                isPrivate, scratchDraft, homeTodos,
                 savedAt: new Date().toISOString()
             };
         }
@@ -2506,8 +2695,10 @@
             }
             if (typeof d.isPrivate === 'boolean') isPrivate = d.isPrivate;
             if (typeof d.scratchDraft === 'string') scratchDraft = d.scratchDraft;
+            if (Array.isArray(d.homeTodos)) homeTodos = d.homeTodos;
             applyPrivacyUI();
             applyScratchDraft();
+            renderHomeTodos();
             populateModeDropdown();
             renderAccounts(); renderRecTable(); renderTaskTable(); renderDocs();
             renderNotesSidebar(); renderCashflowAnalytics(); renderHomeWidgets();
@@ -2546,9 +2737,38 @@
         }
 
         // Offered when a silent restore could not refresh the pass. One tap always works because the user starts it.
+        let reconnecting = false;
+        let autoReconnectArmed = false;
+        let silentRetries = 0;
+        let pausedRetryTimer = null;
         function reconnectCloud() {
+            if (reconnecting) return;
+            reconnecting = true;
             setSyncStatus('Reconnecting...');
             googleAuth(true);
+            // Safety net: if the popup is blocked or dismissed and no callback returns, do not stay stuck.
+            setTimeout(() => { if (reconnecting && !useCloud) { reconnecting = false; if (cloudPaused) armAutoReconnect(); } }, 12000);
+        }
+        // While paused, quietly retry the silent restore every half minute and whenever the app regains focus,
+        // so a temporary block clears on its own without needing a tap.
+        function startPausedAutoRetry() {
+            if (pausedRetryTimer) return;
+            pausedRetryTimer = setInterval(() => {
+                if (cloudPaused && !useCloud && !reconnecting && !locked && document.visibilityState === 'visible') { silentRetries = 0; setSyncStatus('Reconnecting to Drive...'); googleAuth(false); }
+            }, 30000);
+        }
+        function stopPausedAutoRetry() { if (pausedRetryTimer) { clearInterval(pausedRetryTimer); pausedRetryTimer = null; } }
+        // After a paused open, reconnect on the user's first tap, which counts as the gesture Google needs,
+        // so sync resumes on its own without you hunting for the reconnect link.
+        function armAutoReconnect() {
+            if (autoReconnectArmed) return;
+            autoReconnectArmed = true;
+            const h = () => {
+                document.removeEventListener('pointerdown', h, true);
+                autoReconnectArmed = false;
+                if (cloudPaused && !useCloud && !locked && !reconnecting) reconnectCloud();
+            };
+            document.addEventListener('pointerdown', h, true);
         }
 
         // ----- Google Drive engine (adapted from the supplied study.html) -----
@@ -2650,6 +2870,7 @@
                     // Offer a clear one tap reconnect instead, which always works because the user starts it.
                     cloudPaused = true;
                     setSyncStatus('Cloud paused, tap to reconnect', { reconnect: true });
+                    armAutoReconnect(); startPausedAutoRetry();
                     return;
                 }
                 if (!res.ok) { const er = await res.json().catch(() => ({})); throw new Error((er.error && er.error.message) || 'Sync failed'); }
@@ -2685,18 +2906,25 @@
                 client_id: CLIENT_ID,
                 scope: SCOPES,
                 callback: async (res) => {
+                    reconnecting = false;
                     if (res && res.error) {
                         if (authMode === 'silent') {
-                            // Could not restore quietly. Keep the user in the app with cached data and offer one tap reconnect.
+                            // A silent restore can fail briefly. Retry a few times before giving up.
+                            if (silentRetries < 3) { silentRetries++; setSyncStatus('Reconnecting to Drive...'); setTimeout(() => { if (!useCloud) googleAuth(false); }, 1000 * silentRetries); return; }
                             hydrating = false; useCloud = false; cloudPaused = true;
                             setSyncStatus('Cloud paused, tap to reconnect', { reconnect: true });
+                            armAutoReconnect(); startPausedAutoRetry();
+                        } else if (appStarted) {
+                            // A reconnect attempt that was dismissed should not throw the user to the sign in error screen.
+                            cloudPaused = true; setSyncStatus('Cloud paused, tap to reconnect', { reconnect: true });
+                            armAutoReconnect(); startPausedAutoRetry();
                         } else {
                             document.getElementById('auth-error').classList.remove('hidden');
                         }
                         return;
                     }
                     googleToken = res.access_token;
-                    cloudPaused = false;
+                    cloudPaused = false; silentRetries = 0; stopPausedAutoRetry();
                     localStorage.setItem('rishab_cloud', 'true');
                     const firstStart = !appStarted;
                     if (authMode === 'interactive' && firstStart) showAuthLoading();
@@ -3008,8 +3236,12 @@
                 window.addEventListener(ev, () => { if (!locked) markActivity(); }, { passive: true });
             });
             document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) checkIdleLock();   // returning to the page checks how long you were away
+                if (!document.hidden) {
+                    checkIdleLock();   // returning to the page checks how long you were away
+                    if (cloudPaused && !useCloud && !reconnecting && !locked) { silentRetries = 0; setSyncStatus('Reconnecting to Drive...'); googleAuth(false); }
+                }
             });
+            window.addEventListener('focus', () => { if (cloudPaused && !useCloud && !reconnecting && !locked) { silentRetries = 0; googleAuth(false); } });
             setInterval(checkIdleLock, 20000);           // and a steady check covers idling on the page itself
         })();
 
@@ -3403,6 +3635,7 @@
 
             renderSettings();
             renderProfile();
+            renderHomeTodos();
 
             const wasCloud = localStorage.getItem('rishab_cloud') === 'true';
             if (wasCloud) {
@@ -3415,7 +3648,7 @@
                 setTimeout(() => {
                     if (hydrating) {
                         hydrating = false;
-                        if (!useCloud) { cloudPaused = true; setSyncStatus('Cloud paused, tap to reconnect', { reconnect: true }); }
+                        if (!useCloud) { cloudPaused = true; setSyncStatus('Cloud paused, tap to reconnect', { reconnect: true }); armAutoReconnect(); startPausedAutoRetry(); }
                     }
                 }, 9000);
             } else {
