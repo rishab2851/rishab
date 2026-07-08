@@ -640,6 +640,15 @@
                         <div id="editor-container" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col relative">
                             <input type="text" id="note-title" class="text-3xl md:text-4xl font-bold bg-transparent border-none text-white focus:outline-none mb-6 w-full placeholder-gray-600 tracking-tight" placeholder="Untitled Note" oninput="saveNoteState()">
                             <div class="flex flex-wrap items-center gap-2 mb-3 select-none">
+                                <button type="button" onmousedown="event.preventDefault()" onclick="fmtBold()" class="w-8 h-8 flex items-center justify-center text-sm bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg transition" title="Bold (Ctrl+B)"><b>B</b></button>
+                                <button type="button" onmousedown="event.preventDefault()" onclick="fmtItalic()" class="w-8 h-8 flex items-center justify-center text-sm bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg transition" title="Italic (Ctrl+I)"><i>I</i></button>
+                                <button type="button" onmousedown="event.preventDefault()" onclick="fmtUnderline()" class="w-8 h-8 flex items-center justify-center text-sm bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg transition" title="Underline (Ctrl+U)"><u>U</u></button>
+                                <select onchange="applyFont(this.value);this.selectedIndex=0" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Font"><option value="">Font</option><option value="inherit">Default</option><option value="Georgia, serif">Serif</option><option value="ui-monospace, Menlo, Consolas, monospace">Mono</option></select>
+                                <select onchange="applySize(this.value);this.selectedIndex=0" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Size"><option value="">Size</option><option value="small">Small</option><option value="normal">Normal</option><option value="large">Large</option><option value="heading">Heading</option></select>
+                                <select onchange="applyColor(this.value);this.selectedIndex=0" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Text colour"><option value="">Colour</option><option value="default">Default</option><option value="#9ca3af">Grey</option><option value="#f87171">Red</option><option value="#fb923c">Orange</option><option value="#4ade80">Green</option><option value="#60a5fa">Blue</option><option value="#c084fc">Purple</option></select>
+                                <select onchange="applyHighlight(this.value);this.selectedIndex=0" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Highlight"><option value="">Highlight</option><option value="none">None</option><option value="rgba(234,179,8,0.4)">Yellow</option><option value="rgba(34,197,94,0.35)">Green</option><option value="rgba(59,130,246,0.35)">Blue</option><option value="rgba(236,72,153,0.35)">Pink</option></select>
+                                <button type="button" onmousedown="event.preventDefault()" onclick="clearFormatting()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition" title="Clear formatting">Clear</button>
+                                <span class="w-px h-6 bg-corp-700 mx-0.5"></span>
                                 <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteCheckbox()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">☑ Checkbox</button>
                                 <button type="button" onmousedown="event.preventDefault()" onclick="triggerNoteImage()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">📷 Image</button>
                                 <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteLink()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">🔗 Link</button>
@@ -898,6 +907,15 @@
             <div id="task-page-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"></div>
             <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wide mb-3">Other Notes</h3>
             <div class="flex flex-wrap items-center gap-2 mb-3 select-none">
+                <button type="button" onmousedown="event.preventDefault()" onclick="fmtBold()" class="w-8 h-8 flex items-center justify-center text-sm bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg transition" title="Bold (Ctrl+B)"><b>B</b></button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="fmtItalic()" class="w-8 h-8 flex items-center justify-center text-sm bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg transition" title="Italic (Ctrl+I)"><i>I</i></button>
+                <button type="button" onmousedown="event.preventDefault()" onclick="fmtUnderline()" class="w-8 h-8 flex items-center justify-center text-sm bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg transition" title="Underline (Ctrl+U)"><u>U</u></button>
+                <select onchange="applyFont(this.value);this.selectedIndex=0" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Font"><option value="">Font</option><option value="inherit">Default</option><option value="Georgia, serif">Serif</option><option value="ui-monospace, Menlo, Consolas, monospace">Mono</option></select>
+                <select onchange="applySize(this.value);this.selectedIndex=0" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Size"><option value="">Size</option><option value="small">Small</option><option value="normal">Normal</option><option value="large">Large</option><option value="heading">Heading</option></select>
+                <select onchange="applyColor(this.value);this.selectedIndex=0" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Text colour"><option value="">Colour</option><option value="default">Default</option><option value="#9ca3af">Grey</option><option value="#f87171">Red</option><option value="#fb923c">Orange</option><option value="#4ade80">Green</option><option value="#60a5fa">Blue</option><option value="#c084fc">Purple</option></select>
+                <select onchange="applyHighlight(this.value);this.selectedIndex=0" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Highlight"><option value="">Highlight</option><option value="none">None</option><option value="rgba(234,179,8,0.4)">Yellow</option><option value="rgba(34,197,94,0.35)">Green</option><option value="rgba(59,130,246,0.35)">Blue</option><option value="rgba(236,72,153,0.35)">Pink</option></select>
+                <button type="button" onmousedown="event.preventDefault()" onclick="clearFormatting()" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition" title="Clear formatting">Clear</button>
+                <span class="w-px h-6 bg-corp-700 mx-0.5"></span>
                 <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteCheckbox()" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">☑ Checkbox</button>
                 <button type="button" onmousedown="event.preventDefault()" onclick="triggerNoteImage()" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">📷 Image</button>
                 <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteLink()" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">🔗 Link</button>
@@ -2659,7 +2677,7 @@
             const removed = notesDB[idx]; notesDB.splice(idx, 1); activeNoteId = null; renderNotesSidebar();
             showToast('Note deleted.', 'warning', { persist: true, actionLabel: 'Undo', onAction: () => { notesDB.splice(Math.min(idx, notesDB.length), 0, removed); renderNotesSidebar(); showToast('Note restored.', 'success'); } });
         }
-        function handleEditorShortcuts(e) { if (e.key === 'Enter') { if (noteEditorEnter(e)) return; } if(e.code === 'Space') { const sel = window.getSelection(); if (!sel.rangeCount) return; const node = sel.anchorNode; if(node.nodeType === 3 && node.textContent.endsWith('[ ]')) { e.preventDefault(); node.textContent = node.textContent.slice(0, -3); const range = sel.getRangeAt(0); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)'); const span = document.createElement('span'); span.className = 'task-text'; span.innerHTML = '&#8203;'; range.insertNode(span); range.insertNode(cb); range.setStart(span, 1); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); saveNoteState(); } } }
+        function handleEditorShortcuts(e) { if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey) { const k = (e.key || '').toLowerCase(); if (k === 'b') { e.preventDefault(); fmtBold(); return; } if (k === 'i') { e.preventDefault(); fmtItalic(); return; } if (k === 'u') { e.preventDefault(); fmtUnderline(); return; } } if (e.key === 'Enter') { if (noteEditorEnter(e)) return; } if(e.code === 'Space') { const sel = window.getSelection(); if (!sel.rangeCount) return; const node = sel.anchorNode; if(node.nodeType === 3 && node.textContent.endsWith('[ ]')) { e.preventDefault(); node.textContent = node.textContent.slice(0, -3); const range = sel.getRangeAt(0); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.className = 'note-cb mr-2 w-4 h-4 accent-corp-600 rounded bg-corp-900 border-corp-700 align-middle cursor-pointer'; cb.setAttribute('onclick', 'toggleNoteTask(this)'); const span = document.createElement('span'); span.className = 'task-text'; span.innerHTML = '&#8203;'; range.insertNode(span); range.insertNode(cb); range.setStart(span, 1); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); saveNoteState(); } } }
         function toggleNoteTask(cb) { if (cb.checked) cb.setAttribute('checked', 'checked'); else cb.removeAttribute('checked'); if(cb.nextSibling && cb.nextSibling.classList.contains('task-text')) { if(cb.checked) { cb.nextSibling.style.textDecoration = 'line-through'; cb.nextSibling.style.opacity = '0.5'; } else { cb.nextSibling.style.textDecoration = 'none'; cb.nextSibling.style.opacity = '1'; } } const taskId = cb.getAttribute('data-task-id'); if(taskId) { const t = tDB.find(x => x.id == taskId); if(t) { t.done = cb.checked; t.status = t.done ? 'Done' : 'Not started'; renderTaskTable(); renderHomeWidgets(); } } saveNoteState(); }
 
         // ----- Notes toolbar: reliable buttons for phone and laptop -----
@@ -2736,6 +2754,39 @@
                     saveActiveEditor();
                 } });
             } });
+        }
+        // ----- Rich text formatting: wrap the selected text in a styled piece (reliable on phone and laptop) -----
+        function applySelectionStyles(styles) {
+            restoreEditorSelection();
+            const sel = window.getSelection();
+            if (!sel.rangeCount || sel.isCollapsed) { showToast('Select some text first, then apply the style.', 'info'); return; }
+            const range = sel.getRangeAt(0);
+            const span = document.createElement('span');
+            Object.keys(styles).forEach(k => { span.style[k] = styles[k]; });
+            try { range.surroundContents(span); }
+            catch (e) { const frag = range.extractContents(); span.appendChild(frag); range.insertNode(span); }
+            try { const nr = document.createRange(); nr.selectNodeContents(span); sel.removeAllRanges(); sel.addRange(nr); } catch (er) {}
+            saveActiveEditor();
+        }
+        function applyFont(v) { if (!v) return; applySelectionStyles({ fontFamily: v }); }
+        function applySize(v) { if (!v) return; const map = { small: { fontSize: '0.85rem' }, normal: { fontSize: '1rem', fontWeight: '400' }, large: { fontSize: '1.3rem' }, heading: { fontSize: '1.7rem', fontWeight: '700' } }; if (map[v]) applySelectionStyles(map[v]); }
+        function applyColor(v) { if (!v) return; applySelectionStyles({ color: v === 'default' ? '#d1d5db' : v }); }
+        function applyHighlight(v) { if (!v) return; applySelectionStyles({ backgroundColor: v === 'none' ? 'transparent' : v }); }
+        // Bold, italic and underline use the standard reliable commands, which also power Ctrl+B, Ctrl+I and Ctrl+U.
+        function fmtBold() { restoreEditorSelection(); try { document.execCommand('bold'); } catch (e) {} saveActiveEditor(); }
+        function fmtItalic() { restoreEditorSelection(); try { document.execCommand('italic'); } catch (e) {} saveActiveEditor(); }
+        function fmtUnderline() { restoreEditorSelection(); try { document.execCommand('underline'); } catch (e) {} saveActiveEditor(); }
+        function clearFormatting() {
+            restoreEditorSelection();
+            const sel = window.getSelection();
+            if (!sel.rangeCount || sel.isCollapsed) { showToast('Select some text first, then clear its formatting.', 'info'); return; }
+            const range = sel.getRangeAt(0);
+            const text = range.toString();
+            range.deleteContents();
+            const tn = document.createTextNode(text);
+            range.insertNode(tn);
+            try { const nr = document.createRange(); nr.selectNode(tn); sel.removeAllRanges(); sel.addRange(nr); } catch (e) {}
+            saveActiveEditor();
         }
         // Enter inside a checklist item creates the next item; an empty item exits the checklist.
         function noteEditorEnter(e) {
