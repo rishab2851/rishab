@@ -75,6 +75,11 @@
             --gray-700: 55 65 81;
             --gray-800: 31 41 55;
             --gray-900: 17 24 39;
+            --hl-yellow: rgba(234,179,8,0.40);
+            --hl-green: rgba(34,197,94,0.35);
+            --hl-blue: rgba(59,130,246,0.35);
+            --hl-pink: rgba(236,72,153,0.35);
+            color-scheme: dark;
         }
         [data-theme="light"] {
             --corp-900: 238 242 249;   /* page and field surface */
@@ -94,7 +99,72 @@
             --gray-700: 203 213 225;
             --gray-800: 226 232 240;
             --gray-900: 241 245 249;
+            --hl-yellow: rgba(250,204,21,0.60);
+            --hl-green: rgba(134,239,172,0.75);
+            --hl-blue: rgba(147,197,253,0.75);
+            --hl-pink: rgba(249,168,212,0.75);
+            color-scheme: light;
         }
+        /* ===== LIGHT THEME accent corrections (Dark theme is untouched). Forced so they win over utilities on every browser. ===== */
+        :root, [data-theme="dark"] { color-scheme: dark; }
+        [data-theme="light"] { color-scheme: light; }
+        [data-theme="light"] .text-red-400,
+        [data-theme="light"] .text-red-500,
+        [data-theme="light"] .text-red-300 { color: #c0392b !important; }
+        [data-theme="light"] .text-green-400 { color: #15803d !important; }
+        [data-theme="light"] .text-yellow-400,
+        [data-theme="light"] .text-yellow-500,
+        [data-theme="light"] .text-amber-400 { color: #a16207 !important; }
+        [data-theme="light"] .text-orange-400,
+        [data-theme="light"] .text-orange-500 { color: #b45309 !important; }
+        [data-theme="light"] .text-purple-400 { color: #7e3ab4 !important; }
+        [data-theme="light"] .text-pink-400 { color: #be2e6e !important; }
+        [data-theme="light"] .text-blue-400 { color: #2563eb !important; }
+        /* Native status and other dropdowns render their own text in a readable dark tone on the light theme */
+        [data-theme="light"] select option { color: #1f2937; }
+        /* Solid brand, danger and positive buttons keep white labels in both themes */
+        [data-theme="light"] .bg-corp-600,
+        [data-theme="light"] .bg-corp-500,
+        [data-theme="light"] .bg-red-600,
+        [data-theme="light"] .bg-red-500,
+        [data-theme="light"] .bg-green-600,
+        [data-theme="light"] .bg-green-500 { color: #fff !important; }
+
+
+        /* Soft accent backgrounds toned for the Light theme */
+        [data-theme="light"] .bg-red-900\/40, [data-theme="light"] .bg-red-900\/30, [data-theme="light"] .bg-red-900\/20 { background-color: rgba(192,57,43,0.10); }
+        [data-theme="light"] .bg-yellow-900\/40 { background-color: rgba(161,98,7,0.12); }
+        [data-theme="light"] .bg-orange-900\/40 { background-color: rgba(180,83,9,0.10); }
+        [data-theme="light"] .bg-green-500\/20, [data-theme="light"] .bg-green-600\/20 { background-color: rgba(21,128,61,0.12); }
+        [data-theme="light"] .bg-red-500\/20, [data-theme="light"] .bg-red-600\/20 { background-color: rgba(192,57,43,0.10); }
+
+        /* Note text colours, theme aware so they read in both themes. White and Black are deliberate literal choices. */
+        .nc-default { color: rgb(var(--gray-300)); }
+        .nc-white { color: #ffffff; }
+        .nc-black { color: #111827; }
+        .nc-grey { color: #9ca3af; }
+        .nc-red { color: #f87171; }
+        .nc-orange { color: #fb923c; }
+        .nc-green { color: #4ade80; }
+        .nc-blue { color: #60a5fa; }
+        .nc-purple { color: #c084fc; }
+        [data-theme="light"] .nc-grey { color: #6b7280; }
+        [data-theme="light"] .nc-red { color: #c0392b; }
+        [data-theme="light"] .nc-orange { color: #b45309; }
+        [data-theme="light"] .nc-green { color: #15803d; }
+        [data-theme="light"] .nc-blue { color: #2563eb; }
+        [data-theme="light"] .nc-purple { color: #7e3ab4; }
+
+        /* Note highlights, theme aware and retuned to look crisp on a light background */
+        .nh-none { background-color: transparent; }
+        .nh-yellow { background-color: rgba(234,179,8,0.40); }
+        .nh-green { background-color: rgba(34,197,94,0.35); }
+        .nh-blue { background-color: rgba(59,130,246,0.35); }
+        .nh-pink { background-color: rgba(236,72,153,0.35); }
+        [data-theme="light"] .nh-yellow { background-color: rgba(250,204,21,0.62); }
+        [data-theme="light"] .nh-green { background-color: rgba(74,222,128,0.55); }
+        [data-theme="light"] .nh-blue { background-color: rgba(96,165,250,0.50); }
+        [data-theme="light"] .nh-pink { background-color: rgba(244,114,182,0.52); }
 
         /* Apple-style typography & custom scrollbars */
         body { 
@@ -645,8 +715,8 @@
                                 <button type="button" onmousedown="event.preventDefault()" onclick="fmtUnderline()" class="w-8 h-8 flex items-center justify-center text-sm bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg transition" title="Underline (Ctrl+U)"><u>U</u></button>
                                 <select onchange="applyFont(this.value);this.selectedIndex=0" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Font"><option value="">Font</option><option value="inherit">Default</option><option value="Georgia, serif">Serif</option><option value="ui-monospace, Menlo, Consolas, monospace">Mono</option></select>
                                 <select onchange="applySize(this.value);this.selectedIndex=0" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Size"><option value="">Size</option><option value="small">Small</option><option value="normal">Normal</option><option value="large">Large</option><option value="heading">Heading</option></select>
-                                <select onchange="applyColor(this.value);this.selectedIndex=0" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Text colour"><option value="">Colour</option><option value="default">Default</option><option value="#9ca3af">Grey</option><option value="#f87171">Red</option><option value="#fb923c">Orange</option><option value="#4ade80">Green</option><option value="#60a5fa">Blue</option><option value="#c084fc">Purple</option></select>
-                                <select onchange="applyHighlight(this.value);this.selectedIndex=0" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Highlight"><option value="">Highlight</option><option value="none">None</option><option value="rgba(234,179,8,0.4)">Yellow</option><option value="rgba(34,197,94,0.35)">Green</option><option value="rgba(59,130,246,0.35)">Blue</option><option value="rgba(236,72,153,0.35)">Pink</option></select>
+                                <select onchange="applyColor(this.value);this.selectedIndex=0" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Text colour"><option value="">Colour</option><option value="default">Default</option><option value="#000000">Black</option><option value="#ffffff">White</option><option value="#6b7280">Grey</option><option value="#dc2626">Red</option><option value="#ea580c">Orange</option><option value="#16a34a">Green</option><option value="#2563eb">Blue</option><option value="#9333ea">Purple</option></select>
+                                <select onchange="applyHighlight(this.value);this.selectedIndex=0" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Highlight"><option value="">Highlight</option><option value="none">None</option><option value="var(--hl-yellow)">Yellow</option><option value="var(--hl-green)">Green</option><option value="var(--hl-blue)">Blue</option><option value="var(--hl-pink)">Pink</option></select>
                                 <button type="button" onmousedown="event.preventDefault()" onclick="clearFormatting()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition" title="Clear formatting">Clear</button>
                                 <span class="w-px h-6 bg-corp-700 mx-0.5"></span>
                                 <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteCheckbox()" class="text-xs bg-corp-900 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">☑ Checkbox</button>
@@ -912,8 +982,8 @@
                 <button type="button" onmousedown="event.preventDefault()" onclick="fmtUnderline()" class="w-8 h-8 flex items-center justify-center text-sm bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg transition" title="Underline (Ctrl+U)"><u>U</u></button>
                 <select onchange="applyFont(this.value);this.selectedIndex=0" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Font"><option value="">Font</option><option value="inherit">Default</option><option value="Georgia, serif">Serif</option><option value="ui-monospace, Menlo, Consolas, monospace">Mono</option></select>
                 <select onchange="applySize(this.value);this.selectedIndex=0" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Size"><option value="">Size</option><option value="small">Small</option><option value="normal">Normal</option><option value="large">Large</option><option value="heading">Heading</option></select>
-                <select onchange="applyColor(this.value);this.selectedIndex=0" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Text colour"><option value="">Colour</option><option value="default">Default</option><option value="#9ca3af">Grey</option><option value="#f87171">Red</option><option value="#fb923c">Orange</option><option value="#4ade80">Green</option><option value="#60a5fa">Blue</option><option value="#c084fc">Purple</option></select>
-                <select onchange="applyHighlight(this.value);this.selectedIndex=0" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Highlight"><option value="">Highlight</option><option value="none">None</option><option value="rgba(234,179,8,0.4)">Yellow</option><option value="rgba(34,197,94,0.35)">Green</option><option value="rgba(59,130,246,0.35)">Blue</option><option value="rgba(236,72,153,0.35)">Pink</option></select>
+                <select onchange="applyColor(this.value);this.selectedIndex=0" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Text colour"><option value="">Colour</option><option value="default">Default</option><option value="#000000">Black</option><option value="#ffffff">White</option><option value="#6b7280">Grey</option><option value="#dc2626">Red</option><option value="#ea580c">Orange</option><option value="#16a34a">Green</option><option value="#2563eb">Blue</option><option value="#9333ea">Purple</option></select>
+                <select onchange="applyHighlight(this.value);this.selectedIndex=0" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 rounded-lg px-2 py-1.5 transition cursor-pointer outline-none" title="Highlight"><option value="">Highlight</option><option value="none">None</option><option value="var(--hl-yellow)">Yellow</option><option value="var(--hl-green)">Green</option><option value="var(--hl-blue)">Blue</option><option value="var(--hl-pink)">Pink</option></select>
                 <button type="button" onmousedown="event.preventDefault()" onclick="clearFormatting()" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition" title="Clear formatting">Clear</button>
                 <span class="w-px h-6 bg-corp-700 mx-0.5"></span>
                 <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteCheckbox()" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">☑ Checkbox</button>
@@ -2770,7 +2840,7 @@
         }
         function applyFont(v) { if (!v) return; applySelectionStyles({ fontFamily: v }); }
         function applySize(v) { if (!v) return; const map = { small: { fontSize: '0.85rem' }, normal: { fontSize: '1rem', fontWeight: '400' }, large: { fontSize: '1.3rem' }, heading: { fontSize: '1.7rem', fontWeight: '700' } }; if (map[v]) applySelectionStyles(map[v]); }
-        function applyColor(v) { if (!v) return; applySelectionStyles({ color: v === 'default' ? '#d1d5db' : v }); }
+        function applyColor(v) { if (!v) return; applySelectionStyles({ color: v === 'default' ? 'rgb(var(--gray-300))' : v }); }
         function applyHighlight(v) { if (!v) return; applySelectionStyles({ backgroundColor: v === 'none' ? 'transparent' : v }); }
         // Bold, italic and underline use the standard reliable commands, which also power Ctrl+B, Ctrl+I and Ctrl+U.
         function fmtBold() { restoreEditorSelection(); try { document.execCommand('bold'); } catch (e) {} saveActiveEditor(); }
