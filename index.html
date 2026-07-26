@@ -345,7 +345,8 @@
                     <div id="acc-wealth" class="flex flex-col ml-7 mt-1 border-l border-corp-700 pl-2 gap-1 hidden">
                         <button onclick="switchTab('finance')" id="nav-finance" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Financial Dashboard</button>
                         <button onclick="openRecord()" id="nav-record" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Record Transactions</button>
-                        <button onclick="switchTab('analytics')" id="nav-analytics" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Cashflow Analytics</button>
+                        <button onclick="switchTab('analytics')" id="nav-analytics" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Transactions</button>
+                        <button onclick="switchTab('cashflow')" id="nav-cashflow" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Cashflow Analytics</button>
                         <button onclick="switchTab('recurring')" id="nav-recurring" class="text-left px-3 py-1.5 rounded hover:bg-corp-700 transition text-gray-400 text-sm hover:text-gray-200">Recurring Tracker</button>
                     </div>
                 </div>
@@ -553,7 +554,7 @@
 
             <section id="analytics" class="hidden w-full max-w-6xl p-4 md:p-10 mx-auto">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                    <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Cashflow Analytics</h2>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Transactions</h2>
                     <div class="flex items-center gap-3">
                         <span class="text-sm text-gray-400">Timeframe:</span>
                         <input type="month" id="analytics-month" onchange="renderCashflowAnalytics()" class="bg-corp-800 border border-corp-700 rounded-lg px-3 py-1.5 text-sm text-white outline-none focus:border-corp-500 cursor-pointer transition">
@@ -583,7 +584,6 @@
                         <div class="bg-corp-900/50 p-4 border-b border-corp-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                             <div class="flex items-center gap-3">
                                 <span class="font-bold text-gray-200">Unified Ledger Timeline</span>
-                                <span id="ana-filter-badge" class="hidden text-xs bg-corp-600/40 text-corp-300 border border-corp-500 px-2 py-0.5 rounded cursor-pointer hover:bg-corp-600 transition flex items-center gap-1" onclick="clearTimelineFilter()">Filtered <span class="font-bold">&times;</span></span>
                             </div>
                             <span class="text-xs text-gray-500">Day-to-Day & Paid Recurring</span>
                         </div>
@@ -611,20 +611,24 @@
                             <div id="ana-budget-list" class="space-y-4">
                                 </div>
                         </div>
-
-                        <div class="bg-corp-800 rounded-xl border border-corp-700 shadow-lg flex flex-col flex-1 overflow-hidden min-h-[300px]">
-                            <div class="bg-corp-900/50 p-3 border-b border-corp-700 flex justify-between items-center shrink-0">
-                                <span class="font-bold text-gray-200 text-sm">Top Outflows</span>
-                                <div class="flex bg-corp-800 rounded-lg border border-corp-700 overflow-hidden text-xs">
-                                    <button onclick="toggleAnaBreakdown('category')" id="btn-view-cat" class="px-3 py-1 bg-corp-700 text-white font-medium transition">Category</button>
-                                    <button onclick="toggleAnaBreakdown('vendor')" id="btn-view-ven" class="px-3 py-1 text-gray-400 hover:text-gray-200 transition">Vendor</button>
-                                </div>
-                            </div>
-                            <p class="text-[10px] text-center text-gray-500 py-1 bg-corp-900/30 border-b border-corp-700">Click a row to filter timeline</p>
-                            <div class="p-4 overflow-y-auto flex-1" id="ana-breakdown-list"></div>
-                        </div>
                     </div>
                 </div>
+            </section>
+
+            <section id="cashflow" class="hidden w-full max-w-3xl p-4 md:p-10 mx-auto">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Cashflow Analytics</h2>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-gray-400">Month:</span>
+                        <input type="month" id="cf-month" onchange="onCfMonthChange(this.value)" class="bg-corp-800 border border-corp-700 rounded-lg px-3 py-1.5 text-sm text-white outline-none focus:border-corp-500 cursor-pointer transition">
+                    </div>
+                </div>
+                <div class="flex bg-corp-800 border border-corp-700 rounded-xl overflow-hidden mb-6 shadow">
+                    <button id="cf-tab-expense" onclick="setCfSide('expense')" class="flex-1 py-3 px-2 text-sm font-semibold transition flex flex-col items-center gap-0.5"><span>Expenses</span><span id="cf-tab-expense-amt" class="text-xs font-bold"></span></button>
+                    <button id="cf-tab-income" onclick="setCfSide('income')" class="flex-1 py-3 px-2 text-sm font-semibold transition flex flex-col items-center gap-0.5"><span>Income</span><span id="cf-tab-income-amt" class="text-xs font-bold"></span></button>
+                </div>
+                <div id="cf-chart-wrap" class="bg-corp-800 border border-corp-700 rounded-2xl p-6 mb-6 shadow-lg"></div>
+                <div id="cf-legend" class="space-y-2"></div>
             </section>
 
             <section id="recurring" class="hidden w-full max-w-[95%] p-4 md:p-10 mx-auto">
@@ -868,6 +872,17 @@
                 <div class="flex items-center justify-between mb-3"><span class="text-sm text-gray-400">Total</span><span id="group-panel-total" class="text-lg font-bold text-white">₹ 0</span></div>
                 <button onclick="addHoldingToGroup()" class="w-full bg-corp-600 hover:bg-corp-500 text-white py-2 rounded-lg text-sm font-medium transition">+ Add holding to this group</button>
             </div>
+        </div>
+    </div>
+
+    <div id="cf-cat-panel" class="hidden fixed inset-0 z-[130] flex justify-end">
+        <div class="absolute inset-0 bg-corp-900/70 backdrop-blur-sm" onclick="closeCfCategory()"></div>
+        <div class="relative w-full max-w-md h-full bg-corp-800 border-l border-corp-700 shadow-2xl flex flex-col">
+            <div class="p-5 border-b border-corp-700 flex items-center justify-between">
+                <div><h3 id="cf-cat-title" class="text-lg font-bold text-white">Category</h3><p id="cf-cat-sub" class="text-xs text-gray-400"></p></div>
+                <button onclick="closeCfCategory()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+            <div id="cf-cat-list" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
         </div>
     </div>
 
@@ -1287,7 +1302,7 @@
         }
 
         function switchTab(tabId) {
-            ['home', 'finance', 'analytics', 'recurring', 'tasks', 'notes', 'documents', 'settings'].forEach(id => {
+            ['home', 'finance', 'analytics', 'cashflow', 'recurring', 'tasks', 'notes', 'documents', 'settings'].forEach(id => {
                 const sec = document.getElementById(id); if(sec) sec.classList.add('hidden');
                 const navEl = document.getElementById(`nav-${id}`);
                 if(navEl) {
@@ -1302,13 +1317,14 @@
                 else { targetNav.classList.replace('hover:bg-corp-700', 'bg-corp-700'); }
             }
 
-            if(['finance', 'record', 'analytics', 'recurring'].includes(tabId)) forceOpenAccordion('acc-wealth');
+            if(['finance', 'record', 'analytics', 'cashflow', 'recurring'].includes(tabId)) forceOpenAccordion('acc-wealth');
             if(['tasks'].includes(tabId)) forceOpenAccordion('acc-prof');
 
             if(tabId === 'home') { updateGreeting(); renderHomeWidgets(); }
             if(tabId === 'finance') renderAccounts();
             if(tabId === 'recurring') { populateModeDropdown(); renderRecTable(); }
             if(tabId === 'analytics') renderCashflowAnalytics();
+            if(tabId === 'cashflow') renderCashflowReport();
             if(tabId === 'tasks') renderTaskTable();
             if(tabId === 'notes') renderNotesSidebar();
             if(tabId === 'documents') renderDocs();
@@ -1728,6 +1744,100 @@
             showToast('Transactions exported.', 'success');
         }
 
+        // ----- Cashflow Analytics: category donut with drill down -----
+        const CF_PALETTE = ['#f87171', '#fb923c', '#fbbf24', '#facc15', '#a3e635', '#4ade80', '#2dd4bf', '#38bdf8', '#60a5fa', '#818cf8', '#c084fc', '#f472b6'];
+        let cfSide = 'expense';
+        let cfMonth = null;
+        let cfPanelKey = null;
+        function cfEnsureMonth() { if (!cfMonth) cfMonth = todayISO().slice(0, 7); const el = document.getElementById('cf-month'); if (el && el.value !== cfMonth) el.value = cfMonth; }
+        function onCfMonthChange(v) { cfMonth = v; renderCashflowReport(); }
+        function setCfSide(s) { cfSide = s; renderCashflowReport(); }
+        // Only recorded income and expense transactions, plus paid recurring bills for expenses. Investments and transfers never appear.
+        function cfCategoryData(side, monthStr) {
+            const cats = {};
+            transactionsDB.forEach(t => {
+                if (t.type !== side) return;
+                if (!t.date || !String(t.date).startsWith(monthStr)) return;
+                const name = t.category || 'Uncategorised';
+                if (!cats[name]) cats[name] = { name, emoji: t.emoji || '', amount: 0, items: [] };
+                cats[name].amount += Number(t.amount) || 0;
+                if (!cats[name].emoji && t.emoji) cats[name].emoji = t.emoji;
+                cats[name].items.push({ kind: 'tx', id: t.id, date: t.date, desc: t.desc || t.category, amount: Number(t.amount) || 0, emoji: t.emoji || '' });
+            });
+            if (side === 'expense') {
+                recDB.forEach(r => {
+                    if (!r.done || r.type === 'Investments' || r.type === 'Credit card') return;
+                    if (!r.date || !String(r.date).startsWith(monthStr)) return;
+                    const name = r.type || 'Other';
+                    if (!cats[name]) cats[name] = { name, emoji: '🔄', amount: 0, items: [] };
+                    cats[name].amount += Number(r.amount) || 0;
+                    cats[name].items.push({ kind: 'rec', id: r.id, date: r.date, desc: r.name, amount: Number(r.amount) || 0, emoji: '🔄' });
+                });
+            }
+            const arr = Object.values(cats).filter(c => c.amount > 0).sort((a, b) => b.amount - a.amount);
+            const total = arr.reduce((s, c) => s + c.amount, 0);
+            arr.forEach((c, i) => { c.pct = total > 0 ? (c.amount / total * 100) : 0; c.color = CF_PALETTE[i % CF_PALETTE.length]; });
+            return { total, cats: arr };
+        }
+        function renderCashflowReport() {
+            cfEnsureMonth();
+            const exp = cfCategoryData('expense', cfMonth);
+            const inc = cfCategoryData('income', cfMonth);
+            const eAmt = document.getElementById('cf-tab-expense-amt'), iAmt = document.getElementById('cf-tab-income-amt');
+            if (eAmt) eAmt.textContent = `₹ ${formatMoney(exp.total)}`;
+            if (iAmt) iAmt.textContent = `₹ ${formatMoney(inc.total)}`;
+            const et = document.getElementById('cf-tab-expense'), it = document.getElementById('cf-tab-income');
+            if (et) { et.classList.toggle('bg-corp-700', cfSide === 'expense'); et.classList.toggle('text-white', cfSide === 'expense'); et.classList.toggle('text-gray-400', cfSide !== 'expense'); }
+            if (it) { it.classList.toggle('bg-corp-700', cfSide === 'income'); it.classList.toggle('text-white', cfSide === 'income'); it.classList.toggle('text-gray-400', cfSide !== 'income'); }
+            const data = cfSide === 'expense' ? exp : inc;
+            const wrap = document.getElementById('cf-chart-wrap'); const legend = document.getElementById('cf-legend');
+            if (!wrap || !legend) return;
+            if (!data.cats.length) {
+                wrap.innerHTML = `<div class="text-center py-8 text-gray-500"><div class="text-4xl mb-2 opacity-60">📊</div><p class="text-sm">No ${cfSide === 'expense' ? 'expenses' : 'income'} recorded for ${monthLabelFromStr(cfMonth)}.</p></div>`;
+                legend.innerHTML = ''; if (cfPanelKey) refreshCfPanel(); return;
+            }
+            let cum = 0; let segs = '';
+            data.cats.forEach(c => {
+                const len = c.pct; const offset = 25 - cum;
+                const nm = c.name.replace(/'/g, "\\'");
+                segs += `<circle cx="21" cy="21" r="15.9155" fill="transparent" stroke="${c.color}" stroke-width="5.5" stroke-dasharray="${len} ${100 - len}" stroke-dashoffset="${offset}" style="cursor:pointer;transition:stroke-width 0.15s" onmouseover="this.setAttribute('stroke-width','6.5')" onmouseout="this.setAttribute('stroke-width','5.5')" onclick="openCfCategory('${cfSide}','${nm}')"></circle>`;
+                cum += len;
+            });
+            const sideWord = cfSide === 'expense' ? 'spent' : 'received';
+            wrap.innerHTML = `<div class="relative mx-auto" style="max-width:240px"><svg viewBox="0 0 42 42" class="w-full">${segs}</svg><div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none"><span class="text-[11px] text-gray-400 uppercase tracking-wide">${monthLabelFromStr(cfMonth)}</span><span class="text-xl md:text-2xl font-bold text-white">₹ ${formatMoney(data.total)}</span><span class="text-[11px] text-gray-500">Total ${sideWord}</span></div></div>`;
+            legend.innerHTML = '';
+            data.cats.forEach(c => {
+                const nm = c.name.replace(/'/g, "\\'");
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between bg-corp-800 border border-corp-700 rounded-xl p-3 cursor-pointer hover:bg-corp-700/60 transition';
+                row.setAttribute('onclick', `openCfCategory('${cfSide}','${nm}')`);
+                row.innerHTML = `<div class="flex items-center gap-3 min-w-0"><span class="text-xs font-bold px-2 py-1 rounded shrink-0" style="background:${c.color};color:#1f2937">${Math.round(c.pct)}%</span><span class="text-sm text-gray-200 truncate">${c.emoji ? c.emoji + ' ' : ''}${esc(c.name)}</span></div><span class="text-sm font-bold text-gray-100 shrink-0 ml-2">₹ ${formatMoney(c.amount)}</span>`;
+                legend.appendChild(row);
+            });
+            if (cfPanelKey) refreshCfPanel();
+        }
+        function openCfCategory(side, name) { cfPanelKey = { side, name }; document.getElementById('cf-cat-panel').classList.remove('hidden'); refreshCfPanel(); }
+        function closeCfCategory() { cfPanelKey = null; const p = document.getElementById('cf-cat-panel'); if (p) p.classList.add('hidden'); }
+        function refreshCfPanel() {
+            if (!cfPanelKey) return;
+            const { side, name } = cfPanelKey;
+            const data = cfCategoryData(side, cfMonth);
+            const cat = data.cats.find(c => c.name === name);
+            if (!cat) { closeCfCategory(); return; }
+            document.getElementById('cf-cat-title').textContent = `${cat.emoji ? cat.emoji + ' ' : ''}${cat.name}`;
+            document.getElementById('cf-cat-sub').textContent = `${monthLabelFromStr(cfMonth)} · ₹ ${formatMoney(cat.amount)} · ${cat.items.length} ${cat.items.length === 1 ? 'entry' : 'entries'}`;
+            const list = document.getElementById('cf-cat-list'); list.innerHTML = '';
+            cat.items.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(it => {
+                const row = document.createElement('div');
+                row.className = 'bg-corp-900 border border-corp-700 rounded-lg p-3';
+                const actions = it.kind === 'tx'
+                    ? `<div class="flex items-center gap-3 mt-2"><button onclick="openRecordForEdit(${it.id})" class="text-xs text-gray-400 hover:text-corp-300 font-medium">Edit</button><button onclick="delTransaction(${it.id})" class="text-xs text-gray-400 hover:text-red-400 font-medium">Refund & Delete</button></div>`
+                    : `<div class="mt-2"><span class="text-[10px] bg-corp-700 text-gray-300 px-2 py-0.5 rounded">🔄 Recurring, managed in the Recurring tracker</span></div>`;
+                row.innerHTML = `<div class="flex items-center justify-between gap-2"><div class="min-w-0"><div class="text-sm font-medium text-gray-200 truncate">${it.emoji ? it.emoji + ' ' : ''}${esc(it.desc)}</div><div class="text-[11px] text-gray-500">${it.date}</div></div><div class="text-sm font-bold ${side === 'income' ? 'text-green-400' : 'text-red-400'} shrink-0">₹ ${formatMoney(it.amount)}</div></div>${actions}`;
+                list.appendChild(row);
+            });
+        }
+
         // ----- Toast notifications (replace the browser alert boxes) -----
         // Success and info slide away on their own. Warnings, errors and the
         // deletion notice stay until dismissed, since missing them can be costly.
@@ -1911,7 +2021,7 @@
             transactionsDB.push(item);
             document.getElementById('tx-amount').value = ''; document.getElementById('tx-desc').value = ''; document.getElementById('tx-tags').value = '';
             editingTxId = null;
-            renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+            renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets(); if (typeof renderCashflowReport === "function") renderCashflowReport();
             closeRecord();
             showToast(`Transferred ₹${formatMoney(amt)} from ${from.name} to ${to.name}.`, 'success');
         }
@@ -1969,7 +2079,7 @@
                 // Update the existing entry in place; its old effect was already reversed above.
                 oldTx.type = currTxType; oldTx.amount = amt; oldTx.category = finalCat; oldTx.emoji = document.getElementById('tx-emoji').value; oldTx.desc = document.getElementById('tx-desc').value; oldTx.date = document.getElementById('tx-date').value; oldTx.modeId = modeId; oldTx.tags = parseTags(document.getElementById('tx-tags').value);
                 editingTxId = null;
-                renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+                renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets(); if (typeof renderCashflowReport === "function") renderCashflowReport();
                 closeRecord();
                 showToast('Transaction updated.', 'success');
                 if (categoryWarn) showBudgetCategoryWarning(categoryWarn.cat, categoryWarn.limit, categoryWarn.over, categoryWarn.month);
@@ -1979,7 +2089,7 @@
             const item = { id: Date.now(), type: currTxType, amount: amt, category: finalCat, emoji: document.getElementById('tx-emoji').value, desc: document.getElementById('tx-desc').value, date: document.getElementById('tx-date').value, modeId: modeId, tags: parseTags(document.getElementById('tx-tags').value) };
             transactionsDB.push(item);
             document.getElementById('tx-amount').value = ''; document.getElementById('tx-desc').value = ''; document.getElementById('tx-tags').value = ''; document.getElementById('custom-cat-input').value = ''; document.getElementById('tx-amount').focus();
-            renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+            renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets(); if (typeof renderCashflowReport === "function") renderCashflowReport();
             showToast(`${currTxType === 'income' ? 'Income' : 'Expense'} logged.`, 'success');
             if (categoryWarn) showBudgetCategoryWarning(categoryWarn.cat, categoryWarn.limit, categoryWarn.over, categoryWarn.month);
         }
@@ -1992,13 +2102,13 @@
                 if (from) { if (from.type === 'asset') from.balance += tx.amount; else from.balance -= tx.amount; }
                 if (to) { if (to.type === 'asset') to.balance -= tx.amount; else to.balance += tx.amount; }
                 const removedT = transactionsDB.splice(idx, 1)[0]; const removedTIndex = idx;
-                renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+                renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets(); if (typeof renderCashflowReport === "function") renderCashflowReport();
                 showToast('Transfer deleted. The balances have been reversed.', 'warning', { persist: true, actionLabel: 'Undo', onAction: () => {
                     const f2 = accounts.find(a => a.id === removedT.fromId); const t2 = accounts.find(a => a.id === removedT.toId);
                     if (f2) { if (f2.type === 'asset') f2.balance -= removedT.amount; else f2.balance += removedT.amount; }
                     if (t2) { if (t2.type === 'asset') t2.balance += removedT.amount; else t2.balance -= removedT.amount; }
                     transactionsDB.splice(Math.min(removedTIndex, transactionsDB.length), 0, removedT);
-                    renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+                    renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets(); if (typeof renderCashflowReport === "function") renderCashflowReport();
                     showToast('Transfer restored.', 'success');
                 } });
                 return;
@@ -2008,7 +2118,7 @@
             if (acc) { if (tx.type === 'income') { if (acc.type === 'asset') acc.balance -= tx.amount; else acc.balance += tx.amount; } else { if (acc.type === 'asset') acc.balance += tx.amount; else acc.balance -= tx.amount; } }
             const removed = transactionsDB.splice(idx, 1)[0];
             const removedIndex = idx;
-            renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+            renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets(); if (typeof renderCashflowReport === "function") renderCashflowReport();
             showToast('Entry deleted. The affected balances have been reversed.', 'warning', {
                 persist: true,
                 actionLabel: 'Undo',
@@ -2017,7 +2127,7 @@
                     const a2 = accounts.find(a => a.id === removed.modeId);
                     if (a2) { if (removed.type === 'income') { if (a2.type === 'asset') a2.balance += removed.amount; else a2.balance -= removed.amount; } else { if (a2.type === 'asset') a2.balance -= removed.amount; else a2.balance += removed.amount; } }
                     transactionsDB.splice(Math.min(removedIndex, transactionsDB.length), 0, removed);
-                    renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets();
+                    renderAccounts(); renderCashflowAnalytics(); renderHomeWidgets(); if (typeof renderCashflowReport === "function") renderCashflowReport();
                     showToast('Entry restored.', 'success');
                 }
             });
@@ -2045,8 +2155,8 @@
         }
 
         function toggleAnaBreakdown(view) { anaBreakdownView = view; renderBreakdownList(); }
-        function setTimelineFilter(type, value) { anaTimelineFilter = { type, value }; document.getElementById('ana-filter-badge').classList.remove('hidden'); renderCashflowAnalytics(false); }
-        function clearTimelineFilter() { anaTimelineFilter = null; document.getElementById('ana-filter-badge').classList.add('hidden'); renderCashflowAnalytics(false); }
+        function setTimelineFilter(type, value) { anaTimelineFilter = { type, value }; const b=document.getElementById('ana-filter-badge'); if(b) b.classList.remove('hidden'); renderCashflowAnalytics(false); }
+        function clearTimelineFilter() { anaTimelineFilter = null; const b=document.getElementById('ana-filter-badge'); if(b) b.classList.add('hidden'); renderCashflowAnalytics(false); }
 
         function renderCashflowAnalytics(recalcStats = true) {
             const selMonth = document.getElementById('analytics-month').value;
@@ -2204,7 +2314,8 @@
         }
 
         function renderBreakdownList() {
-            if(!window.currentAnaStats) return; const stats = window.currentAnaStats; const container = document.getElementById('ana-breakdown-list'); container.innerHTML = '';
+            const container = document.getElementById('ana-breakdown-list'); if (!container) return;
+            if(!window.currentAnaStats) return; const stats = window.currentAnaStats; container.innerHTML = '';
             const dataMap = anaBreakdownView === 'category' ? stats.catTotals : stats.vendorTotals; let sorted = Object.keys(dataMap).sort((a,b) => dataMap[b].amount - dataMap[a].amount);
             if(sorted.length === 0) { container.innerHTML = `<p class="text-xs text-gray-500 italic text-center mt-4">No data to display.</p>`; return; }
             
