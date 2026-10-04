@@ -559,6 +559,7 @@
                         <span class="text-sm text-gray-400">Timeframe:</span>
                         <input type="month" id="analytics-month" onchange="renderCashflowAnalytics()" class="bg-corp-800 border border-corp-700 rounded-lg px-3 py-1.5 text-sm text-white outline-none focus:border-corp-500 cursor-pointer transition">
                         <button onclick="exportTxCSV()" class="text-sm bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-1.5 rounded-lg transition shadow whitespace-nowrap">📥 Export CSV</button>
+                        <button onclick="openExportCentre()" class="text-sm bg-corp-600 hover:bg-corp-500 border border-corp-500 text-white px-3 py-1.5 rounded-lg transition shadow whitespace-nowrap" title="Export any period with filters as CSV, Excel, PDF or JSON">📦 Export Centre</button>
                     </div>
                 </div>
 
@@ -898,6 +899,7 @@
                 <div class="flex-1 bg-corp-900 rounded-lg border border-corp-700 p-2 text-center"><div class="text-[10px] text-gray-400 uppercase tracking-wide">In</div><div id="acct-tx-in" class="text-sm font-bold text-green-400">₹ 0</div></div>
                 <div class="flex-1 bg-corp-900 rounded-lg border border-corp-700 p-2 text-center"><div class="text-[10px] text-gray-400 uppercase tracking-wide">Out</div><div id="acct-tx-out" class="text-sm font-bold text-red-400">₹ 0</div></div>
                 <button onclick="exportAccountTxCSV()" class="shrink-0 self-center text-xs bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-2 rounded-lg transition" title="Export what is shown">📥 CSV</button>
+                <button onclick="openExportCentre({ accountId: acctTxId })" class="shrink-0 self-center text-xs bg-corp-700 hover:bg-corp-600 border border-corp-600 text-gray-200 px-3 py-2 rounded-lg transition" title="Open Export Centre for this account">📦</button>
             </div>
             <div id="acct-tx-list" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
         </div>
@@ -1006,6 +1008,124 @@
                 <button type="button" onmousedown="event.preventDefault()" onclick="insertNoteLink()" class="text-xs bg-corp-800 hover:bg-corp-700 border border-corp-700 text-gray-300 px-3 py-1.5 rounded-lg transition">🔗 Link</button>
             </div>
             <div id="task-notes-editor" class="rich-editor min-h-[240px] bg-corp-800 border border-corp-700 rounded-xl p-4 text-gray-300 text-base leading-relaxed focus:outline-none mb-10" contenteditable="true" placeholder="Write detailed notes, numbered points, checklists..." onfocus="setActiveEditor('task-notes-editor')" oninput="saveTaskNotes()" onkeydown="handleEditorShortcuts(event)" onclick="noteEditorClick(event)" onblur="linkifyEditor(this)"></div>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         EXPORT CENTRE: export entries for any period, with filters
+         and a choice of CSV, Excel, PDF statement or JSON.
+         Read only. Nothing here changes your saved data.
+         ========================================================== -->
+    <div id="export-modal" class="hidden fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-4 bg-corp-900/85 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="ex-title">
+        <div class="bg-corp-900 border border-corp-700 rounded-2xl w-full max-w-2xl max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-corp-800 flex justify-between items-start gap-3 bg-corp-800">
+                <div>
+                    <h2 id="ex-title" class="text-lg font-bold text-white flex items-center gap-2">📦 Export Centre</h2>
+                    <p class="text-xs text-gray-400 mt-0.5">Choose a period, narrow it down if needed, then pick a format.</p>
+                </div>
+                <button onclick="closeExportCentre()" class="text-gray-400 hover:text-white text-2xl font-bold leading-none" aria-label="Close">&times;</button>
+            </div>
+
+            <div class="p-4 sm:p-5 overflow-y-auto flex-1 flex flex-col gap-4">
+                <!-- Period -->
+                <div class="bg-corp-800 p-4 rounded-xl border border-corp-700">
+                    <label for="ex-preset" class="block text-sm text-gray-200 mb-2 font-semibold">Period</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <select id="ex-preset" onchange="exOnPreset()" class="w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition cursor-pointer">
+                            <optgroup label="Months and quarters">
+                                <option value="this_month">This month</option>
+                                <option value="last_month">Last month</option>
+                                <option value="this_quarter">This quarter</option>
+                                <option value="last_quarter">Last quarter</option>
+                            </optgroup>
+                            <optgroup label="Financial year (April to March)">
+                                <option value="fy">Full financial year</option>
+                                <option value="adv1">Advance tax period 1 (1 Apr to 15 Jun)</option>
+                                <option value="adv2">Advance tax period 2 (16 Jun to 15 Sep)</option>
+                                <option value="adv3">Advance tax period 3 (16 Sep to 15 Dec)</option>
+                                <option value="adv4">Advance tax period 4 (16 Dec to 15 Mar)</option>
+                                <option value="adv5">After last instalment (16 Mar to 31 Mar)</option>
+                            </optgroup>
+                            <optgroup label="Other">
+                                <option value="all">Everything recorded</option>
+                                <option value="custom">Custom dates</option>
+                            </optgroup>
+                        </select>
+                        <select id="ex-fy" onchange="exOnPreset()" aria-label="Financial year" class="hidden w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition cursor-pointer"></select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mt-3">
+                        <div>
+                            <label for="ex-from" class="block text-xs text-gray-400 mb-1">From</label>
+                            <input type="date" id="ex-from" onchange="exOnCustomDate()" class="w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition">
+                        </div>
+                        <div>
+                            <label for="ex-to" class="block text-xs text-gray-400 mb-1">To</label>
+                            <input type="date" id="ex-to" onchange="exOnCustomDate()" class="w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition">
+                        </div>
+                    </div>
+                    <p id="ex-period-label" class="text-xs text-gray-400 mt-2"></p>
+                </div>
+
+                <!-- Filters -->
+                <div class="bg-corp-800 p-4 rounded-xl border border-corp-700">
+                    <span class="block text-sm text-gray-200 mb-2 font-semibold">What to include</span>
+                    <div class="flex flex-wrap gap-2">
+                        <label class="flex items-center gap-2 bg-corp-900 border border-corp-600 rounded-lg px-3 py-1.5 text-sm text-gray-200 cursor-pointer"><input type="checkbox" id="ex-t-expense" checked onchange="exRefresh()" class="accent-red-500"> Expenses</label>
+                        <label class="flex items-center gap-2 bg-corp-900 border border-corp-600 rounded-lg px-3 py-1.5 text-sm text-gray-200 cursor-pointer"><input type="checkbox" id="ex-t-income" checked onchange="exRefresh()" class="accent-green-500"> Income</label>
+                        <label class="flex items-center gap-2 bg-corp-900 border border-corp-600 rounded-lg px-3 py-1.5 text-sm text-gray-200 cursor-pointer"><input type="checkbox" id="ex-t-transfer" checked onchange="exRefresh()" class="accent-blue-500"> Transfers</label>
+                        <label class="flex items-center gap-2 bg-corp-900 border border-corp-600 rounded-lg px-3 py-1.5 text-sm text-gray-200 cursor-pointer"><input type="checkbox" id="ex-t-rec" onchange="exRefresh()" class="accent-purple-500"> Paid recurring bills</label>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                        <div>
+                            <label for="ex-category" class="block text-xs text-gray-400 mb-1">Category</label>
+                            <select id="ex-category" onchange="exRefresh()" class="w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition cursor-pointer"></select>
+                        </div>
+                        <div>
+                            <label for="ex-tags" class="block text-xs text-gray-400 mb-1">Tags (comma separated, any match)</label>
+                            <input type="text" id="ex-tags" oninput="exRefresh()" placeholder="For example 80C, medical" class="w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition">
+                        </div>
+                        <div>
+                            <label for="ex-min" class="block text-xs text-gray-400 mb-1">Minimum amount (₹)</label>
+                            <input type="number" id="ex-min" min="0" oninput="exRefresh()" placeholder="No minimum" class="w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition">
+                        </div>
+                        <div>
+                            <label for="ex-max" class="block text-xs text-gray-400 mb-1">Maximum amount (₹)</label>
+                            <input type="number" id="ex-max" min="0" oninput="exRefresh()" placeholder="No maximum" class="w-full bg-corp-900 border border-corp-600 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-corp-500 transition">
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-xs text-gray-400">Accounts</span>
+                            <button type="button" id="ex-acc-toggle" onclick="exToggleAllAccounts()" class="text-xs text-corp-400 hover:text-white transition">Clear all</button>
+                        </div>
+                        <div id="ex-accounts" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-44 overflow-y-auto pr-1"></div>
+                        <p class="text-[11px] text-gray-500 mt-1.5">A transfer is included when either side of it is a selected account. Choosing a category leaves out transfers, since they carry no category.</p>
+                    </div>
+                </div>
+
+                <!-- Format -->
+                <div class="bg-corp-800 p-4 rounded-xl border border-corp-700">
+                    <span class="block text-sm text-gray-200 mb-2 font-semibold">Format</span>
+                    <div id="ex-formats" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button type="button" data-fmt="csv" onclick="exSetFormat('csv')" class="ex-fmt text-left bg-corp-900 border border-corp-600 rounded-lg p-2.5 transition"><span class="block text-sm font-semibold text-gray-100">CSV</span><span class="block text-[11px] text-gray-400 leading-snug">Opens in Excel, Tally import, Sheets</span></button>
+                        <button type="button" data-fmt="xlsx" onclick="exSetFormat('xlsx')" class="ex-fmt text-left bg-corp-900 border border-corp-600 rounded-lg p-2.5 transition"><span class="block text-sm font-semibold text-gray-100">Excel</span><span class="block text-[11px] text-gray-400 leading-snug">Entries plus monthly and category summaries</span></button>
+                        <button type="button" data-fmt="pdf" onclick="exSetFormat('pdf')" class="ex-fmt text-left bg-corp-900 border border-corp-600 rounded-lg p-2.5 transition"><span class="block text-sm font-semibold text-gray-100">PDF statement</span><span class="block text-[11px] text-gray-400 leading-snug">Printable, for records or loan papers</span></button>
+                        <button type="button" data-fmt="json" onclick="exSetFormat('json')" class="ex-fmt text-left bg-corp-900 border border-corp-600 rounded-lg p-2.5 transition"><span class="block text-sm font-semibold text-gray-100">JSON</span><span class="block text-[11px] text-gray-400 leading-snug">Full detail, for backup or tools</span></button>
+                    </div>
+                    <label class="flex items-start gap-2 mt-3 text-sm text-gray-200 cursor-pointer"><input type="checkbox" id="ex-balances" checked onchange="exRefresh()" class="mt-1"> <span>Add opening and closing balance for each selected account</span></label>
+                    <p class="text-[11px] text-gray-500 mt-1 ml-6">Balances follow the account view: they are worked back from today's balance using day to day entries. Paid recurring bills and manual balance edits are not rolled back, so treat these as indicative.</p>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-corp-800 bg-corp-800 flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+                <div id="ex-preview" class="flex-1 text-xs text-gray-300 leading-snug" aria-live="polite"></div>
+                <div class="flex gap-3 justify-end">
+                    <button onclick="closeExportCentre()" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition">Cancel</button>
+                    <button id="ex-download" onclick="exDownload()" class="bg-corp-600 hover:bg-corp-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition shadow disabled:opacity-50 disabled:cursor-not-allowed">Download</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1734,12 +1854,25 @@
         }
         function exportAccountTxCSV() {
             if (!acctTxId) return; const acc = accounts.find(a => a.id === acctTxId); if (!acc) return;
-            let txs = transactionsDB.filter(t => t.modeId === acctTxId);
-            if (acctTxMonth !== 'all') txs = txs.filter(t => String(t.date).startsWith(acctTxMonth));
-            txs = txs.sort((a, b) => new Date(a.date) - new Date(b.date));
-            if (!txs.length) { showToast('No transactions to export for this view.', 'info'); return; }
-            const rows = [['Date', 'Type', 'Category', 'Description', 'Amount (INR)', 'Tags']];
-            txs.forEach(t => rows.push([t.date, t.type, t.category, t.desc || '', t.amount, (t.tags || []).join(', ')]));
+            // Same selection as the on screen view: entries paid from this account plus transfers received into it.
+            const allTxs = transactionsDB.filter(t => t.modeId === acctTxId || (t.type === 'transfer' && t.toId === acctTxId));
+            const asc = allTxs.slice().sort((a, b) => new Date(a.date) - new Date(b.date) || a.id - b.id);
+            // Running balance across all time, exactly as the account view works it out.
+            const totalEffect = asc.reduce((s, t) => s + effectOnAccount(t, acc), 0);
+            let running = acc.balance - totalEffect;
+            let withRun = asc.map(t => { running += effectOnAccount(t, acc); return { t, run: running }; });
+            if (acctTxMonth !== 'all') withRun = withRun.filter(x => String(x.t.date).startsWith(acctTxMonth));
+            if (!withRun.length) { showToast('No transactions to export for this view.', 'info'); return; }
+            const nameOf = id => { if (!id) return ''; const a = accounts.find(x => x.id === id); return a ? a.name : 'Unknown'; };
+            const rows = [['Date', 'Type', 'Category', 'Description', 'Amount (INR)', 'Direction', 'From account', 'To account', 'Balance after (INR)', 'Tags']];
+            withRun.forEach(({ t, run }) => {
+                const e = effectOnAccount(t, acc);
+                let from = '', to = '';
+                if (t.type === 'transfer') { from = nameOf(t.fromId); to = nameOf(t.toId); }
+                else if (t.type === 'income') to = acc.name;
+                else from = acc.name;
+                rows.push([t.date, t.type, t.type === 'transfer' ? 'Transfer' : (t.category || ''), t.desc || '', Number(t.amount) || 0, e >= 0 ? 'In' : 'Out', from, to, Math.round(run * 100) / 100, (t.tags || []).join(', ')]);
+            });
             const suffix = acctTxMonth === 'all' ? 'all' : acctTxMonth;
             downloadCSV(`Transactions_${acc.name.replace(/[^a-z0-9]+/gi, '_')}_${suffix}.csv`, rows);
             showToast('Transactions exported.', 'success');
@@ -2347,6 +2480,562 @@
             });
             downloadCSV(`Transactions_${selMonth}.csv`, rows);
             showToast('Transactions exported.', 'success');
+        }
+
+        // ==========================================
+        // EXPORT CENTRE
+        // Exports entries for any period with filters, as CSV, Excel,
+        // a printable PDF statement or JSON. Read only: it never changes
+        // balances, transactions, budgets or anything that is saved.
+        // ==========================================
+        let exFormat = 'csv';
+        let exKeyHandler = null;
+        let exXlsxPromise = null;
+        const EX_ADV = {
+            adv1: { n: 1, from: fy => `${fy}-04-01`, to: fy => `${fy}-06-15`, text: '1 April to 15 June' },
+            adv2: { n: 2, from: fy => `${fy}-06-16`, to: fy => `${fy}-09-15`, text: '16 June to 15 September' },
+            adv3: { n: 3, from: fy => `${fy}-09-16`, to: fy => `${fy}-12-15`, text: '16 September to 15 December' },
+            adv4: { n: 4, from: fy => `${fy}-12-16`, to: fy => `${fy + 1}-03-15`, text: '16 December to 15 March' },
+            adv5: { n: 5, from: fy => `${fy + 1}-03-16`, to: fy => `${fy + 1}-03-31`, text: '16 March to 31 March, after the last instalment' }
+        };
+
+        function exPad(n) { return String(n).padStart(2, '0'); }
+        function exYMD(d) { return d.getFullYear() + '-' + exPad(d.getMonth() + 1) + '-' + exPad(d.getDate()); }
+        function exFYStart(d) { return d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1; }
+        function exFYName(y) { return 'FY ' + y + '/' + exPad((y + 1) % 100); }
+        function exFYTag(y) { return 'FY' + y + '_' + exPad((y + 1) % 100); }
+        function exFmtDate(s) { if (!s) return ''; const p = String(s).slice(0, 10).split('-'); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : String(s); }
+        function exInr(n) { return (Number(n) || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+        function exRound(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+        function exAccName(id) { if (!id) return ''; const a = accounts.find(x => x.id === id); return a ? a.name : 'Unknown'; }
+        function exSafe(s) { return String(s || '').replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, ''); }
+        function exMonthName(d) { return d.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }); }
+        function exAllDates() {
+            const out = [];
+            transactionsDB.forEach(t => { if (t.date) out.push(String(t.date).slice(0, 10)); });
+            recDB.forEach(r => { if (r.date) out.push(String(r.date).slice(0, 10)); });
+            return out.sort();
+        }
+        function exQuarterInfo(s) {
+            const fyq = Math.floor(((s.getMonth() + 9) % 12) / 3) + 1;
+            const fy = exFYStart(s);
+            const e = new Date(s.getFullYear(), s.getMonth() + 3, 0);
+            return {
+                tag: `${exFYTag(fy)}_Q${fyq}`,
+                label: `Q${fyq} of ${exFYName(fy)} (${s.toLocaleDateString('en-IN', { month: 'long' })} to ${exMonthName(e)})`
+            };
+        }
+
+        // Works out the From and To dates for a period choice. Uses a fresh clock so it is right even if the app stayed open overnight.
+        function exPresetRange(preset, fy) {
+            const now = new Date(); const y = now.getFullYear(), m = now.getMonth();
+            const qs = m - (m % 3);
+            if (preset === 'this_month') { const s = new Date(y, m, 1); return { from: exYMD(s), to: exYMD(new Date(y, m + 1, 0)), tag: `${y}_${exPad(m + 1)}`, label: exMonthName(s) }; }
+            if (preset === 'last_month') { const s = new Date(y, m - 1, 1); return { from: exYMD(s), to: exYMD(new Date(y, m, 0)), tag: `${s.getFullYear()}_${exPad(s.getMonth() + 1)}`, label: exMonthName(s) }; }
+            if (preset === 'this_quarter') { const s = new Date(y, qs, 1); const q = exQuarterInfo(s); return { from: exYMD(s), to: exYMD(new Date(y, qs + 3, 0)), tag: q.tag, label: q.label }; }
+            if (preset === 'last_quarter') { const s = new Date(y, qs - 3, 1); const q = exQuarterInfo(s); return { from: exYMD(s), to: exYMD(new Date(y, qs, 0)), tag: q.tag, label: q.label }; }
+            if (preset === 'fy') return { from: `${fy}-04-01`, to: `${fy + 1}-03-31`, tag: exFYTag(fy), label: `${exFYName(fy)} (1 April ${fy} to 31 March ${fy + 1})` };
+            if (EX_ADV[preset]) {
+                const a = EX_ADV[preset];
+                return { from: a.from(fy), to: a.to(fy), tag: `${exFYTag(fy)}_AdvTax_P${a.n}`, label: `Advance tax period ${a.n} of ${exFYName(fy)} (${a.text})` };
+            }
+            if (preset === 'all') {
+                const ds = exAllDates(); const today = exYMD(now);
+                const last = ds.length ? ds[ds.length - 1] : today;
+                return { from: ds[0] || today, to: last > today ? last : today, tag: 'All', label: 'Everything recorded' };
+            }
+            return null;
+        }
+
+        function exCurrentRange() {
+            const preset = document.getElementById('ex-preset').value;
+            const from = document.getElementById('ex-from').value;
+            const to = document.getElementById('ex-to').value;
+            if (preset !== 'custom') {
+                const fy = Number(document.getElementById('ex-fy').value) || exFYStart(new Date());
+                const r = exPresetRange(preset, fy);
+                if (r && r.from === from && r.to === to) return r;
+            }
+            return { from, to, tag: `${String(from).replace(/-/g, '_')}_to_${String(to).replace(/-/g, '_')}`, label: `Custom period, ${exFmtDate(from)} to ${exFmtDate(to)}` };
+        }
+
+        function openExportCentre(opts) {
+            opts = opts || {};
+            const now = new Date(); const curFY = exFYStart(now);
+
+            // Financial years: from the earliest entry up to the current one, newest first.
+            const ds = exAllDates();
+            let firstFY = curFY;
+            if (ds.length) { const p = ds[0].split('-'); const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])); if (!isNaN(d)) firstFY = Math.min(curFY, exFYStart(d)); }
+            const fySel = document.getElementById('ex-fy');
+            let fyOpts = '';
+            for (let y = curFY; y >= firstFY; y--) fyOpts += `<option value="${y}">${exFYName(y)}${y === curFY ? ' (current)' : (y === curFY - 1 ? ' (previous)' : '')}</option>`;
+            fySel.innerHTML = fyOpts; fySel.value = String(curFY);
+
+            // Categories that actually appear in entries and paid recurring bills.
+            const cats = new Set();
+            transactionsDB.forEach(t => { if (t.type !== 'transfer' && t.category) cats.add(t.category); });
+            recDB.forEach(r => { if (r.type) cats.add(r.type); });
+            document.getElementById('ex-category').innerHTML = '<option value="">All categories</option>' + [...cats].sort((a, b) => a.localeCompare(b)).map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+
+            // Accounts, grouped in the same order as the Finance page.
+            const order = SUBTYPE_ORDER_ASSET.concat(SUBTYPE_ORDER_LIAB);
+            const sorted = accounts.slice().sort((a, b) => order.indexOf(a.subtype) - order.indexOf(b.subtype) || String(a.name).localeCompare(String(b.name)));
+            document.getElementById('ex-accounts').innerHTML = sorted.length
+                ? sorted.map(a => `<label class="flex items-center gap-2 bg-corp-900 border border-corp-700 rounded-lg px-2.5 py-1.5 text-sm text-gray-200 cursor-pointer min-w-0"><input type="checkbox" class="ex-acc" value="${esc(a.id)}" ${(!opts.accountId || opts.accountId === a.id) ? 'checked' : ''} onchange="exRefresh()"><span class="truncate">${esc(a.name)}</span><span class="ml-auto text-[10px] text-gray-500 shrink-0">${esc(SUBTYPE_SINGULAR[a.subtype] || '')}</span></label>`).join('')
+                : '<div class="text-xs text-gray-500 italic">No accounts yet.</div>';
+
+            // Default period: the current financial year when opened from an account, else this month.
+            document.getElementById('ex-preset').value = opts.preset || (opts.accountId ? 'fy' : 'this_month');
+            exOnPreset();
+            exSetFormat(exFormat);
+
+            document.getElementById('export-modal').classList.remove('hidden');
+            if (!exKeyHandler) { exKeyHandler = e => { if (e.key === 'Escape') closeExportCentre(); }; document.addEventListener('keydown', exKeyHandler); }
+            setTimeout(() => { const p = document.getElementById('ex-preset'); if (p) p.focus(); }, 30);
+        }
+
+        function closeExportCentre() {
+            document.getElementById('export-modal').classList.add('hidden');
+            if (exKeyHandler) { document.removeEventListener('keydown', exKeyHandler); exKeyHandler = null; }
+        }
+
+        function exOnPreset() {
+            const preset = document.getElementById('ex-preset').value;
+            const fySel = document.getElementById('ex-fy');
+            fySel.classList.toggle('hidden', !(preset === 'fy' || EX_ADV[preset]));
+            if (preset === 'custom') {
+                const f = document.getElementById('ex-from'), t = document.getElementById('ex-to');
+                if (!f.value || !t.value) { const r = exPresetRange('this_month'); f.value = r.from; t.value = r.to; }
+            } else {
+                const r = exPresetRange(preset, Number(fySel.value) || exFYStart(new Date()));
+                if (r) { document.getElementById('ex-from').value = r.from; document.getElementById('ex-to').value = r.to; }
+            }
+            exRefresh();
+        }
+
+        function exOnCustomDate() {
+            document.getElementById('ex-preset').value = 'custom';
+            document.getElementById('ex-fy').classList.add('hidden');
+            exRefresh();
+        }
+
+        function exSetFormat(fmt) {
+            exFormat = fmt;
+            document.querySelectorAll('#ex-formats .ex-fmt').forEach(b => {
+                const on = b.getAttribute('data-fmt') === fmt;
+                b.classList.toggle('border-corp-400', on); b.classList.toggle('bg-corp-700', on);
+                b.classList.toggle('border-corp-600', !on); b.classList.toggle('bg-corp-900', !on);
+                b.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+            const btn = document.getElementById('ex-download');
+            if (btn) btn.textContent = { csv: 'Download CSV', xlsx: 'Download Excel', pdf: 'Open PDF statement', json: 'Download JSON' }[fmt] || 'Download';
+        }
+
+        function exToggleAllAccounts() {
+            const boxes = [...document.querySelectorAll('#ex-accounts .ex-acc')];
+            const allOn = boxes.length && boxes.every(b => b.checked);
+            boxes.forEach(b => { b.checked = !allOn; });
+            exRefresh();
+        }
+
+        function exFilters() {
+            const boxes = [...document.querySelectorAll('#ex-accounts .ex-acc')];
+            const chosen = boxes.filter(b => b.checked).map(b => b.value);
+            const min = parseFloat(document.getElementById('ex-min').value);
+            const max = parseFloat(document.getElementById('ex-max').value);
+            return {
+                types: { expense: document.getElementById('ex-t-expense').checked, income: document.getElementById('ex-t-income').checked, transfer: document.getElementById('ex-t-transfer').checked },
+                includeRec: document.getElementById('ex-t-rec').checked,
+                category: document.getElementById('ex-category').value,
+                tags: document.getElementById('ex-tags').value.split(',').map(s => s.trim().toLowerCase()).filter(Boolean),
+                min: isNaN(min) ? null : min,
+                max: isNaN(max) ? null : max,
+                // When every account is ticked there is no account filter, so entries on removed accounts are kept too.
+                accSet: (boxes.length && chosen.length === boxes.length) ? null : new Set(chosen),
+                accCount: chosen.length,
+                accTotal: boxes.length,
+                chosenIds: chosen,
+                balances: document.getElementById('ex-balances').checked
+            };
+        }
+
+        function exTagsMatch(entryTags, wanted) {
+            if (!wanted.length) return true;
+            const have = (entryTags || []).map(t => String(t).trim().toLowerCase());
+            return wanted.some(w => have.includes(w));
+        }
+
+        function exCollect() {
+            const range = exCurrentRange();
+            const f = exFilters();
+            const rows = []; const rawTx = []; const rawRec = [];
+            const totals = { income: 0, expense: 0, transfer: 0, rec: 0, count: 0 };
+            if (!range.from || !range.to || range.from > range.to) return { range, f, rows, rawTx, rawRec, totals, invalid: true };
+            const inRange = d => { const s = String(d || '').slice(0, 10); return s && s >= range.from && s <= range.to; };
+            const amtOk = a => (f.min == null || a >= f.min) && (f.max == null || a <= f.max);
+
+            transactionsDB.forEach(t => {
+                if (!inRange(t.date)) return;
+                if (!f.types[t.type]) return;
+                if (f.accSet) {
+                    if (t.type === 'transfer') { if (!f.accSet.has(t.fromId) && !f.accSet.has(t.toId)) return; }
+                    else if (!f.accSet.has(t.modeId)) return;
+                }
+                if (f.category && (t.type === 'transfer' || (t.category || '') !== f.category)) return;
+                if (!exTagsMatch(t.tags, f.tags)) return;
+                const amt = Number(t.amount) || 0;
+                if (!amtOk(amt)) return;
+                let from = '', to = '';
+                if (t.type === 'transfer') { from = exAccName(t.fromId); to = exAccName(t.toId); }
+                else if (t.type === 'income') to = exAccName(t.modeId);
+                else from = exAccName(t.modeId);
+                rows.push({
+                    date: String(t.date).slice(0, 10), sortId: Number(t.id) || 0,
+                    type: t.type === 'transfer' ? 'Transfer' : (t.type === 'income' ? 'Income' : 'Expense'),
+                    kind: t.type, category: t.type === 'transfer' ? 'Transfer' : (t.category || 'Uncategorised'),
+                    desc: t.desc || '', amount: amt, from, to, tags: (t.tags || []).join(', ')
+                });
+                rawTx.push(t);
+                if (t.type === 'income') totals.income += amt; else if (t.type === 'transfer') totals.transfer += amt; else totals.expense += amt;
+            });
+
+            if (f.includeRec) {
+                recDB.forEach(r => {
+                    if (!r.done || !inRange(r.date)) return;
+                    if (f.accSet && !f.accSet.has(r.modeId) && !(r.destId && f.accSet.has(r.destId))) return;
+                    if (f.category && (r.type || '') !== f.category) return;
+                    if (!exTagsMatch(r.tags, f.tags)) return;
+                    const amt = Number(r.amount) || 0;
+                    if (!amtOk(amt)) return;
+                    let to = '';
+                    if (r.type === 'Investments' && r.destId) to = exAccName(r.destId);
+                    else if (r.type === 'Credit card') { const cc = accounts.find(a => a.name === r.name); if (cc) to = cc.name; }
+                    rows.push({
+                        date: String(r.date).slice(0, 10), sortId: Number(r.id) || 0,
+                        type: 'Recurring bill', kind: 'recurring', category: r.type || 'Other',
+                        desc: r.name || '', amount: amt, from: exAccName(r.modeId), to, tags: (r.tags || []).join(', ')
+                    });
+                    rawRec.push(r);
+                    totals.rec += amt;
+                });
+            }
+
+            rows.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.sortId - b.sortId));
+            totals.count = rows.length;
+            return { range, f, rows, rawTx, rawRec, totals, invalid: false };
+        }
+
+        // Opening and closing balance per account, worked back from today's balance on the same basis as the account view.
+        function exBalances(range, f) {
+            const list = f.accSet ? accounts.filter(a => f.accSet.has(a.id)) : accounts.slice();
+            const order = SUBTYPE_ORDER_ASSET.concat(SUBTYPE_ORDER_LIAB);
+            list.sort((a, b) => order.indexOf(a.subtype) - order.indexOf(b.subtype) || String(a.name).localeCompare(String(b.name)));
+            return list.map(acc => {
+                let after = 0, increase = 0, decrease = 0;
+                transactionsDB.forEach(t => {
+                    if (!t.date) return;
+                    if (!(t.modeId === acc.id || (t.type === 'transfer' && t.toId === acc.id))) return;
+                    const d = String(t.date).slice(0, 10);
+                    const e = effectOnAccount(t, acc);
+                    if (d > range.to) after += e;
+                    else if (d >= range.from) { if (e >= 0) increase += e; else decrease += -e; }
+                });
+                const closing = (Number(acc.balance) || 0) - after;
+                const opening = closing - (increase - decrease);
+                return { name: acc.name, group: SUBTYPE_SINGULAR[acc.subtype] || '', opening: exRound(opening), increase: exRound(increase), decrease: exRound(decrease), closing: exRound(closing) };
+            });
+        }
+
+        function exRefresh() {
+            const toggle = document.getElementById('ex-acc-toggle');
+            const boxes = [...document.querySelectorAll('#ex-accounts .ex-acc')];
+            if (toggle) toggle.textContent = (boxes.length && boxes.every(b => b.checked)) ? 'Clear all' : 'Select all';
+
+            const data = exCollect();
+            const lbl = document.getElementById('ex-period-label');
+            const prev = document.getElementById('ex-preview');
+            const btn = document.getElementById('ex-download');
+            if (data.invalid) {
+                lbl.textContent = 'The From date must be on or before the To date.';
+                prev.textContent = 'Fix the period to see what will be exported.';
+                btn.disabled = true; return;
+            }
+            lbl.textContent = data.range.label;
+            const t = data.totals;
+            if (!t.count) {
+                prev.textContent = 'Nothing matches this period and these filters. Widen the period or tick more entry types.';
+                btn.disabled = true; return;
+            }
+            let txt = `${t.count} ${t.count === 1 ? 'entry' : 'entries'} will be exported. Income ₹${formatMoney(t.income)}, expenses ₹${formatMoney(t.expense)}`;
+            if (data.f.types.transfer) txt += `, transfers ₹${formatMoney(t.transfer)}`;
+            if (data.f.includeRec) txt += `, recurring bills ₹${formatMoney(t.rec)}`;
+            prev.textContent = txt + '.';
+            btn.disabled = false;
+        }
+
+        function exFileName(data, ext) {
+            const f = data.f;
+            let accPart = 'AllAccounts';
+            if (f.accSet) accPart = f.accCount === 1 ? (exSafe(exAccName(f.chosenIds[0])) || 'Account') : `${f.accCount}Accounts`;
+            return `RishabOS_Transactions_${data.range.tag}_${accPart}.${ext}`;
+        }
+
+        function exFilterSummary(f) {
+            const parts = [];
+            const types = []; if (f.types.expense) types.push('expenses'); if (f.types.income) types.push('income'); if (f.types.transfer) types.push('transfers'); if (f.includeRec) types.push('paid recurring bills');
+            parts.push('Entry types: ' + (types.join(', ') || 'none'));
+            parts.push('Accounts: ' + (f.accSet ? (f.chosenIds.map(exAccName).join(', ') || 'none') : 'all'));
+            if (f.category) parts.push('Category: ' + f.category);
+            if (f.tags.length) parts.push('Tags: ' + f.tags.join(', '));
+            if (f.min != null) parts.push('Minimum ₹' + exInr(f.min));
+            if (f.max != null) parts.push('Maximum ₹' + exInr(f.max));
+            return parts;
+        }
+
+        function exNetCash(t) { return exRound(t.income - t.expense - t.rec); }
+
+        function exDownloadBlob(filename, blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+        }
+
+        async function exDownload() {
+            const data = exCollect();
+            if (data.invalid || !data.totals.count) { exRefresh(); return; }
+            const btn = document.getElementById('ex-download');
+            const label = btn.textContent;
+            try {
+                btn.disabled = true;
+                if (exFormat === 'csv') exBuildCSV(data);
+                else if (exFormat === 'xlsx') { btn.textContent = 'Preparing Excel...'; await exBuildXLSX(data); }
+                else if (exFormat === 'pdf') exBuildPDF(data);
+                else if (exFormat === 'json') exBuildJSON(data);
+            } catch (e) {
+                console.error('Export failed', e);
+                showToast(exFormat === 'xlsx' ? 'Excel export could not load. Check your internet connection, or choose CSV, which works offline.' : 'Export failed. Please try again.', 'warning');
+            } finally {
+                btn.textContent = label; btn.disabled = false;
+            }
+        }
+
+        const EX_HEAD = ['Date', 'Type', 'Category', 'Description', 'Amount (INR)', 'From account', 'To account', 'Tags'];
+        function exRowArray(r) { return [r.date, r.type, r.category, r.desc, exRound(r.amount), r.from, r.to, r.tags]; }
+
+        function exBuildCSV(data) {
+            const out = [EX_HEAD];
+            data.rows.forEach(r => out.push(exRowArray(r)));
+            const t = data.totals;
+            out.push([]);
+            out.push(['Summary']);
+            out.push(['Period', data.range.label]);
+            out.push(['From', data.range.from]);
+            out.push(['To', data.range.to]);
+            out.push(['Entries', t.count]);
+            out.push(['Total income (INR)', exRound(t.income)]);
+            out.push(['Total expenses (INR)', exRound(t.expense)]);
+            if (data.f.includeRec) out.push(['Paid recurring bills (INR)', exRound(t.rec)]);
+            if (data.f.types.transfer) out.push(['Transfers between own accounts (INR)', exRound(t.transfer)]);
+            out.push(['Net cash flow (INR)', exNetCash(t)]);
+            exFilterSummary(data.f).forEach(p => out.push(['Filter', p]));
+            if (data.f.balances) {
+                out.push([]);
+                out.push(['Account balances (worked back from current balance, day to day entries only)']);
+                out.push(['Account', 'Account type', 'Opening balance (INR)', 'Increase in balance (INR)', 'Decrease in balance (INR)', 'Closing balance (INR)']);
+                exBalances(data.range, data.f).forEach(b => out.push([b.name, b.group, b.opening, b.increase, b.decrease, b.closing]));
+            }
+            const name = exFileName(data, 'csv');
+            downloadCSV(name, out);
+            showToast(`Exported ${t.count} ${t.count === 1 ? 'entry' : 'entries'} to ${name}.`, 'success');
+        }
+
+        function exLoadXlsx() {
+            if (window.XLSX) return Promise.resolve(window.XLSX);
+            if (exXlsxPromise) return exXlsxPromise;
+            exXlsxPromise = new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+                s.onload = () => window.XLSX ? resolve(window.XLSX) : reject(new Error('Excel library missing'));
+                s.onerror = () => { exXlsxPromise = null; reject(new Error('Excel library failed to load')); };
+                document.head.appendChild(s);
+            });
+            return exXlsxPromise;
+        }
+
+        // Applies a money format to every number cell below the header row.
+        function exSheetMoney(X, ws, firstDataRow) {
+            if (!ws['!ref']) return;
+            const rng = X.utils.decode_range(ws['!ref']);
+            for (let R = firstDataRow; R <= rng.e.r; R++) {
+                for (let C = rng.s.c; C <= rng.e.c; C++) {
+                    const cell = ws[X.utils.encode_cell({ r: R, c: C })];
+                    if (cell && cell.t === 'n') cell.z = '#,##0.00';
+                }
+            }
+        }
+
+        async function exBuildXLSX(data) {
+            const X = await exLoadXlsx();
+            const wb = X.utils.book_new();
+            const t = data.totals;
+            const txCols = [{ wch: 11 }, { wch: 14 }, { wch: 18 }, { wch: 32 }, { wch: 14 }, { wch: 20 }, { wch: 20 }, { wch: 22 }];
+
+            // Sheet 1: every entry.
+            const ws1 = X.utils.aoa_to_sheet([EX_HEAD].concat(data.rows.map(exRowArray)));
+            ws1['!cols'] = txCols; exSheetMoney(X, ws1, 1);
+            X.utils.book_append_sheet(wb, ws1, 'Transactions');
+
+            // Sheet 2: month by month summary.
+            const months = {};
+            data.rows.forEach(r => {
+                const k = r.date.slice(0, 7);
+                const m = months[k] || (months[k] = { income: 0, expense: 0, rec: 0, transfer: 0, count: 0 });
+                m.count++;
+                if (r.kind === 'income') m.income += r.amount; else if (r.kind === 'transfer') m.transfer += r.amount; else if (r.kind === 'recurring') m.rec += r.amount; else m.expense += r.amount;
+            });
+            const mKeys = Object.keys(months).sort();
+            const mAoa = [['Month', 'Entries', 'Income (INR)', 'Expenses (INR)', 'Paid recurring bills (INR)', 'Net cash flow (INR)', 'Transfers (INR)']];
+            mKeys.forEach(k => { const m = months[k]; mAoa.push([monthLabelFromStr(k), m.count, exRound(m.income), exRound(m.expense), exRound(m.rec), exRound(m.income - m.expense - m.rec), exRound(m.transfer)]); });
+            mAoa.push(['Total', t.count, exRound(t.income), exRound(t.expense), exRound(t.rec), exNetCash(t), exRound(t.transfer)]);
+            const ws2 = X.utils.aoa_to_sheet(mAoa);
+            ws2['!cols'] = [{ wch: 18 }, { wch: 9 }, { wch: 15 }, { wch: 15 }, { wch: 22 }, { wch: 18 }, { wch: 15 }];
+            exSheetMoney(X, ws2, 1);
+            X.utils.book_append_sheet(wb, ws2, 'Monthly summary');
+
+            // Sheet 3: spending by category, including paid recurring bills when ticked.
+            const cats = {};
+            data.rows.forEach(r => { if (r.kind === 'expense' || r.kind === 'recurring') { cats[r.category] = (cats[r.category] || 0) + r.amount; } });
+            const catTotal = Object.values(cats).reduce((s, v) => s + v, 0);
+            const cAoa = [['Category', 'Amount (INR)', 'Share of spending (%)']];
+            Object.keys(cats).sort((a, b) => cats[b] - cats[a]).forEach(c => cAoa.push([c, exRound(cats[c]), catTotal ? Math.round(cats[c] / catTotal * 1000) / 10 : 0]));
+            cAoa.push(['Total', exRound(catTotal), catTotal ? 100 : 0]);
+            const ws3 = X.utils.aoa_to_sheet(cAoa);
+            ws3['!cols'] = [{ wch: 22 }, { wch: 15 }, { wch: 20 }];
+            exSheetMoney(X, ws3, 1);
+            X.utils.book_append_sheet(wb, ws3, 'By category');
+
+            // Sheet 4: account balances.
+            if (data.f.balances) {
+                const bAoa = [['Account', 'Account type', 'Opening balance (INR)', 'Increase in balance (INR)', 'Decrease in balance (INR)', 'Closing balance (INR)']];
+                exBalances(data.range, data.f).forEach(b => bAoa.push([b.name, b.group, b.opening, b.increase, b.decrease, b.closing]));
+                bAoa.push([]);
+                bAoa.push(['Balances are worked back from the current balance using day to day entries only. For credit cards and loans, an increase means more is owed. Paid recurring bills and manual balance edits are not rolled back.']);
+                const ws4 = X.utils.aoa_to_sheet(bAoa);
+                ws4['!cols'] = [{ wch: 24 }, { wch: 16 }, { wch: 20 }, { wch: 16 }, { wch: 16 }, { wch: 20 }];
+                exSheetMoney(X, ws4, 1);
+                X.utils.book_append_sheet(wb, ws4, 'Account balances');
+            }
+
+            // One sheet per month when the period spans 2 to 24 months.
+            if (mKeys.length >= 2 && mKeys.length <= 24) {
+                mKeys.forEach(k => {
+                    const ws = X.utils.aoa_to_sheet([EX_HEAD].concat(data.rows.filter(r => r.date.startsWith(k)).map(exRowArray)));
+                    ws['!cols'] = txCols; exSheetMoney(X, ws, 1);
+                    const p = k.split('-'); const nm = new Date(Number(p[0]), Number(p[1]) - 1, 1).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+                    X.utils.book_append_sheet(wb, ws, nm.slice(0, 31));
+                });
+            }
+
+            // Last sheet: what this file contains.
+            const info = [['Rishab OS transaction export'], ['Period', data.range.label], ['From', data.range.from], ['To', data.range.to], ['Exported on', new Date().toLocaleString('en-IN')]];
+            exFilterSummary(data.f).forEach(p => info.push(['Filter', p]));
+            const ws5 = X.utils.aoa_to_sheet(info); ws5['!cols'] = [{ wch: 14 }, { wch: 70 }];
+            X.utils.book_append_sheet(wb, ws5, 'About this export');
+
+            const name = exFileName(data, 'xlsx');
+            X.writeFile(wb, name);
+            showToast(`Exported ${t.count} ${t.count === 1 ? 'entry' : 'entries'} to ${name}.`, 'success');
+        }
+
+        function exBuildPDF(data) {
+            const t = data.totals;
+            const name = exFileName(data, 'pdf').replace(/\.pdf$/, '');
+            let owner = '';
+            try { owner = typeof displayName === 'function' ? (displayName() || '') : ''; } catch (e) { owner = ''; }
+            const balRows = data.f.balances ? exBalances(data.range, data.f) : [];
+            const txRows = data.rows.map(r => `<tr><td class="nw">${exFmtDate(r.date)}</td><td>${esc(r.desc || r.category)}${r.desc && r.category ? `<div class="sub">${esc(r.category)}</div>` : ''}</td><td>${esc(r.type)}</td><td>${esc(r.from)}</td><td>${esc(r.to)}</td><td class="num ${r.kind === 'income' ? 'pos' : (r.kind === 'transfer' ? '' : 'neg')}">${exInr(r.amount)}</td></tr>`).join('');
+            const summary = [['Income', t.income, 'pos'], ['Expenses', t.expense, 'neg']];
+            if (data.f.includeRec) summary.push(['Paid recurring bills', t.rec, 'neg']);
+            summary.push(['Net cash flow', exNetCash(t), exNetCash(t) >= 0 ? 'pos' : 'neg']);
+            if (data.f.types.transfer) summary.push(['Transfers between own accounts', t.transfer, '']);
+            const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(name)}</title>
+<style>
+  @page { size: A4; margin: 14mm 12mm; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1b2433; font-size: 11px; margin: 0; padding: 18px; background: #fff; }
+  .bar { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 14px; }
+  .bar button { font: inherit; font-size: 13px; padding: 8px 14px; border-radius: 8px; border: 1px solid #2f569c; background: #2f569c; color: #fff; cursor: pointer; }
+  .bar button.alt { background: #fff; color: #2f569c; }
+  header { border-bottom: 2px solid #0a1128; padding-bottom: 10px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+  h1 { font-size: 20px; margin: 0 0 2px; color: #0a1128; }
+  .muted { color: #5b6678; }
+  .sub { color: #6b7587; font-size: 10px; }
+  h2 { font-size: 13px; margin: 18px 0 6px; color: #0a1128; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-weight: 600; background: #eef2f8; color: #22304a; padding: 6px; border-bottom: 1px solid #c9d3e3; }
+  td { padding: 5px 6px; border-bottom: 1px solid #e6eaf1; vertical-align: top; }
+  tr { page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .nw { white-space: nowrap; }
+  .pos { color: #13804a; } .neg { color: #b42318; }
+  .sum td { font-size: 12px; } .sum td:first-child { color: #3d4859; }
+  .filters { margin: 0; padding-left: 16px; color: #3d4859; }
+  .note { margin-top: 16px; font-size: 9.5px; color: #6b7587; }
+  @media print { .bar { display: none; } body { padding: 0; } }
+</style></head><body>
+<div class="bar"><button class="alt" onclick="window.close()">Close</button><button onclick="window.print()">Print or save as PDF</button></div>
+<header><div><h1>Transaction statement</h1><div class="muted">${esc(data.range.label)}</div><div class="muted">${exFmtDate(data.range.from)} to ${exFmtDate(data.range.to)}</div></div>
+<div class="muted" style="text-align:right">${owner ? esc(owner) + '<br>' : ''}Generated ${esc(new Date().toLocaleString('en-IN'))}<br>Rishab OS</div></header>
+<h2>Summary</h2>
+<table class="sum"><tbody>${summary.map(s => `<tr><td>${esc(s[0])}</td><td class="num ${s[2]}">₹ ${exInr(s[1])}</td></tr>`).join('')}<tr><td>Entries</td><td class="num">${t.count}</td></tr></tbody></table>
+<h2>Filters applied</h2><ul class="filters">${exFilterSummary(data.f).map(p => `<li>${esc(p)}</li>`).join('')}</ul>
+${balRows.length ? `<h2>Account balances</h2><table><thead><tr><th>Account</th><th>Type</th><th class="num">Opening (₹)</th><th class="num">Increase (₹)</th><th class="num">Decrease (₹)</th><th class="num">Closing (₹)</th></tr></thead><tbody>${balRows.map(b => `<tr><td>${esc(b.name)}</td><td>${esc(b.group)}</td><td class="num">${exInr(b.opening)}</td><td class="num pos">${exInr(b.increase)}</td><td class="num neg">${exInr(b.decrease)}</td><td class="num">${exInr(b.closing)}</td></tr>`).join('')}</tbody></table>` : ''}
+<h2>Entries</h2>
+<table><thead><tr><th>Date</th><th>Particulars</th><th>Type</th><th>From</th><th>To</th><th class="num">Amount (₹)</th></tr></thead><tbody>${txRows}</tbody></table>
+<p class="note">${balRows.length ? 'Account balances are worked back from the current balance using day to day entries only. Paid recurring bills and manual balance edits are not rolled back, so these balances are indicative. ' : ''}Transfers move money between your own accounts and are not counted as income or expense.</p>
+</body></html>`;
+
+            const w = window.open('', '_blank');
+            if (w) {
+                w.document.open(); w.document.write(html); w.document.close();
+                w.focus();
+                setTimeout(() => { try { w.print(); } catch (e) { /* the on page button still works */ } }, 500);
+                showToast('Statement opened. Choose Save as PDF in the print dialog.', 'success');
+                return;
+            }
+            // Pop ups blocked: print through a hidden frame instead.
+            const frame = document.createElement('iframe');
+            frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+            document.body.appendChild(frame);
+            const doc = frame.contentWindow.document;
+            doc.open(); doc.write(html); doc.close();
+            setTimeout(() => {
+                try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e) { showToast('Allow pop ups for this site to open the PDF statement.', 'warning'); }
+                setTimeout(() => frame.remove(), 60000);
+            }, 500);
+            showToast('Choose Save as PDF in the print dialog.', 'info');
+        }
+
+        function exBuildJSON(data) {
+            const t = data.totals;
+            const payload = {
+                app: 'Rishab OS',
+                exportType: 'transactions',
+                exportedAt: new Date().toISOString(),
+                period: { label: data.range.label, from: data.range.from, to: data.range.to },
+                filters: exFilterSummary(data.f),
+                summary: { entries: t.count, income: exRound(t.income), expenses: exRound(t.expense), paidRecurringBills: exRound(t.rec), transfers: exRound(t.transfer), netCashFlow: exNetCash(t) },
+                accountBalances: data.f.balances ? exBalances(data.range, data.f) : undefined,
+                entries: data.rows.map(r => ({ date: r.date, type: r.type, category: r.category, description: r.desc, amount: exRound(r.amount), fromAccount: r.from, toAccount: r.to, tags: r.tags })),
+                raw: { transactions: data.rawTx, recurringBills: data.rawRec }
+            };
+            const name = exFileName(data, 'json');
+            exDownloadBlob(name, new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
+            showToast(`Exported ${t.count} ${t.count === 1 ? 'entry' : 'entries'} to ${name}.`, 'success');
         }
 
         // ==========================================
